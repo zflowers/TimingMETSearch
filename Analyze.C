@@ -1,3 +1,9 @@
+/* ----------------------------------------------------------------------------
+Author: Zach Flowers
+Description:  Combines the output histograms from the jet files
+Date: April 23rd 2018
+* ---------------------------------------------------------------------------- */
+
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -14,8 +20,8 @@ void Analyze()
     bool high=true;
     //bool high=false;
     
-    TFile *f1 = new TFile("output.root", "READ");
-    
+    TFile *f1 = new TFile("output.root", "READ"); //open the root file with the histograms
+    //Make a Canvas and pad for the PT histograms
     TCanvas *c1 = new TCanvas("Merged_PT_hist", "Canvas for Merged PT Hist", 800, 800);
     
     TPad *pad1 = new TPad("pad1","pad1",0,0.3,1,1.0);
@@ -23,7 +29,8 @@ void Analyze()
     //pad1->SetLogy();
     pad1->Draw();
     pad1->cd();
-
+    
+    //Get the histograms for merging from the root file
     TH1F* h1_PT = (TH1F*)f1->Get("hist_PT_n2n2");
     TH1F* h2_PT = (TH1F*)f1->Get("hist_PT_n2n2j");
     TH1F* h3_PT = (TH1F*)f1->Get("hist_PT_n2n2jj");
@@ -45,6 +52,8 @@ void Analyze()
     h2_PT->SetStats(false);
     h3_PT->SetStats(false);
     
+    //Make histograms for the ratio plots
+    
     TH1F* h1_res_PT = (TH1F*)h1_PT->Clone("h1_res_PT");
     TH1F* h2_res_PT = (TH1F*)h2_PT->Clone("h2_res_PT");
     TH1F* h3_res_PT = (TH1F*)h3_PT->Clone("h3_res_PT");
@@ -53,14 +62,17 @@ void Analyze()
     h2_res_PT->SetDirectory(0);
     h3_res_PT->SetDirectory(0);
     
+    //Divide by the histogram with 1 jet
     h1_res_PT->Divide(h2_PT);
     h2_res_PT->Divide(h2_PT);
     h3_res_PT->Divide(h2_PT);
     
+    //Turn off the stats box
     h1_res_PT->SetStats(false);
     h2_res_PT->SetStats(false);
     h3_res_PT->SetStats(false);
     
+    //Create a legend for the combined histograms
     TLegend* leg_PT = new TLegend(0.7,0.7,.9,.9, "");
     leg_PT->SetTextFont(42);
     leg_PT->SetTextSize(0.04);
@@ -74,6 +86,7 @@ void Analyze()
     h3_PT->Draw("SAME");
     leg_PT->Draw("SAME");
     
+    //Make the pad for the residuals
     c1->cd();
     TPad *pad2 = new TPad("pad2", "pad2", 0, 0.05, 1, 0.3);
     pad2->Draw();
@@ -87,10 +100,13 @@ void Analyze()
         h2_res_PT->GetYaxis()->SetRangeUser(0.0,8.0);
         h3_res_PT->GetYaxis()->SetRangeUser(0.0,8.0);
     }
+    //Draw the residuals
     h1_res_PT->Draw();
     h2_res_PT->Draw("SAME");
     h3_res_PT->Draw("SAME");
     pad2->Update();
+    
+    //Save the outputs
     if(high==true)
     {
         c1->SaveAs("PTResidual_Truncated_highPT.pdf");
@@ -99,11 +115,11 @@ void Analyze()
     {
         c1->SaveAs("PTResidual.pdf");
     }
-        
+    //Same setup as before but now on a log scale
     TCanvas *c2 = new TCanvas("Merged_PT_histLOG", "Canvas for Merged PT HistLOG", 800, 800);
     TPad *pad3 = new TPad("pad3","pad3",0,0.3,1,1.0);
     pad3->SetBottomMargin(0.07);
-    pad3->SetLogy();
+    pad3->SetLogy(); //Change to Log scale
     pad3->Draw();
     pad3->cd();
     
@@ -406,11 +422,3 @@ void Analyze()
     
     f1->Close();
 }
-
-/*TPaveStats *stats =(TPaveStats*)c1->GetPrimitive("stats");
- stats->SetName("h1stats");
- stats->SetY1NDC(.8);
- stats->SetY2NDC(1.0);
- stats->SetX1NDC(0.6);
- stats->SetX2NDC(0.8);
- stats->SetTextColor(kRed);*/
