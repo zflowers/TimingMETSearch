@@ -62,7 +62,7 @@ void Analyze()
     h2_res_PT->SetDirectory(0);
     h3_res_PT->SetDirectory(0);
     
-    //Divide by the histogram with 1 jet
+    //Divide each histogram by the histogram with 1 jet
     h1_res_PT->Divide(h2_PT);
     h2_res_PT->Divide(h2_PT);
     h3_res_PT->Divide(h2_PT);
@@ -420,5 +420,5 @@ void Analyze()
     pad16->Update();
     c8->SaveAs("MassResidualLOG.pdf");
     
-    f1->Close();
+    f1->Close(); //close the TFile
 }

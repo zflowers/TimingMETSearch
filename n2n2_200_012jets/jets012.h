@@ -2,11 +2,11 @@
 // This class has been automatically generated on
 // Mon Mar  5 13:27:38 2018 by ROOT version 6.10/08
 // from TTree LHEF/Analysis tree
-// found on file: n2n2_200_jets.root
+// found on file: n2n2_200_jets012.root
 //////////////////////////////////////////////////////////
 
-#ifndef jets_h
-#define jets_h
+#ifndef jets012_h
+#define jets012_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -16,7 +16,7 @@
 #include "TClonesArray.h"
 #include "TObject.h"
 
-class jets {
+class jets012 {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -104,8 +104,8 @@ public :
    TBranch        *b_Particle_Spin;   //!
    TBranch        *b_Particle_size;   //!
 
-   jets(TTree *tree=0);
-   virtual ~jets();
+   jets012(TTree *tree=0);
+   virtual ~jets012();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -117,15 +117,15 @@ public :
 
 #endif
 
-#ifdef jets_cxx
-jets::jets(TTree *tree) : fChain(0) 
+#ifdef jets012_cxx
+jets012::jets012(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("n2n2_200_jets.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("n2n2_200_jets012.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("n2n2_200_jets.root");
+         f = new TFile("n2n2_200_jets012.root");
       }
       f->GetObject("LHEF",tree);
 
@@ -133,19 +133,19 @@ jets::jets(TTree *tree) : fChain(0)
    Init(tree);
 }
 
-jets::~jets()
+jets012::~jets012()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t jets::GetEntry(Long64_t entry)
+Int_t jets012::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t jets::LoadTree(Long64_t entry)
+Long64_t jets012::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -158,7 +158,7 @@ Long64_t jets::LoadTree(Long64_t entry)
    return centry;
 }
 
-void jets::Init(TTree *tree)
+void jets012::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -214,7 +214,7 @@ void jets::Init(TTree *tree)
    Notify();
 }
 
-Bool_t jets::Notify()
+Bool_t jets012::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -225,18 +225,18 @@ Bool_t jets::Notify()
    return kTRUE;
 }
 
-void jets::Show(Long64_t entry)
+void jets012::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t jets::Cut(Long64_t entry)
+Int_t jets012::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef jets_cxx
+#endif // #ifdef jets012_cxx

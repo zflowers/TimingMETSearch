@@ -1,10 +1,10 @@
-#define jets_cxx
-#include "jets.h"
+#define jets012_cxx
+#include "jets012.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
 
-void jets::Loop()
+void jets012::Loop()
 {
    if (fChain == 0) return;
 
