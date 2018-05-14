@@ -1,3 +1,4 @@
+<<<<<<< HEAD:n2n2_200_012jets/jets012.C
 /* ----------------------------------------------------------------------------
  Author: Zach Flowers
  Description:  Adds the 012 jet histograms to the output root file
