@@ -59,8 +59,8 @@ void jets012::Loop()
     //hist_Rapidity_n2n2jj->GetYaxis()->SetRangeUser(0.0,Rapidityyaxis);
     //hist_Mass_n2n2jj->GetYaxis()->SetRangeUser(0.0,Massyaxis);
     
-    TLorentzVector n2A; //TLV for the first neutrilino in the event
-    TLorentzVector n2B; //TLV for the second neutrilino in the event
+    TLorentzVector n2A; //TLV for the first neutralino in the event
+    TLorentzVector n2B; //TLV for the second neutralino in the event
     TLorentzVector n2; //Dummy TLV for summing the TLV of the neutralino TLVs
                         // Useful for getting vectorial sums of particles
     bool n2check=true; //boolean for checking if the first neutralino in an event has been identified
@@ -83,7 +83,7 @@ void jets012::Loop()
            }
        }
        n2check=true; //reset the boolean checker
-       n2=n2A+n2B; //sum the neutrilinos in the event
+       n2=n2A+n2B; //sum the neutralinos in the event
        //fill histograms
        hist_PT_n2n2jj->Fill(n2.Pt());
        hist_Eta_n2n2jj->Fill(n2.Eta());
