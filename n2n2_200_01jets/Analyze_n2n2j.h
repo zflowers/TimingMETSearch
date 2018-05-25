@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon May 14 09:45:52 2018 by ROOT version 6.10/08
+// Fri May 25 10:44:12 2018 by ROOT version 6.10/08
 // from TTree n2n2j/Output
 // found on file: n2n2j_output.root
 //////////////////////////////////////////////////////////
@@ -50,10 +50,16 @@ public :
    TLorentzVector  *n2B_MC;
    TLorentzVector  *n1A_MC;
    TLorentzVector  *n1B_MC;
-   TLorentzVector  *lA_MC;
-   TLorentzVector  *lB_MC;
-   TLorentzVector  *lC_MC;
-   TLorentzVector  *lD_MC;
+   vector<double>  *Electron_MC_PT;
+   vector<double>  *Electron_MC_Eta;
+   vector<double>  *Electron_MC_Phi;
+   vector<double>  *Electron_MC_E;
+   Int_t           Electron_MC_Size;
+   vector<double>  *Muon_MC_PT;
+   vector<double>  *Muon_MC_Eta;
+   vector<double>  *Muon_MC_Phi;
+   vector<double>  *Muon_MC_E;
+   Int_t           Muon_MC_Size;
    vector<double>  *Jet_MC_PT;
    vector<double>  *Jet_MC_Eta;
    vector<double>  *Jet_MC_Phi;
@@ -87,10 +93,16 @@ public :
    TBranch        *b_n2B_MC;   //!
    TBranch        *b_n1A_MC;   //!
    TBranch        *b_n1B_MC;   //!
-   TBranch        *b_lA_MC;   //!
-   TBranch        *b_lB_MC;   //!
-   TBranch        *b_lC_MC;   //!
-   TBranch        *b_lD_MC;   //!
+   TBranch        *b_Electron_MC_PT;   //!
+   TBranch        *b_Electron_MC_Eta;   //!
+   TBranch        *b_Electron_MC_Phi;   //!
+   TBranch        *b_Electron_MC_E;   //!
+   TBranch        *b_Electron_MC_Size;   //!
+   TBranch        *b_Muon_MC_PT;   //!
+   TBranch        *b_Muon_MC_Eta;   //!
+   TBranch        *b_Muon_MC_Phi;   //!
+   TBranch        *b_Muon_MC_E;   //!
+   TBranch        *b_Muon_MC_Size;   //!
    TBranch        *b_Jet_MC_PT;   //!
    TBranch        *b_Jet_MC_Eta;   //!
    TBranch        *b_Jet_MC_Phi;   //!
@@ -183,10 +195,14 @@ void Analyze_n2n2j::Init(TTree *tree)
    n2B_MC = 0;
    n1A_MC = 0;
    n1B_MC = 0;
-   lA_MC = 0;
-   lB_MC = 0;
-   lC_MC = 0;
-   lD_MC = 0;
+   Electron_MC_PT = 0;
+   Electron_MC_Eta = 0;
+   Electron_MC_Phi = 0;
+   Electron_MC_E = 0;
+   Muon_MC_PT = 0;
+   Muon_MC_Eta = 0;
+   Muon_MC_Phi = 0;
+   Muon_MC_E = 0;
    Jet_MC_PT = 0;
    Jet_MC_Eta = 0;
    Jet_MC_Phi = 0;
@@ -223,10 +239,16 @@ void Analyze_n2n2j::Init(TTree *tree)
    fChain->SetBranchAddress("n2B_MC", &n2B_MC, &b_n2B_MC);
    fChain->SetBranchAddress("n1A_MC", &n1A_MC, &b_n1A_MC);
    fChain->SetBranchAddress("n1B_MC", &n1B_MC, &b_n1B_MC);
-   fChain->SetBranchAddress("lA_MC", &lA_MC, &b_lA_MC);
-   fChain->SetBranchAddress("lB_MC", &lB_MC, &b_lB_MC);
-   fChain->SetBranchAddress("lC_MC", &lC_MC, &b_lC_MC);
-   fChain->SetBranchAddress("lD_MC", &lD_MC, &b_lD_MC);
+   fChain->SetBranchAddress("Electron_MC_PT", &Electron_MC_PT, &b_Electron_MC_PT);
+   fChain->SetBranchAddress("Electron_MC_Eta", &Electron_MC_Eta, &b_Electron_MC_Eta);
+   fChain->SetBranchAddress("Electron_MC_Phi", &Electron_MC_Phi, &b_Electron_MC_Phi);
+   fChain->SetBranchAddress("Electron_MC_E", &Electron_MC_E, &b_Electron_MC_E);
+   fChain->SetBranchAddress("Electron_MC_Size", &Electron_MC_Size, &b_Electron_MC_Size);
+   fChain->SetBranchAddress("Muon_MC_PT", &Muon_MC_PT, &b_Muon_MC_PT);
+   fChain->SetBranchAddress("Muon_MC_Eta", &Muon_MC_Eta, &b_Muon_MC_Eta);
+   fChain->SetBranchAddress("Muon_MC_Phi", &Muon_MC_Phi, &b_Muon_MC_Phi);
+   fChain->SetBranchAddress("Muon_MC_E", &Muon_MC_E, &b_Muon_MC_E);
+   fChain->SetBranchAddress("Muon_MC_Size", &Muon_MC_Size, &b_Muon_MC_Size);
    fChain->SetBranchAddress("Jet_MC_PT", &Jet_MC_PT, &b_Jet_MC_PT);
    fChain->SetBranchAddress("Jet_MC_Eta", &Jet_MC_Eta, &b_Jet_MC_Eta);
    fChain->SetBranchAddress("Jet_MC_Phi", &Jet_MC_Phi, &b_Jet_MC_Phi);
