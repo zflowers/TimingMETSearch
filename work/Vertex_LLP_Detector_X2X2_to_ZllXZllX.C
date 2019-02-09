@@ -232,9 +232,9 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(MIa3, MIb3, cat_list);
     histPlot->AddPlot(Pull_E_Z, cat_list);
     //histPlot->AddPlot(MuonResolution, cat_list);
-    //histPlot->AddPlot(Pull_E_L, cat_list);
+    histPlot->AddPlot(Pull_E_L, cat_list);
     histPlot->AddPlot(Pull_D, cat_list);
-    //histPlot->AddPlot(Pull_T, cat_list);
+    histPlot->AddPlot(Pull_T, cat_list);
     histPlot->AddPlot(Pull_Beta_Mag, cat_list);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
