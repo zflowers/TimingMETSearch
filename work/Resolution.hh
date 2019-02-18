@@ -107,20 +107,9 @@ inline double Resolution::Energy_Z_Parent_Resolution(TVector3 Beta, TLorentzVect
     double b = sigma_E_lepton2*gamma*(1.0-Beta.Mag()*TMath::Cos(GetAngle(Beta,Lepton2)));
     double c = sigma_cos_theta1*gamma3*Lepton1.E()*TMath::Cos(GetAngle(Beta,Lepton1));
     double d = sigma_cos_theta2*gamma3*Lepton2.E()*TMath::Cos(GetAngle(Beta,Lepton2));
-    double e = sigma_Beta_Mag*((Lepton1.E()*Beta.Mag()*gamma3+Lepton2.E()*Beta.Mag()*gamma3)+(Lepton1.E()*TMath::Cos(GetAngle(Beta,Lepton1))+Lepton2.E()*TMath::Cos(GetAngle(Beta,Lepton2))));
+    double e = sigma_Beta_Mag*gamma3*(Lepton1.E()*Beta.Mag()+Lepton2.E()*Beta.Mag()-Lepton1.E()*TMath::Cos(GetAngle(Beta,Lepton1))-Lepton2.E()*TMath::Cos(GetAngle(Beta,Lepton2)));
     return sqrt(a*a + b*b + c*c + d*d + e*e);
-}
-
-inline double Resolution::Energy_Z_Parent_Resolution(TVector3 Beta, TLorentzVector Lepton1, TLorentzVector Lepton2, double sigma_E_lepton, double sigma_cos_theta, double sigma_Beta_Mag)
-{
-    double gamma = 1.0/sqrt(1.0-Beta.Mag2());
-    double gamma3 = gamma*gamma*gamma;
-    double a = sigma_E_lepton*gamma*(1.0-Beta.Mag()*TMath::Cos(GetAngle(Beta,Lepton1)));
-    double b = sigma_E_lepton*gamma*(1.0-Beta.Mag()*TMath::Cos(GetAngle(Beta,Lepton2)));
-    double c = sigma_cos_theta*gamma3*Lepton1.E()*TMath::Cos(GetAngle(Beta,Lepton1));
-    double d = sigma_cos_theta*gamma3*Lepton2.E()*TMath::Cos(GetAngle(Beta,Lepton2));
-    double e = sigma_Beta_Mag*((Lepton1.E()*Beta.Mag()*gamma3+Lepton2.E()*Beta.Mag()*gamma3)+(Lepton1.E()*TMath::Cos(GetAngle(Beta,Lepton1))+Lepton2.E()*TMath::Cos(GetAngle(Beta,Lepton2))));
-    return sqrt(a*a + b*b + c*c + d*d + e*e);
+    //return sqrt(a*a + b*b + e*e);
 }
 
 
