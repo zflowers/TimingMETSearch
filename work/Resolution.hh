@@ -24,7 +24,9 @@ public:
     double Energy_Z_Parent(Vertex PV, Vertex SV, TLorentzVector Lepton1, TLorentzVector Lepton2);
     double Energy_Z_Parent_Resolution(TVector3 Beta, TLorentzVector Lepton1, TLorentzVector Lepton2, double sigma_E_lepton1, double sigma_E_lepton2, double sigma_cos_theta1, double sigma_cos_theta2, double sigma_Beta_Mag);
     double Energy_Z_Parent_Resolution(TVector3 Beta, TLorentzVector Lepton1, TLorentzVector Lepton2, double sigma_E_lepton, double sigma_cos_theta, double sigma_Beta_Mag);
-    double Mass_Parent_Resolution(TVector3 Beta, TVector3 Decay, double sigma_Decay_Momentum, double sigma_Angle, double sigma_Gamma, double sigma_Beta_Mag);
+    double Decay_Resolution(TVector3 MET, TVector3 Lepton1, TVector3 Lepton2, double sigma_MET, double sigma_L1, double sigma_L2, double sigma_AngleIa, double sigma_AngleIb, double sigma_Angleab);
+    double Cos_Resolution(TVector3 V1, TVector3 V2, double sigma_V1, double sigma_V2);
+    double Mass_Parent_Resolution(TVector3 Beta, TVector3 Decay, double sigma_Decay_Momentum, double sigma_Angle, double sigma_Beta_Mag);
 };
 #endif
 
@@ -109,18 +111,44 @@ inline double Resolution::Energy_Z_Parent_Resolution(TVector3 Beta, TLorentzVect
     double d = sigma_cos_theta2*gamma3*Lepton2.E()*TMath::Cos(GetAngle(Beta,Lepton2));
     double e = sigma_Beta_Mag*gamma3*(Lepton1.E()*Beta.Mag()+Lepton2.E()*Beta.Mag()-Lepton1.E()*TMath::Cos(GetAngle(Beta,Lepton1))-Lepton2.E()*TMath::Cos(GetAngle(Beta,Lepton2)));
     return sqrt(a*a + b*b + c*c + d*d + e*e);
-    //return sqrt(a*a + b*b + e*e);
 }
 
+inline double Resolution::Decay_Resolution(TVector3 MET, TVector3 Lepton1, TVector3 Lepton2, double sigma_MET, double sigma_L1, double sigma_L2, double sigma_AngleIa, double sigma_AngleIb, double sigma_Angleab)
+{
+    double x = (MET+Lepton1+Lepton2).Mag();
+    double thetaIA = GetAngle(MET,Lepton1);
+    double thetaIB = GetAngle(MET,Lepton2);
+    double thetaAB = GetAngle(Lepton1,Lepton2);
+    double I_Mag = MET.Mag();
+    double a_Mag = Lepton1.Mag();
+    double b_Mag = Lepton2.Mag();
+    double a = sigma_MET*(a_Mag+b_Mag+2.0*a_Mag*TMath::Cos(thetaIA)+2.0*b_Mag*TMath::Cos(thetaIB))/(2.0*x);
+    double b = sigma_L1*(I_Mag+b_Mag+2.0*I_Mag*TMath::Cos(thetaIA)+2.0*b_Mag*TMath::Cos(thetaAB))/(2.0*x);
+    double c = sigma_L2*(I_Mag+a_Mag+2.0*I_Mag*TMath::Cos(thetaIB)+2.0*a_Mag*TMath::Cos(thetaAB))/(2.0*x);
+    double d = sigma_AngleIa*(I_Mag*a_Mag*TMath::Sin(thetaIA))/x;
+    double e = sigma_AngleIb*(I_Mag*b_Mag*TMath::Sin(thetaIB))/x;
+    double f = sigma_Angleab*(a_Mag*b_Mag*TMath::Sin(thetaAB))/x;
+    return sqrt(a*a+b*b+c*c+d*d+e*e+f*f);
+}
 
-inline double Resolution::Mass_Parent_Resolution(TVector3 Beta, TVector3 Decay, double sigma_Decay_Momentum, double sigma_Angle, double sigma_Gamma, double sigma_Beta_Mag){
-    double cos_theta = GetAngle(Beta,Decay);
+inline double Resolution::Cos_Resolution(TVector3 V1, TVector3 V2, double sigma_V1, double sigma_V2)
+{
+    double a1 = sigma_V1*V2.X();
+    double a2 = sigma_V1*V2.Y();
+    double a3 = sigma_V2*V1.X();
+    double a4 = sigma_V2*V1.Y();
+    double a = (1.0/(V1.Mag()*V2.Mag()))*sqrt(a1*a1+a2*a2+a3*a3+a4*a4);
+    double b = sigma_V1*V1.Dot(V2)*(1.0/(V1.Mag2()*V2.Mag()));
+    double c = sigma_V2*V1.Dot(V2)*(1.0/(V1.Mag()*V2.Mag2()));
+    return sqrt(a*a+b*b+c*c);
+}
+
+inline double Resolution::Mass_Parent_Resolution(TVector3 Beta, TVector3 Decay, double sigma_Decay_Momentum, double sigma_Angle, double sigma_Beta_Mag){
+    double cos_theta = TMath::Cos(GetAngle(Beta,Decay));
     double gamma = 1.0/sqrt(1.0-Beta.Mag2());
     
     double a = sigma_Decay_Momentum*cos_theta*(1.0/(gamma*Beta.Mag()));
     double b = sigma_Angle*Decay.Mag()*(1.0/(gamma*Beta.Mag()));
-    double c = sigma_Gamma*Decay.Mag()*cos_theta*(1.0/(gamma*gamma*Beta.Mag()));
-    double d = sigma_Beta_Mag*Decay.Mag2()*cos_theta*(1.0/(gamma*Beta.Mag2()));
-    
-    return sqrt(a*a + b*b + c*c + d*d);
+    double c = sigma_Beta_Mag*Decay.Mag()*cos_theta*(1.0/(gamma*Beta.Mag2()));
+    return sqrt(a*a + b*b + c*c);
 }
