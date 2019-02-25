@@ -180,7 +180,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& DbL = histPlot->GetNewVar("DbL", "log_{10} D(#tilde{#chi}_{2}^{0})", -2.5, 4.5, "[cm]");
     const HistPlotVar& ToFa = histPlot->GetNewVar("ToFa","ToF(#tilde{#chi}_{2}^{0})",0.0,30.0,"[ns]");
     const HistPlotVar& ToFb = histPlot->GetNewVar("ToFb","ToF(#tilde{#chi}_{2}^{0})",0.0,30.0,"[ns]");
-    const HistPlotVar& Da = histPlot->GetNewVar("Da", "D(#tilde{#chi}_{2}^{0})", -15.0, 15.0, "[cm]");
+    const HistPlotVar& Da = histPlot->GetNewVar("Da", "D(#tilde{#chi}_{2}^{0})", 0.0, 0.05, "[cm]");
     const HistPlotVar& Db = histPlot->GetNewVar("Db", "D(#tilde{#chi}_{2}^{0})", -15.0, 15.0, "[cm]");
     const HistPlotVar& betaa = histPlot->GetNewVar("betaa", "#beta(#tilde{#chi}_{2}^{0})", 0., 1.);
     const HistPlotVar& betab = histPlot->GetNewVar("betab", "#beta(#tilde{#chi}_{2}^{0})", 0., 1.);
@@ -234,10 +234,10 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Pull_E_Z, cat_list);
     //histPlot->AddPlot(MuonResolution, cat_list);
     //histPlot->AddPlot(Pull_E_L, cat_list);
-    //histPlot->AddPlot(Pull_D, cat_list);
+    histPlot->AddPlot(Pull_D, cat_list);
     //histPlot->AddPlot(Pull_T, cat_list);
     //histPlot->AddPlot(Pull_Beta_Mag, cat_list);
-    histPlot->AddPlot(Pull_vPta, cat_list);
+    //histPlot->AddPlot(Pull_vPta, cat_list);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -432,13 +432,14 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         double Smeared_ToF = PUPPI_Detector.Smear_ToF(ToFa);
         
         //initial pull plots
-        if(RefVect.Unit().Dot(Da_Smear.Unit().Cross(Da_True.Unit())) > 0.0)
+        TVector3 Delta_Distance = Da_Smear-Da_True;
+        if(RefVect.Dot(Delta_Distance) >= 0.0)
         {
-            Pull_D = (Da_Smear-Da_True).Mag()/sigmaDistance;
+            Pull_D = Delta_Distance.Mag()/sigmaDistance;
         }
         else
         {
-            Pull_D = -1.0*(Da_Smear-Da_True).Mag()/sigmaDistance;
+            Pull_D = -1.0*Delta_Distance.Mag()/sigmaDistance;
         }
         //Pull_D = (Da_Smear.Mag()-Da_True.Mag())/sigmaDistance;
         Pull_T = (ToFa-Smeared_ToF)/PUPPI_Detector.Get_sigmaT();
@@ -484,14 +485,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         
         double Cos_Resolution_BD = test_Resolution.Cos_Resolution(vBetaaT_Gen,vPtaGen,Sigma_Beta_MagT,Resolution_Decay);
         double MP_Resolution;
-        if(m==0)
-        {
-            MP_Resolution = test_Resolution.Mass_Parent_Resolution(vBetaaGen,vPtaGen,Resolution_Decay,Cos_Resolution_BD,Sigma_Beta_MagT);
-        }
-        else if(m==1)
-        {
-            MP_Resolution = test_Resolution.Mass_Parent_Resolution(vBetaaGen,vPtaGen,Resolution_Decay,0.0,Sigma_Beta_MagT);
-        }
+        MP_Resolution = test_Resolution.Mass_Parent_Resolution(vBetaaGen,vPtaGen,Resolution_Decay,Cos_Resolution_BD,Sigma_Beta_MagT);
         double MXa_Gen = (vPtaGen.Mag()*TMath::Cos(test_Resolution.GetAngle(vPtaGen,vBetaaT_Gen)))/((1.0/sqrt(1.0-vBetaaGen.Mag2()))*vBetaaT_Gen.Mag());
         MXa = (vPta.Mag()*TMath::Cos(test_Resolution.GetAngle(vPta,Smeared_vBetaaT)))/((1.0/sqrt(1.0-Smeared_vBetaa.Mag2()))*Smeared_vBetaaT.Mag());
         MassReco_MassGen = MXa-MXa_Gen;
