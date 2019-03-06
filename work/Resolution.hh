@@ -39,7 +39,7 @@ inline Resolution::Resolution()
     m_Detector.Set_con1_perp(1.41597);
     m_Detector.Set_con2_perp(-6.37947e-07);
     m_Detector.Set_sigmaT(0.03/sqrt(2.));
-    m_Detector.Set_sigmaPV(12.0/10000.0);
+    m_Detector.Set_sigmaPV(20.0/10000.0);
     m_Detector.Set_sigmaSV(65.0/10000.0);
 }
 
@@ -114,6 +114,7 @@ inline double Resolution::Energy_Z_Parent_Resolution(TVector3 Beta, TLorentzVect
 
 inline double Resolution::Cos_Resolution(TVector3 V1, TVector3 V2, double sigma_V1, double sigma_V2)
 {
+    
     double a1 = sigma_V1*V2.X();
     double a2 = sigma_V1*V2.Y();
     double a3 = sigma_V2*V1.X();
@@ -121,6 +122,9 @@ inline double Resolution::Cos_Resolution(TVector3 V1, TVector3 V2, double sigma_
     double a = (1.0/(V1.Mag()*V2.Mag()))*sqrt(a1*a1+a2*a2+a3*a3+a4*a4);
     double b = sigma_V1*V1.Dot(V2)*(1.0/(V1.Mag2()*V2.Mag()));
     double c = sigma_V2*V1.Dot(V2)*(1.0/(V1.Mag()*V2.Mag2()));
+    
+    
+    
     return sqrt(a*a+b*b+c*c);
 }
 
