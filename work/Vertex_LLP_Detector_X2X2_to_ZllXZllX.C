@@ -42,8 +42,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t start = gSystem->Now();
     
     //setting masses and widths
-    double mX2 = 500.0;
-    double mX1 = 100.0;
+    double mX2 = 700.0;
+    double mX1 = 400.0;
     double mZ = 91.19;
     double wZ = 2.50;
     
@@ -55,13 +55,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         ctau.push_back(i);
     }
     */
-    //ctau.push_back(100.);
-    //ctau.push_back(5000.);
-    ctau.push_back(50.);
-    //ctau.push_back(25.);
-    //ctau.push_back(10.);
-    //ctau.push_back(1.);
 
+    ctau.push_back(50.);
     
     int Nctau = ctau.size();
 
@@ -188,6 +183,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& Pull_Mass_Invisible = histPlot->GetNewVar("Pull_Mass_Inv","Pull of M(#tilde{#chi}_{1a}^{0})",-5.0,5.0,"");
     const HistPlotVar& Mreco_Mgen = histPlot->GetNewVar("Mreco_Mgen","#Delta M(#tilde{#chi}_{1a}^{0})",-300.0,300.0,"[GeV]");
     const HistPlotVar& Mass_Invisible_Resolution = histPlot->GetNewVar("Mass_Invisible_Resolution","Invisible Mass Resolution",290.0,310.0,"[GeV]");
+    const HistPlotVar& MIa = histPlot->GetNewVar("MIa", "M(#tilde{#chi}_{1a}^{0})", 0., 500., "[GeV]");
     
     const HistPlotVar& EZb = histPlot->GetNewVar("EZb", "E_{Zb}^{#tilde{#chi}_{2b}^{0}}", 0., 800., "[GeV]");
     const HistPlotVar& MXa = histPlot->GetNewVar("MXa", "M(#tilde{#chi}_{2a}^{0})", 0., 1800., "[GeV]");
@@ -239,11 +235,12 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Pull_E_L, cat_list);
     //histPlot->AddPlot(Pull_D, cat_list);
     //histPlot->AddPlot(Pull_T, cat_list);
-    //histPlot->AddPlot(Pull_Beta_Mag, cat_list);
+    histPlot->AddPlot(Pull_Beta_Mag, cat_list);
     //histPlot->AddPlot(Pull_vPta, cat_list);
     histPlot->AddPlot(Pull_Mass_Invisible, cat_list);
-    histPlot->AddPlot(Mreco_Mgen, cat_list);
+    //histPlot->AddPlot(Mreco_Mgen, cat_list);
     //histPlot->AddPlot(Mass_Invisible_Resolution, cat_list);
+    //histPlot->AddPlot(MIa, cat_list);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -301,7 +298,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     
   for(int m = 0; m < Nctau; m++){
     g_Log << LogInfo << "Generating events for ";
-    g_Log << "mX2 = " << mX2 << " , ";
+    g_Log << "mX2 = " << mX2 << ", ";
     g_Log << "ctau = " << ctau[m] << LogEnd;
     
     LAB_Gen.InitializeAnalysis();
@@ -499,18 +496,12 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         MXa = test_Resolution.Mass_Parent(vPta,Smeared_vBetaa);
         MassReco_MassGen = MXa-MXa_Gen;
         Pull_Mass_Parent = MassReco_MassGen/MP_Resolution;
-        
-        if(MXa*MXa-2.*MXa*EZa+((L1a_RECO+L2a_RECO).M2()) < 0.0)
-        {
-            igen--;
-            continue;
-        }
-        
+
         Mass_Invisible_Resolution = test_Resolution.Mass_Invisible_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECO,L2a_RECO,MET_Resolution,Sigma_Beta_Mag);
         
         double MI_Gen = sqrt(MXa_Gen*MXa_Gen-2.*MXa_Gen*vZaGen.E()+((L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M2()));
-        double MI_RECO = sqrt(MXa*MXa-2.*MXa*EZa+((L1a_RECO+L2a_RECO).M2()));
-        Mreco_Mgen = (MI_Gen-MI_RECO);
+        MIa = sqrt(MXa*MXa-2.*MXa*EZa+((L1a_RECO+L2a_RECO).M2()));
+        Mreco_Mgen = (MI_Gen-MIa);
         Pull_Mass_Invisible = Mreco_Mgen/Mass_Invisible_Resolution;
         
         /*
