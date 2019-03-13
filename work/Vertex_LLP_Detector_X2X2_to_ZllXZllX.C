@@ -500,6 +500,12 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         MassReco_MassGen = MXa-MXa_Gen;
         Pull_Mass_Parent = MassReco_MassGen/MP_Resolution;
         
+        if(MXa*MXa-2.*MXa*EZa+((L1a_RECO+L2a_RECO).M2()) < 0.0)
+        {
+            igen--;
+            continue;
+        }
+        
         Mass_Invisible_Resolution = test_Resolution.Mass_Invisible_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECO,L2a_RECO,MET_Resolution,Sigma_Beta_Mag);
         
         double MI_Gen = sqrt(MXa_Gen*MXa_Gen-2.*MXa_Gen*vZaGen.E()+((L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M2()));
