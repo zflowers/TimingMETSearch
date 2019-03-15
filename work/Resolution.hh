@@ -29,6 +29,9 @@ public:
     double Mass_Parent(TVector3 Decay, TVector3 Beta);
     double Mass_Parent_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_L1, double sigma_L2, double sigma_Beta_Mag);
     double Mass_Invisible_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_Beta_Mag);
+    double Par_Resolution(TVector3 MET, TVector3 L1a, TVector3 L2a, TVector3 L1b, TVector3 L2b, double sigma_MET, double sigma_L1a, double sigma_L2a, double sigma_L1b, double sigma_L2b);
+    double Mass_Parents2(TVector3 Par, TVector3 Betaa, TVector3 Betab);
+    double Mass_Parents2_Resolution(TVector3 Par, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_Par);
 };
 #endif
 
@@ -141,7 +144,6 @@ inline double Resolution::Mass_Parent(TVector3 Decay, TVector3 Beta)
 inline double Resolution::Mass_Parent_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_L1, double sigma_L2, double sigma_Beta_Mag){
     
     double gamma = 1.0/sqrt(1.0-Beta.Mag2());
-    //Beta.SetZ(0.0);
     double sigmaCos_BetaMET = Cos_Resolution(Beta,MET,sigma_Beta_Mag,sigma_MET);
     double sigmaCos_BetaL1 = Cos_Resolution(Beta,L1.Vect(),sigma_Beta_Mag,sigma_L1);
     double sigmaCos_BetaL2 = Cos_Resolution(Beta,L2.Vect(),sigma_Beta_Mag,sigma_L2);
@@ -155,7 +157,6 @@ inline double Resolution::Mass_Parent_Resolution(TVector3 Beta, TVector3 MET, TL
     double g = sigmaCos_BetaL2*L2.Vect().Mag()/(gamma*Beta.Mag());
     
     return sqrt(a*a + b*b + c*c + d*d);
-    //return sqrt(a*a + b*b + c*c + d*d + e*e + f*f + g*g);
 }
 
 inline double Resolution::Mass_Invisible_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_Beta_Mag)
@@ -173,5 +174,39 @@ inline double Resolution::Mass_Invisible_Resolution(TVector3 Beta, TVector3 MET,
     double a = (sigma_Beta_Mag/Mass_Invisible)*((-J*gamma)/(Beta.Pt()*Beta.Pt())*(Mass_P-Energy_Z_Parent(Beta,L1,L2))+Mass_P*gamma*gamma*gamma*(Beta.Mag()*L1.E()+Beta.Mag()*L2.E()-L1.E()*TMath::Cos(GetAngle(Beta,L1))-L2.E()*TMath::Cos(GetAngle(Beta,L2))));
     double b = (sigma_MET/Mass_Invisible)*(TMath::Cos(Beta.DeltaPhi(MET)))/(gamma*Beta.Pt())*(Mass_P-Energy_Z_Parent(Beta,L1,L2));
     
+    return sqrt(a*a + b*b);
+}
+
+inline double Resolution::Par_Resolution(TVector3 MET, TVector3 L1a, TVector3 L2a, TVector3 L1b, TVector3 L2b, double sigma_MET, double sigma_L1a, double sigma_L2a, double sigma_L1b, double sigma_L2b)
+{
+    double Par = (MET+L1a+L2a+L1b+L2b).Mag();
+    double a = (sigma_MET/Par)*(MET.Mag()+L1a.Mag()*TMath::Cos(GetAngle(MET,L1a))+L2a.Mag()*TMath::Cos(GetAngle(MET,L2a))+L1b.Mag()*TMath::Cos(GetAngle(MET,L1b))+L2b.Mag()*TMath::Cos(GetAngle(MET,L2b)));
+    double b = (sigma_L1a/Par)*(L1a.Mag()+MET.Mag()*TMath::Cos(GetAngle(MET,L1a))+L2a.Mag()*TMath::Cos(GetAngle(L1a,L2a))+L1b.Mag()*TMath::Cos(GetAngle(L1a,L1b))+L2b.Mag()*TMath::Cos(GetAngle(L1a,L2b)));
+    double c = (sigma_L2a/Par)*(L2a.Mag()+L1a.Mag()*TMath::Cos(GetAngle(L2a,L1a))+MET.Mag()*TMath::Cos(GetAngle(MET,L2a))+L1b.Mag()*TMath::Cos(GetAngle(L2a,L1b))+L2b.Mag()*TMath::Cos(GetAngle(L2a,L2b)));
+    double d = (sigma_L1b/Par)*(L1b.Mag()+L1a.Mag()*TMath::Cos(GetAngle(L1b,L1a))+L2a.Mag()*TMath::Cos(GetAngle(L1b,L2a))+MET.Mag()*TMath::Cos(GetAngle(MET,L1b))+L2b.Mag()*TMath::Cos(GetAngle(L1b,L2b)));
+    double e = (sigma_L2b/Par)*(L2b.Mag()+L1a.Mag()*TMath::Cos(GetAngle(L2b,L1a))+L2a.Mag()*TMath::Cos(GetAngle(L2b,L2a))+L1b.Mag()*TMath::Cos(GetAngle(L2b,L1b))+MET.Mag()*TMath::Cos(GetAngle(MET,L2b)));
+    
+    return sqrt(a*a+b*b+c*c+d*d+e*e);
+}
+
+inline double Resolution::Mass_Parents2(TVector3 Par, TVector3 Betaa, TVector3 Betab)
+{
+    TVector3 Zhat(0.0,0.0,1.0);
+    TVector3 Perp = Par.Cross(Zhat);
+    double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
+    return Par.Mag()*Betab.Dot(Perp.Unit())/(gamma*(Betaa.Dot(Par.Unit())*Betab.Dot(Perp.Unit())-Betab.Dot(Par.Unit())*Betaa.Dot(Perp.Unit())));
+}
+
+inline double Resolution::Mass_Parents2_Resolution(TVector3 Par, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_Par)
+{
+    TVector3 Zhat(0.0,0.0,1.0);
+    TVector3 Perp = Par.Cross(Zhat);
+    double cos_PaPar = TMath::Cos(GetAngle(Betaa,Par));
+    double cos_PaPerp = TMath::Cos(GetAngle(Betaa,Perp));
+    double cos_PbPar = TMath::Cos(GetAngle(Betab,Par));
+    double cos_PbPerp = TMath::Cos(GetAngle(Betab,Perp));
+    double gammaa = 1.0/sqrt(1.0-Betaa.Mag2());
+    double a = -sigma_Beta_Maga*gammaa*cos_PbPerp/((cos_PaPar*cos_PbPerp-cos_PbPar*cos_PaPerp)*Betaa.Mag2());
+    double b = sigma_Par*Mass_Parents2(Par,Betaa,Betab)/Par.Mag();
     return sqrt(a*a + b*b);
 }
