@@ -208,7 +208,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(DCosA, cat_list);
     //histPlot->AddPlot(Pull_Cos, cat_list);
     //histPlot->AddPlot(ThetaA, cat_list);
-    //histPlot->AddPlot(Pull_MET, cat_list);
+    histPlot->AddPlot(Pull_MET, cat_list);
     //histPlot->AddPlot(DBetaA, cat_list);
     //histPlot->AddPlot(ToFaL, cat_list);
     //histPlot->AddPlot(DaL, cat_list);
@@ -239,10 +239,10 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Pull_T, cat_list);
     //histPlot->AddPlot(Pull_Beta_Mag, cat_list);
     //histPlot->AddPlot(Pull_vPta, cat_list);
-    //histPlot->AddPlot(Pull_Mass_Invisible, cat_list);
+    histPlot->AddPlot(Pull_Mass_Invisible, cat_list);
     //histPlot->AddPlot(Mreco_Mgen, cat_list);
     //histPlot->AddPlot(Mass_Invisible_Resolution, cat_list);
-    //histPlot->AddPlot(MIa, cat_list);
+    histPlot->AddPlot(MIa, cat_list);
     histPlot->AddPlot(MXa2, cat_list);
     histPlot->AddPlot(Pull_MXa2, cat_list);
     histPlot->AddPlot(Pull_Par, cat_list);
