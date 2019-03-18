@@ -42,8 +42,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t start = gSystem->Now();
     
     //setting masses and widths
-    double mX2 = 700.0;
-    double mX1 = 400.0;
+    double mX2 = 800.0;
+    double mX1 = 300.0;
     double mZ = 91.19;
     double wZ = 2.50;
     
@@ -185,7 +185,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& Mass_Invisible_Resolution = histPlot->GetNewVar("Mass_Invisible_Resolution","Invisible Mass Resolution",290.0,310.0,"[GeV]");
     const HistPlotVar& MIa = histPlot->GetNewVar("MIa", "M(#tilde{#chi}_{1a}^{0})", 0., 500., "[GeV]");
     const HistPlotVar& Pull_MXa2 = histPlot->GetNewVar("Pull_MXa2", "Pull of M(#tilde{#chi}_{2a}^{0})", -5.0, 5.0, "");
-    const HistPlotVar& Pull_Par = histPlot->GetNewVar("Pull_Par", "Pull of Par", -5.0, 5.0, "");
+    const HistPlotVar& Pull_Par = histPlot->GetNewVar("Pull_Par", "Pull of n_{||}", -5.0, 5.0, "");
+    const HistPlotVar& Par = histPlot->GetNewVar("Par","n_{||}",0.0,500.0);
     
     const HistPlotVar& EZb = histPlot->GetNewVar("EZb", "E_{Zb}^{#tilde{#chi}_{2b}^{0}}", 0., 800., "[GeV]");
     const HistPlotVar& MXa = histPlot->GetNewVar("MXa", "M(#tilde{#chi}_{2a}^{0})", 0., 1800., "[GeV]");
@@ -237,15 +238,16 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Pull_E_L, cat_list);
     //histPlot->AddPlot(Pull_D, cat_list);
     //histPlot->AddPlot(Pull_T, cat_list);
-    //histPlot->AddPlot(Pull_Beta_Mag, cat_list);
+    histPlot->AddPlot(Pull_Beta_Mag, cat_list);
     //histPlot->AddPlot(Pull_vPta, cat_list);
     histPlot->AddPlot(Pull_Mass_Invisible, cat_list);
     //histPlot->AddPlot(Mreco_Mgen, cat_list);
     //histPlot->AddPlot(Mass_Invisible_Resolution, cat_list);
-    histPlot->AddPlot(MIa, cat_list);
-    histPlot->AddPlot(MXa2, cat_list);
+    //histPlot->AddPlot(MIa, cat_list);
+    //histPlot->AddPlot(MXa2, cat_list);
     histPlot->AddPlot(Pull_MXa2, cat_list);
     histPlot->AddPlot(Pull_Par, cat_list);
+    //histPlot->AddPlot(Par, cat_list);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -308,6 +310,10 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
       LAB_Gen.ClearEvent();                           // clear the gen tree
       //set momentum based upon the mass
         physics.GetEtaPtCM(LAB_eta,LAB_Pt);
+        //Fix the momentum by hand
+        LAB_Pt = gRandom->Gaus(3000.0,100.0);
+        LAB_eta = gRandom->Gaus(0.0,2.4);
+        //
       LAB_Gen.SetTransverseMomentum(LAB_Pt);
       LAB_Gen.SetLongitudinalMomentum(LAB_Pt*TMath::SinH(LAB_eta));
     
@@ -514,6 +520,13 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         TVector3 Perp_Gen = Par_Gen.Cross(Zhat);
         TVector3 Par_RECO = MET_RECO_PUPPI+Va.Vect()+Vb.Vect();
         TVector3 Perp_RECO = Par_RECO.Cross(Zhat);
+        Par = Par_Gen.Mag();//-Par_RECO.Mag();
+        
+        if(Par < 25.0)
+        {
+            igen--;
+            continue;
+        }
         
         double Sigma_Par = test_Resolution.Par_Resolution(MET_RECO_PUPPI,L1a_RECOt.Vect(),L2a_RECOt.Vect(),L1b_RECOt.Vect(),L2b_RECOt.Vect(),MET_Resolution,L1a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1a_Gent),L2a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2a_Gent),L1b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1b_Gent),L2b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2b_Gent));
         
