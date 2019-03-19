@@ -33,39 +33,40 @@
 #include "Physics.hh"
 #include "Resolution.hh"
 #include <TSystem.h>
+#include <TROOT.h>
+#include <TKey.h>
 
 using namespace RestFrames;
 
-void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
-			      "output_Vertex_LLP_Detector_X2X2_to_ZallXZbllX.root"){
+void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
+			      "output_Mass_LLP_Detector_X2X2_to_ZallXZbllX.root"){
 
     Long64_t start = gSystem->Now();
-    
-    //setting masses and widths
-    double mX2 = 4000.0;
-    double mX1 = 300.0;
+    double ctau = 50.0;
+    double mX1 = 100.0;
     double mZ = 91.19;
     double wZ = 2.50;
+  
     
-    vector<double> ctau;
-    //setting ctau values
-    /*
-    for(int i = 1; i <= 100; i++)
-    {
-        ctau.push_back(i);
-    }
-    */
-
-    ctau.push_back(50.);
+    vector<double> mX2;
+    mX2.push_back(200.);
+    //mX2.push_back(300.);
+    mX2.push_back(400.);
+    //mX2.push_back(500.);
+    //mX2.push_back(600.);
+    mX2.push_back(700.);
+    //mX2.push_back(800.);
+    //mX2.push_back(900.);
+    mX2.push_back(1000.);
     
-    int Nctau = ctau.size();
+    int NmX2 = mX2.size();
 
     //Number of events
     int Ngen = 100000;
     
     g_Log << LogInfo << "Initializing generator frames and tree..." << LogEnd;
     
-    //Setting up the tree: x2x2->X1X1 + ZZ->4l
+    //
     ppLabGenFrame LAB_Gen("LAB_Gen","LAB");
     DecayGenFrame     X2X2_Gen("X2X2_Gen","#tilde{#chi}^{ 0}_{2} #tilde{#chi}^{ 0}_{2}");
     DecayGenFrame     X2a_Gen("X2a_Gen","#tilde{#chi}^{ 0}_{2 a}");
@@ -101,19 +102,17 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     
   
   X2X2_Gen.SetVariableMass();
-  X2a_Gen.SetMass(mX2);       X2b_Gen.SetMass(mX2);
+  X2a_Gen.SetMass(mX2[0]);       X2b_Gen.SetMass(mX2[0]);
   X1a_Gen.SetMass(mX1);       X1b_Gen.SetMass(mX1);
   Za_Gen.SetMass(mZ);
   Za_Gen.SetWidth(wZ);
   Zb_Gen.SetMass(mZ);
   Zb_Gen.SetWidth(wZ);
-    
-    
-    //For now we remove any cuts
-  //L1a_Gen.SetPtCut(10.);        L1a_Gen.SetEtaCut(2.5);
-  //L2a_Gen.SetPtCut(10.);        L2a_Gen.SetEtaCut(2.5);
-  //L1b_Gen.SetPtCut(10.);        L1b_Gen.SetEtaCut(2.5);
-  //L2b_Gen.SetPtCut(10.);        L2b_Gen.SetEtaCut(2.5);
+
+  L1a_Gen.SetPtCut(10.);        L1a_Gen.SetEtaCut(2.5);
+  L2a_Gen.SetPtCut(10.);        L2a_Gen.SetEtaCut(2.5);
+  L1b_Gen.SetPtCut(10.);        L1b_Gen.SetEtaCut(2.5);
+  L2b_Gen.SetPtCut(10.);        L2b_Gen.SetEtaCut(2.5);
   
   if(LAB_Gen.InitializeAnalysis())
     g_Log << LogInfo << "...Successfully initialized generator analysis" << LogEnd;
@@ -136,15 +135,13 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     histPlot->SetRebin(1);
     
     RFList<const HistPlotCategory> cat_list;
-    char smassX2[200];
-    string sctau = "c#tau = ";
-    for(int m = 0; m < Nctau; m++){
+    for(int m = 0; m < NmX2; m++)
+    {
+        char smX2[200], scat[50];
+        sprintf(scat, "MX2_%.0f", mX2[m]);
+        sprintf(smX2, "m_{#tilde{#chi}^{0}_{2}}= %.0f", mX2[m]);
         
-        char sname[200], scat[50];
-        sprintf(scat, "ctau_%d", m);
-        sprintf(sname, "%.1f cm", ctau[m]);
-        
-        cat_list += histPlot->GetNewCategory(scat, sctau+std::string(sname));
+        cat_list += histPlot->GetNewCategory(scat, std::string(smX2));
     }
     
     //setting up all the variables that could be potentially plotted
@@ -249,20 +246,12 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Pull_Par, cat_list);
     //histPlot->AddPlot(Par, cat_list);
     
-    //since there is a correlation between MET and the PT/Eta of the CM frame
-    //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
-    TFile* input = new TFile("PTEta.root");
-    string PTEta_histname = "hist_PTvsEta_1000";
-    /*
-    string PTEta_histname = "hist_PTvsEta_";
-    int hist_mX2 = mX2;
-    PTEta_histname += std::to_string(hist_mX2);
-    */
-    TH2* hist = (TH2*)input->Get(PTEta_histname.c_str());
+    TFile* file = new TFile("PTEta.root","READ");
+    TH2* hist = (TH2*)file->Get("hist_PTvsEta_1000");
     Physics physics;
     physics.SetEtaPtCM(*hist);
-    input->Close();
-    delete input;
+    file->Close();
+    delete file;
     
     //build the detector
     Detector PUPPI_Detector;
@@ -295,31 +284,27 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     int gen_events = 0;
     int acp_events = 0;
     
-  for(int m = 0; m < Nctau; m++){
+  for(int m = 0; m < NmX2; m++){
     g_Log << LogInfo << "Generating events for ";
-    g_Log << "mX2 = " << mX2 << ", ";
-    g_Log << "ctau = " << ctau[m] << LogEnd;
-    
+    g_Log << "mX2 = " << mX2[m] << " , ";
+    g_Log << "ctau = " << ctau << LogEnd;
+      
+      X2a_Gen.SetMass(mX2[m]);
+      X2b_Gen.SetMass(mX2[m]);
+
     LAB_Gen.InitializeAnalysis();
       
     for(int igen = 0; igen < Ngen; igen++){
       if(igen%((std::max(Ngen,10))/10) == 0)
 	g_Log << LogInfo << "Generating event " << igen << " of " << Ngen << LogEnd;
-
-      // generate event
-      LAB_Gen.ClearEvent();                           // clear the gen tree
-      //set momentum based upon the mass
+        
+        // generate event
+        LAB_Gen.ClearEvent();                           // clear the gen tree
         physics.GetEtaPtCM(LAB_eta,LAB_Pt);
-        //Fix the momentum by hand
-        /*
-        LAB_Pt = gRandom->Gaus(3000.0,100.0);
-        LAB_eta = gRandom->Gaus(0.0,2.4);
-        */
-        //
-      LAB_Gen.SetTransverseMomentum(LAB_Pt);
-      LAB_Gen.SetLongitudinalMomentum(LAB_Pt*TMath::SinH(LAB_eta));
-    
-      LAB_Gen.AnalyzeEvent();                         // generate a new event
+        LAB_Gen.SetTransverseMomentum(LAB_Pt);
+        LAB_Gen.SetLongitudinalMomentum(LAB_Pt*TMath::SinH(LAB_eta));
+        
+        LAB_Gen.AnalyzeEvent();                         // generate a new event
         gen_events++;
         
         TLorentzVector Pa = X2a_Gen.GetFourVector();
@@ -346,8 +331,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         TVector3 vBetaaGen = Pa.BoostVector();
         TVector3 vBetabGen = Pb.BoostVector();
         
-        ToFa = physics.Get_ToF(ctau[m], Pa);
-        ToFb = physics.Get_ToF(ctau[m], Pb);
+        ToFa = physics.Get_ToF(ctau, Pa);
+        ToFb = physics.Get_ToF(ctau, Pb);
         
         //ToFa = 1.0e12;
         if(ToFa <= 0.0)
@@ -408,12 +393,12 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         Db = 30.*ToFa*betab;
         
         /*
-        if(betaa < VelocityUncertainty || betab < VelocityUncertainty) //require significant displacement
-        {
-            igen--;
-            continue;
-        }
-        */
+         if(betaa < VelocityUncertainty || betab < VelocityUncertainty) //require significant displacement
+         {
+         igen--;
+         continue;
+         }
+         */
         
         //set some resolutions
         MuonResolution = PUPPI_Detector.GetMuonResolution(L2a_Gen.GetFourVector());
@@ -508,7 +493,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         MXa = test_Resolution.Mass_Parent(vPta,Smeared_vBetaa);
         MassReco_MassGen = MXa-MXa_Gen;
         Pull_Mass_Parent = MassReco_MassGen/MP_Resolution;
-
+        
         Mass_Invisible_Resolution = test_Resolution.Mass_Invisible_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECO,L2a_RECO,MET_Resolution,Sigma_Beta_Mag);
         
         double MI_Gen = sqrt(MXa_Gen*MXa_Gen-2.*MXa_Gen*vZaGen.E()+((L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M2()));
@@ -523,13 +508,13 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         TVector3 Par_RECO = MET_RECO_PUPPI+Va.Vect()+Vb.Vect();
         TVector3 Perp_RECO = Par_RECO.Cross(Zhat);
         Par = Par_Gen.Mag();//-Par_RECO.Mag();
-/* //for par pull plot
-        if(Par < 25.0)
-        {
-            igen--;
-            continue;
-        }
-*/
+        /* //for par pull plot
+         if(Par < 25.0)
+         {
+         igen--;
+         continue;
+         }
+         */
         double Sigma_Par = test_Resolution.Par_Resolution(MET_RECO_PUPPI,L1a_RECOt.Vect(),L2a_RECOt.Vect(),L1b_RECOt.Vect(),L2b_RECOt.Vect(),MET_Resolution,L1a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1a_Gent),L2a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2a_Gent),L1b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1b_Gent),L2b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2b_Gent));
         
         Pull_Par = (Par_Gen.Mag()-Par_RECO.Mag())/Sigma_Par;
@@ -544,51 +529,51 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         
         Pull_MXa2 = (MPa_Gen-MXa2)/test_Resolution.Mass_Parents2_Resolution(Par_RECO,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,Sigma_Par);
         /*
-        EZb = vZb.E();
-        MXa = EZa + sqrt(EZa*EZa + mX1*mX1 - vZa.M2());
-        
-        MXa2 = vPta.Dot(Smeared_vBetaaT)*sqrt(1.-Smeared_vBetaa.Mag2())/Smeared_vBetaaT.Mag2();
-        MXa2 = vPtb.Dot(Smeared_vBetabT)*sqrt(1.-Smeared_vBetab.Mag2())/Smeared_vBetabT.Mag2();
-        MIa2 = sqrt(MXa2*MXa2 - 2.*MXa2*EZa+vZa.M2());
-        RMIXa2 = MIa2 / MXa2;
-        
-        MXa3 = (vZa.M2()-vZb.M2())/2./(EZa-EZb);
-        MIa3 = sqrt(MXa3*MXa3 - 2.*MXa3*EZa+vZa.M2());
-        
-        gammaa = 1./sqrt(1.-Smeared_vBetaa.Mag2());
-        gammab = 1./sqrt(1.-Smeared_vBetab.Mag2());
-        
-        TVector3 vPar = vPt.Unit();
-        TVector3 vPer = vPt.Cross(Zhat).Unit();
-        
-        BaPar = Smeared_vBetaaT.Dot(vPar);
-        BaPer = Smeared_vBetaaT.Dot(vPer);
-        BbPar = Smeared_vBetabT.Dot(vPar);
-        BbPer = Smeared_vBetabT.Dot(vPer);
-        
-        Epa = vPt.Mag()/( BaPar - BbPar*BaPer/BbPer );
-        MXa3 = Epa/gammaa;
-        Epb = vPt.Mag()/( BbPar - BaPar*BbPer/BaPer );
-        MXb3 = Epb/gammab;
-        MIb3 = sqrt(MXb3*MXb3 - 2.*MXb3*EZb+vZb.M2());
-        */
+         EZb = vZb.E();
+         MXa = EZa + sqrt(EZa*EZa + mX1*mX1 - vZa.M2());
+         
+         MXa2 = vPta.Dot(Smeared_vBetaaT)*sqrt(1.-Smeared_vBetaa.Mag2())/Smeared_vBetaaT.Mag2();
+         MXa2 = vPtb.Dot(Smeared_vBetabT)*sqrt(1.-Smeared_vBetab.Mag2())/Smeared_vBetabT.Mag2();
+         MIa2 = sqrt(MXa2*MXa2 - 2.*MXa2*EZa+vZa.M2());
+         RMIXa2 = MIa2 / MXa2;
+         
+         MXa3 = (vZa.M2()-vZb.M2())/2./(EZa-EZb);
+         MIa3 = sqrt(MXa3*MXa3 - 2.*MXa3*EZa+vZa.M2());
+         
+         gammaa = 1./sqrt(1.-Smeared_vBetaa.Mag2());
+         gammab = 1./sqrt(1.-Smeared_vBetab.Mag2());
+         
+         TVector3 vPar = vPt.Unit();
+         TVector3 vPer = vPt.Cross(Zhat).Unit();
+         
+         BaPar = Smeared_vBetaaT.Dot(vPar);
+         BaPer = Smeared_vBetaaT.Dot(vPer);
+         BbPar = Smeared_vBetabT.Dot(vPar);
+         BbPer = Smeared_vBetabT.Dot(vPer);
+         
+         Epa = vPt.Mag()/( BaPar - BbPar*BaPer/BbPer );
+         MXa3 = Epa/gammaa;
+         Epb = vPt.Mag()/( BbPar - BaPar*BbPer/BaPer );
+         MXb3 = Epb/gammab;
+         MIb3 = sqrt(MXb3*MXb3 - 2.*MXb3*EZb+vZb.M2());
+         */
         histPlot->Fill(cat_list[m]);
         acp_events++;
     }
-    LAB_Gen.PrintGeneratorEfficiency();
+      LAB_Gen.PrintGeneratorEfficiency();
   }
-  histPlot->Draw();
-
-  TFile fout(output_name.c_str(),"RECREATE");
-  fout.Close();
-  histPlot->WriteOutput(output_name);
-  histPlot->WriteHist(output_name);
-  treePlot->WriteOutput(output_name);
+    histPlot->Draw();
     
-  g_Log << LogInfo << "Finished" << LogEnd;
+    TFile fout(output_name.c_str(),"RECREATE");
+    fout.Close();
+    histPlot->WriteOutput(output_name);
+    histPlot->WriteHist(output_name);
+    treePlot->WriteOutput(output_name);
+    
+    g_Log << LogInfo << "Finished" << LogEnd;
     g_Log << LogInfo << "Generated a Total of " << gen_events << " Events " << LogEnd;
     g_Log << LogInfo << acp_events << " passed selection requirements " << LogEnd;
     g_Log << LogInfo << "Efficiency: " << 100.0*acp_events/gen_events << "%" << LogEnd;
     Long64_t end = gSystem->Now();
-    g_Log << LogInfo << "Time to Generate " << Ngen*Nctau << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
+    g_Log << LogInfo << "Time to Generate " << Ngen*NmX2 << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
 }
