@@ -1,7 +1,5 @@
 #ifndef RESOLUTION_H
 #define RESOLUTION_H
-//#include "Physics.hh"
-//#include "Detector.hh"
 
 class Resolution
 {
@@ -31,7 +29,7 @@ public:
     double Mass_Invisible_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_Beta_Mag);
     double Par_Resolution(TVector3 MET, TVector3 L1a, TVector3 L2a, TVector3 L1b, TVector3 L2b, double sigma_MET, double sigma_L1a, double sigma_L2a, double sigma_L1b, double sigma_L2b);
     double Mass_Parents2(TVector3 Par, TVector3 Betaa, TVector3 Betab);
-    double Mass_Parents2_Resolution(TVector3 Par, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_Par);
+    double Mass_Parents2_Resolution(TVector3 Par, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_Par, double sigma_CbPerp);
 };
 #endif
 
@@ -197,7 +195,7 @@ inline double Resolution::Mass_Parents2(TVector3 Par, TVector3 Betaa, TVector3 B
     return Par.Mag()*Betab.Dot(Perp.Unit())/(gamma*(Betaa.Dot(Par.Unit())*Betab.Dot(Perp.Unit())-Betab.Dot(Par.Unit())*Betaa.Dot(Perp.Unit())));
 }
 
-inline double Resolution::Mass_Parents2_Resolution(TVector3 Par, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_Par)
+inline double Resolution::Mass_Parents2_Resolution(TVector3 Par, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_Par, double sigma_CbPerp)
 {
     TVector3 Zhat(0.0,0.0,1.0);
     TVector3 Perp = Par.Cross(Zhat);
@@ -208,5 +206,6 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 Par, TVector3 Betaa,
     double gammaa = 1.0/sqrt(1.0-Betaa.Mag2());
     double a = -sigma_Beta_Maga*gammaa*cos_PbPerp/((cos_PaPar*cos_PbPerp-cos_PbPar*cos_PaPerp)*Betaa.Mag2());
     double b = sigma_Par*Mass_Parents2(Par,Betaa,Betab)/Par.Mag();
-    return sqrt(a*a + b*b);
+    double c = sigma_CbPerp*Par.Mag()*cos_PbPar*cos_PaPerp/(gammaa*Betaa.Mag()*(cos_PaPar*cos_PbPerp-cos_PbPar*cos_PaPerp)*(cos_PaPar*cos_PbPerp-cos_PbPar*cos_PaPerp));
+    return sqrt(a*a + b*b + c*c);
 }

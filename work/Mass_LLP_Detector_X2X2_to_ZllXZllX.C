@@ -43,21 +43,18 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
 
     Long64_t start = gSystem->Now();
     double ctau = 50.0;
-    double mX1 = 100.0;
+    double mX1 = 300.0;
     double mZ = 91.19;
     double wZ = 2.50;
   
     
     vector<double> mX2;
-    mX2.push_back(200.);
-    //mX2.push_back(300.);
-    mX2.push_back(400.);
-    //mX2.push_back(500.);
-    //mX2.push_back(600.);
-    mX2.push_back(700.);
-    //mX2.push_back(800.);
-    //mX2.push_back(900.);
-    mX2.push_back(1000.);
+    //mX2.push_back(1000.);
+    //mX2.push_back(2000.);
+    //mX2.push_back(3000.);
+    //mX2.push_back(4000.);
+    mX2.push_back(5000.);
+    
     
     int NmX2 = mX2.size();
 
@@ -108,12 +105,12 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
   Za_Gen.SetWidth(wZ);
   Zb_Gen.SetMass(mZ);
   Zb_Gen.SetWidth(wZ);
-
+  /*
   L1a_Gen.SetPtCut(10.);        L1a_Gen.SetEtaCut(2.5);
   L2a_Gen.SetPtCut(10.);        L2a_Gen.SetEtaCut(2.5);
   L1b_Gen.SetPtCut(10.);        L1b_Gen.SetEtaCut(2.5);
   L2b_Gen.SetPtCut(10.);        L2b_Gen.SetEtaCut(2.5);
-  
+  */
   if(LAB_Gen.InitializeAnalysis())
     g_Log << LogInfo << "...Successfully initialized generator analysis" << LogEnd;
   else
@@ -241,7 +238,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Mreco_Mgen, cat_list);
     //histPlot->AddPlot(Mass_Invisible_Resolution, cat_list);
     //histPlot->AddPlot(MIa, cat_list);
-    histPlot->AddPlot(MXa2, cat_list);
+    //histPlot->AddPlot(MXa2, cat_list);
     histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_Par, cat_list);
     //histPlot->AddPlot(Par, cat_list);

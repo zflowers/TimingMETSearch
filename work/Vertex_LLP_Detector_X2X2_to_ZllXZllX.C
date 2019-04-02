@@ -42,7 +42,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t start = gSystem->Now();
     
     //setting masses and widths
-    double mX2 = 4000.0;
+    double mX2 = 1000.0;
     double mX1 = 300.0;
     double mZ = 91.19;
     double wZ = 2.50;
@@ -150,7 +150,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //setting up all the variables that could be potentially plotted
     const HistPlotVar& Pull_Mass_Parent = histPlot->GetNewVar("Pull_Mass_Parent","Pull of M(#tilde{#chi}_{2a}^{0})",-5.0,5.0,"");
     //const HistPlotVar& Mass_Parent_Resolution = histPlot->GetNewVar("Resolution_of_Parent_Mass","M(#tilde{#chi}_{2a}^{0})",-200.0,200.0,"[GeV]");
-    const HistPlotVar& MassReco_MassGen = histPlot->GetNewVar("RecoMass_GenMass","#Delta M(#tilde{#chi}_{2a}^{0})",-100.0,100.0,"[GeV]");
+    const HistPlotVar& MassReco_MassGen = histPlot->GetNewVar("RecoMass_GenMass","#Delta M(#tilde{#chi}_{2a}^{0})",-1000.0,1000.0,"[GeV]");
     const HistPlotVar& Pull_E_Z = histPlot->GetNewVar("Pull_E_Z","Pull of #delta E_{Za}^{#tilde{#chi}_{2a}^{0}}",-5.0,5.0,"");
     const HistPlotVar& Pull_E_L = histPlot->GetNewVar("Pull_E_L","Pull of #delta E_{L1a}",-5.0,5.0,"");
     const HistPlotVar& Pull_D = histPlot->GetNewVar("Pull_D","Pull of Distance",-5.0,5.0,"");
@@ -163,7 +163,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& ThetaA = histPlot->GetNewVar("ThetaA","#theta",-5.0,5.0,"[Radians]"); //some angle, see below
     const HistPlotVar& Pull_MET = histPlot->GetNewVar("Pull MET","Pull of MET",-5.0,5.0,"[GeV]");
     const HistPlotVar& DCosA = histPlot->GetNewVar("DCosA","#Delta Cos(#theta)",-0.002,0.002,"[Radians]");
-    const HistPlotVar& Pull_Cos = histPlot->GetNewVar("Pull_Cos","Pull of Cos(#theta)",-5.0,5.0,"");
+    const HistPlotVar& Pull_Cos = histPlot->GetNewVar("Pull_Cos","Pull of Cos(#theta)",-1.0,1.0,"");
     const HistPlotVar& DElA = histPlot->GetNewVar("DElA","#Delta E_{Lepton}",-25.0,25.0,"[GeV]");
     const HistPlotVar& DBetaA = histPlot->GetNewVar("DBetaA","#Delta #Beta",-0.5,0.5,"[#mu m/pico s]");
     
@@ -200,14 +200,14 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& MIb3 = histPlot->GetNewVar("MIb3", "M(#tilde{#chi}_{1b}^{0})", 0., 1800., "[GeV]");
     
     //comment in/out whatever plots are interesting
-    //histPlot->AddPlot(MassReco_MassGen, cat_list);
+    histPlot->AddPlot(MassReco_MassGen, cat_list);
     //histPlot->AddPlot(Pull_Mass_Parent, cat_list);
     //histPlot->AddPlot(Ereco_Egen, cat_list);
     //histPlot->AddPlot(E_Z_Parent_Resolution, cat_list);
     //histPlot->AddPlot(DElA, cat_list);
     //histPlot->AddPlot(CosA, cat_list);
     //histPlot->AddPlot(DCosA, cat_list);
-    //histPlot->AddPlot(Pull_Cos, cat_list);
+    histPlot->AddPlot(Pull_Cos, cat_list);
     //histPlot->AddPlot(ThetaA, cat_list);
     //histPlot->AddPlot(Pull_MET, cat_list);
     //histPlot->AddPlot(DBetaA, cat_list);
@@ -244,7 +244,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Mreco_Mgen, cat_list);
     //histPlot->AddPlot(Mass_Invisible_Resolution, cat_list);
     //histPlot->AddPlot(MIa, cat_list);
-    histPlot->AddPlot(MXa2, cat_list);
+    //histPlot->AddPlot(MXa2, cat_list);
     histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_Par, cat_list);
     //histPlot->AddPlot(Par, cat_list);
@@ -252,12 +252,12 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
     TFile* input = new TFile("PTEta.root");
-    string PTEta_histname = "hist_PTvsEta_1000";
-    /*
+    //string PTEta_histname = "hist_PTvsEta_1000";
+    
     string PTEta_histname = "hist_PTvsEta_";
     int hist_mX2 = mX2;
     PTEta_histname += std::to_string(hist_mX2);
-    */
+    
     TH2* hist = (TH2*)input->Get(PTEta_histname.c_str());
     Physics physics;
     physics.SetEtaPtCM(*hist);
@@ -311,10 +311,10 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
       //set momentum based upon the mass
         physics.GetEtaPtCM(LAB_eta,LAB_Pt);
         //Fix the momentum by hand
-        /*
-        LAB_Pt = gRandom->Gaus(3000.0,100.0);
-        LAB_eta = gRandom->Gaus(0.0,2.4);
-        */
+        
+        //LAB_Pt = gRandom->Gaus(5000.0,100.0);
+        //LAB_eta = gRandom->Gaus(0.0,2.4);
+        
         //
       LAB_Gen.SetTransverseMomentum(LAB_Pt);
       LAB_Gen.SetLongitudinalMomentum(LAB_Pt*TMath::SinH(LAB_eta));
@@ -522,7 +522,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         TVector3 Perp_Gen = Par_Gen.Cross(Zhat);
         TVector3 Par_RECO = MET_RECO_PUPPI+Va.Vect()+Vb.Vect();
         TVector3 Perp_RECO = Par_RECO.Cross(Zhat);
-        Par = Par_Gen.Mag();//-Par_RECO.Mag();
+        Par = Par_Gen.Mag();
 /* //for par pull plot
         if(Par < 25.0)
         {
@@ -539,39 +539,13 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         double gammaa_RECO = 1./sqrt(1.-Smeared_vBetaa.Mag2());
         double gammab_RECO = 1./sqrt(1.-Smeared_vBetab.Mag2());
         
+        Pull_Cos = Perp_Gen.Unit().Dot(vBetabGen.Unit()) - Perp_RECO.Unit().Dot(Smeared_vBetab.Unit());
+        
         double MPa_Gen = test_Resolution.Mass_Parents2(Par_Gen,vBetaaGen,vBetabGen);
         MXa2 = test_Resolution.Mass_Parents2(Par_RECO,Smeared_vBetaa,Smeared_vBetab);
-        
-        Pull_MXa2 = (MPa_Gen-MXa2)/test_Resolution.Mass_Parents2_Resolution(Par_RECO,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,Sigma_Par);
-        /*
-        EZb = vZb.E();
-        MXa = EZa + sqrt(EZa*EZa + mX1*mX1 - vZa.M2());
-        
-        MXa2 = vPta.Dot(Smeared_vBetaaT)*sqrt(1.-Smeared_vBetaa.Mag2())/Smeared_vBetaaT.Mag2();
-        MXa2 = vPtb.Dot(Smeared_vBetabT)*sqrt(1.-Smeared_vBetab.Mag2())/Smeared_vBetabT.Mag2();
-        MIa2 = sqrt(MXa2*MXa2 - 2.*MXa2*EZa+vZa.M2());
-        RMIXa2 = MIa2 / MXa2;
-        
-        MXa3 = (vZa.M2()-vZb.M2())/2./(EZa-EZb);
-        MIa3 = sqrt(MXa3*MXa3 - 2.*MXa3*EZa+vZa.M2());
-        
-        gammaa = 1./sqrt(1.-Smeared_vBetaa.Mag2());
-        gammab = 1./sqrt(1.-Smeared_vBetab.Mag2());
-        
-        TVector3 vPar = vPt.Unit();
-        TVector3 vPer = vPt.Cross(Zhat).Unit();
-        
-        BaPar = Smeared_vBetaaT.Dot(vPar);
-        BaPer = Smeared_vBetaaT.Dot(vPer);
-        BbPar = Smeared_vBetabT.Dot(vPar);
-        BbPer = Smeared_vBetabT.Dot(vPer);
-        
-        Epa = vPt.Mag()/( BaPar - BbPar*BaPer/BbPer );
-        MXa3 = Epa/gammaa;
-        Epb = vPt.Mag()/( BbPar - BaPar*BbPer/BaPer );
-        MXb3 = Epb/gammab;
-        MIb3 = sqrt(MXb3*MXb3 - 2.*MXb3*EZb+vZb.M2());
-        */
+        MassReco_MassGen = MPa_Gen - MXa2;
+        Pull_MXa2 = (MPa_Gen-MXa2)/test_Resolution.Mass_Parents2_Resolution(Par_RECO,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,Sigma_Par,0.03);
+        //the velocity doesn't matter that much, as can be seen by setting Sigma_Beta_Mag to zero
         histPlot->Fill(cat_list[m]);
         acp_events++;
     }
