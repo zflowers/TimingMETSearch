@@ -200,14 +200,14 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& MIb3 = histPlot->GetNewVar("MIb3", "M(#tilde{#chi}_{1b}^{0})", 0., 1800., "[GeV]");
     
     //comment in/out whatever plots are interesting
-    histPlot->AddPlot(MassReco_MassGen, cat_list);
+    //histPlot->AddPlot(MassReco_MassGen, cat_list);
     //histPlot->AddPlot(Pull_Mass_Parent, cat_list);
     //histPlot->AddPlot(Ereco_Egen, cat_list);
     //histPlot->AddPlot(E_Z_Parent_Resolution, cat_list);
     //histPlot->AddPlot(DElA, cat_list);
     //histPlot->AddPlot(CosA, cat_list);
     //histPlot->AddPlot(DCosA, cat_list);
-    histPlot->AddPlot(Pull_Cos, cat_list);
+    //histPlot->AddPlot(Pull_Cos, cat_list);
     //histPlot->AddPlot(ThetaA, cat_list);
     //histPlot->AddPlot(Pull_MET, cat_list);
     //histPlot->AddPlot(DBetaA, cat_list);
@@ -244,8 +244,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Mreco_Mgen, cat_list);
     //histPlot->AddPlot(Mass_Invisible_Resolution, cat_list);
     //histPlot->AddPlot(MIa, cat_list);
-    //histPlot->AddPlot(MXa2, cat_list);
     histPlot->AddPlot(Pull_MXa2, cat_list);
+    histPlot->AddPlot(MXa2, cat_list);
     //histPlot->AddPlot(Pull_Par, cat_list);
     //histPlot->AddPlot(Par, cat_list);
     
@@ -542,9 +542,9 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         Pull_Cos = Perp_Gen.Unit().Dot(vBetabGen.Unit()) - Perp_RECO.Unit().Dot(Smeared_vBetab.Unit());
         
         double MPa_Gen = test_Resolution.Mass_Parents2(Par_Gen,vBetaaGen,vBetabGen);
-        MXa2 = test_Resolution.Mass_Parents2(Par_RECO,Smeared_vBetaa,Smeared_vBetab);
+        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
         MassReco_MassGen = MPa_Gen - MXa2;
-        Pull_MXa2 = (MPa_Gen-MXa2)/test_Resolution.Mass_Parents2_Resolution(Par_RECO,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,Sigma_Par,0.03);
+        Pull_MXa2 = (MPa_Gen-MXa2)/test_Resolution.Mass_Parents2_Resolution(Par_RECO,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Resolution);
         //the velocity doesn't matter that much, as can be seen by setting Sigma_Beta_Mag to zero
         histPlot->Fill(cat_list[m]);
         acp_events++;
