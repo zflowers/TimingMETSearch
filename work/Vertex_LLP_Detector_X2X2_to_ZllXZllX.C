@@ -42,7 +42,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t start = gSystem->Now();
     
     //setting masses and widths
-    double mX2 = 1000.0;
+    double mX2 = 6000.0;
     double mX1 = 100.0;
     double mZ = 91.19;
     double wZ = 2.50;
@@ -192,7 +192,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     
     const HistPlotVar& EZb = histPlot->GetNewVar("EZb", "E_{Zb}^{#tilde{#chi}_{2b}^{0}}", 0., 800., "[GeV]");
     const HistPlotVar& MXa = histPlot->GetNewVar("MXa", "M(#tilde{#chi}_{2a}^{0})", 0., 1800., "[GeV]");
-    const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 1800., "[GeV]");
+    const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 2000., "[GeV]");
     const HistPlotVar& MXb2 = histPlot->GetNewVar("MXb2", "M(#tilde{#chi}_{2b}^{0})", 0., 1800., "[GeV]");
     const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", 0., 1000., "[GeV]");
     const HistPlotVar& RMIXa2 = histPlot->GetNewVar("RMIXa2", "M(#tilde{#chi}_{1a}^{0})/M(#tilde{#chi}_{2a}^{0})", 0., 1.2);
@@ -211,7 +211,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(DCosA, cat_list);
     //histPlot->AddPlot(Pull_Cos, cat_list);
     //histPlot->AddPlot(ThetaA, cat_list);
-    //histPlot->AddPlot(Pull_MET, cat_list);
+    histPlot->AddPlot(Pull_MET, cat_list);
     //histPlot->AddPlot(DBetaA, cat_list);
     //histPlot->AddPlot(ToFaL, cat_list);
     //histPlot->AddPlot(DaL, cat_list);
@@ -246,20 +246,20 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Mreco_Mgen, cat_list);
     //histPlot->AddPlot(Mass_Invisible_Resolution, cat_list);
     //histPlot->AddPlot(MIa, cat_list);
-    histPlot->AddPlot(Pull_MXa2, cat_list);
     histPlot->AddPlot(MXa2, cat_list);
+    histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_Par, cat_list);
     //histPlot->AddPlot(Par, cat_list);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
     TFile* input = new TFile("PTEta.root");
-    //string PTEta_histname = "hist_PTvsEta_1000";
-    
+    string PTEta_histname = "hist_PTvsEta_1000";
+    /*
     string PTEta_histname = "hist_PTvsEta_";
     int hist_mX2 = mX2;
     PTEta_histname += std::to_string(hist_mX2);
-    
+    */
     TH2* hist = (TH2*)input->Get(PTEta_histname.c_str());
     Physics physics;
     physics.SetEtaPtCM(*hist);
@@ -314,8 +314,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         physics.GetEtaPtCM(LAB_eta,LAB_Pt);
         //Fix the momentum by hand
         
-        //LAB_Pt = gRandom->Gaus(1000.0,100.0);
-        //LAB_eta = gRandom->Gaus(0.0,2.4);
+        LAB_Pt = gRandom->Gaus(10.0,1.);
+        LAB_eta = gRandom->Gaus(0.0,2.4);
         
         //
       LAB_Gen.SetTransverseMomentum(LAB_Pt);

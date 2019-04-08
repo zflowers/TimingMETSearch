@@ -204,26 +204,18 @@ inline double Resolution::Mass_Parents2(TVector3 MET, TVector3 Vis, TVector3 Bet
     double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
     Betaa.SetZ(0.);
     Betab.SetZ(0.);
-    double ca = TMath::Cos(GetAngle(MET,Betaa));
-    double cb = TMath::Cos(GetAngle(MET,Betab));
-    double sa = TMath::Sin(GetAngle(MET,Betaa));
-    double sb = TMath::Sin(GetAngle(MET,Betab));
-    double cla = TMath::Cos(GetAngle(Vis,Betaa));
-    double clb = TMath::Cos(GetAngle(Vis,Betab));
-    double sla = TMath::Sin(GetAngle(Vis,Betaa));
-    double slb = TMath::Sin(GetAngle(Vis,Betab));
-    double cmv = TMath::Cos(GetAngle(MET,Vis));
-    //These can be either -1 or 1
-    double czmb = TMath::Cos(GetAngle(Betab.Unit().Cross(MET),Zhat));
-    double czvb = TMath::Cos(GetAngle(Betab.Unit().Cross(Vis),Zhat));
-    double czma = TMath::Cos(GetAngle(Betaa.Unit().Cross(MET),Zhat));
-    double czva = TMath::Cos(GetAngle(Betaa.Unit().Cross(Vis),Zhat));
-    
-    
-    //return (MET.Mag2()+2.0*MET.Mag()*Vis.Mag()*cmv+Vis.Mag2())*(czmb*MET.Mag()*sb+czvb*Vis.Mag()*slb)/(gamma*Betaa.Pt()*(MET.Mag()*ca*(MET.Mag()*sb+Vis.Mag()*sla)+Vis.Mag()*cla*(MET.Mag()*sb+Vis.Mag()*slb)-MET.Mag()*cb*(MET.Mag()*sa+Vis.Mag()*sla)-Vis.Mag()*clb*(MET.Mag()*sa+Vis.Mag()*sla))); //Chris
-    //return (MET.Mag2()+2.0*MET.Mag()*Vis.Mag()*cmv+Vis.Mag2())*(czmb*MET.Mag()*sb+czvb*Vis.Mag()*slb)/(gamma*Betaa.Pt()*(MET.Mag2()*(ca*sb-cb*sa)+MET.Mag()*Vis.Mag()*(ca*slb+cla*sb-cb*sla-clb*sa)+Vis.Mag2()*(cla*slb-clb*sla))); //Chris
-    return (MET.Mag2()+2.0*MET.Mag()*Vis.Mag()*cmv+Vis.Mag2())*(czmb*MET.Mag()*sb+czvb*Vis.Mag()*slb)/(gamma*Betaa.Pt()*((MET.Mag()*ca+Vis.Mag()*cla)*(czmb*MET.Mag()*sb+czvb*Vis.Mag()*slb)-(MET.Mag()*cb+Vis.Mag()*clb)*(czma*MET.Mag()*sa+czva*Vis.Mag()*sla)));
-    //return ((Betab.Unit().Cross(Par.Unit()).Dot(Zhat))*Par.Mag())/(gamma*Betaa.Pt()*(Betaa.Unit().Dot(Par.Unit())*Betab.Unit().Cross(Par.Unit())-Betab.Unit().Dot(Par.Unit())*Betaa.Unit().Cross(Par.Unit())).Dot(Zhat));
+    double ca = MET.Unit().Dot(Betaa.Unit());
+    double cb = MET.Unit().Dot(Betab.Unit());
+    double sa = MET.Unit().Cross(Betaa.Unit()).Dot(Zhat);
+    double sb = MET.Unit().Cross(Betab.Unit()).Dot(Zhat);
+    double cla = Vis.Unit().Dot(Betaa.Unit());
+    double clb = Vis.Unit().Dot(Betab.Unit());
+    double sla = Vis.Unit().Cross(Betaa.Unit()).Dot(Zhat);
+    double slb = Vis.Unit().Cross(Betab.Unit()).Dot(Zhat);
+    double cmv = Vis.Unit().Dot(MET.Unit());
+    double den = gamma*Betaa.Pt()*(MET.Mag2()*(ca*sb-cb*sa)+MET.Mag()*Vis.Mag()*(ca*slb+cla*sb-cb*sla-clb*sa)+Vis.Mag2()*(cla*slb-clb*sla));
+
+    return (MET.Mag2()+2.0*MET.Mag()*Vis.Mag()*cmv+Vis.Mag2())*(MET.Mag()*sb+Vis.Mag()*slb)/(den);
 }
 
 inline double Resolution::Mass_Parents2_Resolution(TVector3 MET, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET)
@@ -233,31 +225,22 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 MET, TVector3 Vis, T
     double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
     Betaa.SetZ(0.);
     Betab.SetZ(0.);
-    double MET_RES;
-
-    double ca = TMath::Cos(GetAngle(MET,Betaa));
-    double cb = TMath::Cos(GetAngle(MET,Betab));
-    double sa = TMath::Sin(GetAngle(MET,Betaa));
-    double sb = TMath::Sin(GetAngle(MET,Betab));
-    double cla = TMath::Cos(GetAngle(Vis,Betaa));
-    double clb = TMath::Cos(GetAngle(Vis,Betab));
-    double sla = TMath::Sin(GetAngle(Vis,Betaa));
-    double slb = TMath::Sin(GetAngle(Vis,Betab));
-    double czmb = TMath::Cos(GetAngle(Betab.Unit().Cross(MET),Zhat));
-    double czvb = TMath::Cos(GetAngle(Betab.Unit().Cross(Vis),Zhat));
-    double czma = TMath::Cos(GetAngle(Betaa.Unit().Cross(MET),Zhat));
-    double czva = TMath::Cos(GetAngle(Betaa.Unit().Cross(Vis),Zhat));
-    double cmv = TMath::Cos(GetAngle(MET,Vis));
+    double ca = MET.Unit().Dot(Betaa.Unit());
+    double cb = MET.Unit().Dot(Betab.Unit());
+    double sa = MET.Unit().Cross(Betaa.Unit()).Dot(Zhat);
+    double sb = MET.Unit().Cross(Betab.Unit()).Dot(Zhat);
+    double cla = Vis.Unit().Dot(Betaa.Unit());
+    double clb = Vis.Unit().Dot(Betab.Unit());
+    double sla = Vis.Unit().Cross(Betaa.Unit()).Dot(Zhat);
+    double slb = Vis.Unit().Cross(Betab.Unit()).Dot(Zhat);
+    double cmv = Vis.Unit().Dot(MET.Unit());
+    double den = gamma*Betaa.Pt()*(MET.Mag2()*(ca*sb-cb*sa)+MET.Mag()*Vis.Mag()*(ca*slb+cla*sb-cb*sla-clb*sa)+Vis.Mag2()*(cla*slb-clb*sla));
     
-    double dir1num = -((2.*cmv*Vis.Mag()*MET.Mag()+Vis.Mag2()+MET.Mag2())*(czmb*sb*MET.Mag()+czvb*slb*Vis.Mag())*(ca*(czmb*sb*MET.Mag()+czvb*slb*Vis.Mag())+czmb*sb*(ca*MET.Mag()+cla*Vis.Mag())-czma*sa*(cb*MET.Mag()+clb*Vis.Mag())-cb*(czma*sa*MET.Mag()+czva*sla*Vis.Mag())));
-    double dir1dena = ((ca*MET.Mag()+Vis.Mag()*cla)*(czmb*sb*MET.Mag()+czvb*slb*Vis.Mag())-(cb*MET.Mag()+clb*Vis.Mag())*(czma*sa*MET.Mag()+czva*sla*Vis.Mag()));
-    double dir1den = gamma*Betaa.Pt()*dir1dena*dir1dena;
-    double dir2num = czmb*sb*(2.*cmv*Vis.Mag()*MET.Mag()+Vis.Mag2()+MET.Mag2());
-    double dir2den = dir1dena*gamma*Betaa.Pt();
-    double dir3num = (2.*cmv*Vis.Mag()+2.*MET.Mag())*(czmb*sb*MET.Mag()+czvb*slb*Vis.Mag());
-    MET_RES = sigma_MET*(dir3num/dir1dena+dir2num/dir1dena+dir1num/dir1den);
+    
+    double der1 = ((2.*cmv*Vis.Mag()+2.*MET.Mag())*(MET.Mag()*sa+Vis.Mag()*sla)+sa*Par.Mag2())/(den);
+    double der2 = (Par.Mag2()*(MET.Mag()*sa+Vis.Mag()*sla)*(Vis.Mag()*(ca*slb+cla*sb-cb*sla-clb*sa)+2.*MET.Mag()*((ca*sb-cb*sa))))/(den*den/(gamma*Betaa.Pt()));
+    double MET_RES = sigma_MET*(der1-der2);
     
     double BETA_RES = sigma_Beta_Maga*gamma*gamma*Mass_Parents2(Par,Betaa,Betab)/Betaa.Pt();
-    //MET_RES = sigma_MET*Mass_Parents2(Par,Betaa,Betab)*(MET.Mag()+Vis.Mag()*TMath::Cos(GetAngle(MET,Vis)));
-    return sqrt(BETA_RES*BETA_RES*0. + MET_RES*MET_RES);
+    return sqrt(BETA_RES*BETA_RES + 0.*MET_RES*MET_RES);
 }

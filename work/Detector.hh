@@ -171,7 +171,8 @@ inline TVector3 Detector::Smear_MET(const TLorentzVector& sys, const TVector3& i
     TVector3 parhat  = inv.Unit();
     TVector3 perphat = inv.Cross(zhat).Unit();
     
-    TVector3 MET = inv + gRandom->Gaus(0.,sigma_par)*parhat + gRandom->Gaus(0.,sigma_perp)*perphat;
+    //NOTE: Set divide PerpHat by 10 to turn down the direction smearing
+    TVector3 MET = inv + gRandom->Gaus(0.,sigma_par)*parhat + 0.1*gRandom->Gaus(0.,sigma_perp)*perphat;
     
     return MET;
 }
