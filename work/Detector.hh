@@ -19,6 +19,8 @@ private:
     double sigmaT;
     double sigmaPV;
     double sigmaSV;
+    double sigma_par;
+    double sigma_perp;
 
 public:
     
@@ -54,7 +56,11 @@ public:
     double Get_Sigma_Perp(const TLorentzVector& sys);
     double Get_Sigma_Par(const TLorentzVector& sys);
     
-    TVector3 Smear_MET(const TLorentzVector& sys, const TVector3& inv);
+    TVector3 Smear_MET(const TVector3& inv);
+    
+    TVector3 Smear_MET_Mag(TVector3& inv);
+    
+    TVector3 Smear_MET_Dir(TVector3& inv);
     
     TLorentzVector Smear_Electron(const TLorentzVector& Electron_MC_TLV);
     
@@ -75,6 +81,8 @@ public:
     double Smear_ToF(double ToF);
     
     TVector3 Smear_Beta(Vertex User_PV, Vertex User_SV);
+    
+    TVector3 Smear_Beta_Mag(Vertex User_PV, Vertex User_SV);
     
     Vertex Smear_Vertex(Vertex User_Vertex, double sigmaV, double sigmaT);
 
@@ -151,30 +159,44 @@ inline double Detector::Get_con2_perp()
 
 inline double Detector::Get_Sigma_Perp(const TLorentzVector& sys)
 {
-    return (sys.Pt()*sqrt((con0_perp*con0_perp)/(sys.Pt()*sys.Pt())+(con1_perp*con1_perp)/sys.Pt()+con2_perp*con2_perp));
+    sigma_perp = (sys.Pt()*sqrt((con0_perp*con0_perp)/(sys.Pt()*sys.Pt())+(con1_perp*con1_perp)/sys.Pt()+con2_perp*con2_perp));
+    return sigma_perp;
 }
 
 inline double Detector::Get_Sigma_Par(const TLorentzVector& sys)
 {
-    return (sys.Pt()*sqrt((con0_par*con0_par)/(sys.Pt()*sys.Pt())+(con1_par*con1_par)/sys.Pt()+con2_par*con2_par));
+    sigma_par = (sys.Pt()*sqrt((con0_par*con0_par)/(sys.Pt()*sys.Pt())+(con1_par*con1_par)/sys.Pt()+con2_par*con2_par));
+    return sigma_par;
 }
 
 // smear MET
-inline TVector3 Detector::Smear_MET(const TLorentzVector& sys, const TVector3& inv)
+inline TVector3 Detector::Smear_MET(const TVector3& inv)
 {
     TVector3 zhat;
     zhat.SetXYZ(0.0,0.0,1.0);
     
-    double sigma_perp = Get_Sigma_Perp(sys);
-    double sigma_par = Get_Sigma_Par(sys);
-    
     TVector3 parhat  = inv.Unit();
     TVector3 perphat = inv.Cross(zhat).Unit();
     
-    //NOTE: Set divide PerpHat by 10 to turn down the direction smearing
-    TVector3 MET = inv + gRandom->Gaus(0.,sigma_par)*parhat + 0.1*gRandom->Gaus(0.,sigma_perp)*perphat;
-    
+    TVector3 MET = inv + gRandom->Gaus(0.,sigma_par)*parhat + gRandom->Gaus(0.,sigma_perp)*perphat;
+
     return MET;
+}
+
+inline TVector3 Detector::Smear_MET_Mag(TVector3& inv)
+{
+    TVector3 parhat  = inv.Unit();
+    TVector3 MET_Mag = inv + gRandom->Gaus(0.,sigma_par)*parhat;
+    return MET_Mag;
+}
+
+inline TVector3 Detector::Smear_MET_Dir(TVector3& inv)
+{
+    TVector3 zhat;
+    zhat.SetXYZ(0.0,0.0,1.0);
+    TVector3 perphat = inv.Cross(zhat).Unit();
+    TVector3 MET_Dir = gRandom->Gaus(0.,sigma_perp)*perphat;
+    return MET_Dir;
 }
 
 // smear Electron Given TLV of Electron
@@ -551,6 +573,23 @@ inline TVector3 Detector::Smear_Beta(Vertex User_PV, Vertex User_SV)
 {
     TVector3 Smeared_Beta = (1./30./(User_SV.GetTPos()-User_PV.GetTPos()))*(User_SV.GetXYZPos()-User_PV.GetXYZPos());
     return Smeared_Beta;
+}
+
+inline TVector3 Detector::Smear_Beta_Mag(Vertex User_PV, Vertex User_SV)
+{
+    TVector3 Beta_True = (1./30./(User_SV.GetTPos()-User_PV.GetTPos()))*(User_SV.GetXYZPos()-User_PV.GetXYZPos());
+    
+    TVector3 RefVec(1.0,1.0,1.0);
+    
+    TVector3 parhat  = Beta_True.Unit();
+    TVector3 perphat = Beta_True.Cross(RefVec).Unit();
+    double sigma_par_beta = Beta_True.Mag()*.1;
+    //double sigma_perp = ;
+    
+    //NOTE: Set divide PerpHat by 10 to turn down the direction smearing
+    TVector3 Beta = Beta_True + gRandom->Gaus(0.,sigma_par_beta)*parhat;// + gRandom->Gaus(0.,sigma_perp)*perphat;
+    
+    return Beta;
 }
 
 inline Vertex Detector::Smear_Vertex(Vertex User_Vertex, double User_sigmaV, double User_sigmaT)

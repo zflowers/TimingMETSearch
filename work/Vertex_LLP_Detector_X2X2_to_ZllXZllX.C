@@ -42,7 +42,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t start = gSystem->Now();
     
     //setting masses and widths
-    double mX2 = 6000.0;
+    double mX2 = 1000.0;
     double mX1 = 100.0;
     double mZ = 91.19;
     double wZ = 2.50;
@@ -211,7 +211,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(DCosA, cat_list);
     //histPlot->AddPlot(Pull_Cos, cat_list);
     //histPlot->AddPlot(ThetaA, cat_list);
-    histPlot->AddPlot(Pull_MET, cat_list);
+    //histPlot->AddPlot(Pull_MET, cat_list);
     //histPlot->AddPlot(DBetaA, cat_list);
     //histPlot->AddPlot(ToFaL, cat_list);
     //histPlot->AddPlot(DaL, cat_list);
@@ -247,19 +247,19 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Mass_Invisible_Resolution, cat_list);
     //histPlot->AddPlot(MIa, cat_list);
     histPlot->AddPlot(MXa2, cat_list);
-    histPlot->AddPlot(Pull_MXa2, cat_list);
+    //histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_Par, cat_list);
     //histPlot->AddPlot(Par, cat_list);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
     TFile* input = new TFile("PTEta.root");
-    string PTEta_histname = "hist_PTvsEta_1000";
-    /*
+    //string PTEta_histname = "hist_PTvsEta_1000";
+    
     string PTEta_histname = "hist_PTvsEta_";
     int hist_mX2 = mX2;
     PTEta_histname += std::to_string(hist_mX2);
-    */
+    
     TH2* hist = (TH2*)input->Get(PTEta_histname.c_str());
     Physics physics;
     physics.SetEtaPtCM(*hist);
@@ -314,8 +314,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         physics.GetEtaPtCM(LAB_eta,LAB_Pt);
         //Fix the momentum by hand
         
-        LAB_Pt = gRandom->Gaus(10.0,1.);
-        LAB_eta = gRandom->Gaus(0.0,2.4);
+        //LAB_Pt = gRandom->Gaus(10.0,1.);
+        //LAB_eta = gRandom->Gaus(0.0,2.4);
         
         //
       LAB_Gen.SetTransverseMomentum(LAB_Pt);
@@ -332,13 +332,18 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         TLorentzVector I   = Ia+Ib;
         I.SetZ(0.0);
         
+        double MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
+        double MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
         
         //The smearing begins
-        TVector3 MET_RECO_PUPPI = PUPPI_Detector.Smear_MET(sys,I.Vect());
+        TVector3 I_Vect = I.Vect();
+        TVector3 MET_Par = PUPPI_Detector.Smear_MET_Mag(I_Vect);
+        TVector3 MET_Perp = PUPPI_Detector.Smear_MET_Dir(I_Vect);
+        TVector3 MET_RECO_PUPPI = MET_Par+MET_Perp;
         MET_RECO_PUPPI.SetZ(0.0);
-        TVector3 Ia_RECO = PUPPI_Detector.Smear_MET(sys,Ia.Vect());
+        TVector3 Ia_RECO = PUPPI_Detector.Smear_MET(Ia.Vect());
         Ia_RECO.SetZ(0.0);
-        TVector3 Ib_RECO = PUPPI_Detector.Smear_MET(sys,Ib.Vect());
+        TVector3 Ib_RECO = PUPPI_Detector.Smear_MET(Ib.Vect());
         Ib_RECO.SetZ(0.0);
         TLorentzVector L1a_RECO = L1a_Gen.GetFourVector();//PUPPI_Detector.Smear_Muon(L1a_Gen.GetFourVector());
         TLorentzVector L1b_RECO = L1b_Gen.GetFourVector();//PUPPI_Detector.Smear_Muon(L1b_Gen.GetFourVector());
@@ -369,6 +374,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         Vertex Smeared_SVa = SVa;//PUPPI_Detector.Smear_SV(SVa);
         Vertex Smeared_SVb = SVb;//PUPPI_Detector.Smear_SV(SVb);
         TVector3 Smeared_vBetaa = vBetaaGen;//PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
+        //TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta_Mag(PV,SVa);
         TVector3 Smeared_vBetab = vBetabGen;//PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
         TVector3 Smeared_vBetaaT = Smeared_vBetaa;
         Smeared_vBetaaT.SetZ(0.0);
@@ -419,7 +425,6 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         
         //set some resolutions
         MuonResolution = PUPPI_Detector.GetMuonResolution(L2a_Gen.GetFourVector());
-        double MET_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
         
         TVector3 vPta = (L1a_RECO+L2a_RECO).Vect()+Ia_RECO;
         TVector3 vPtaGen = (L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()+Ia).Vect();
@@ -493,8 +498,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         Pull_Cos = DCosA/Resolution_CosL1aL2a;
         
         
-        Pull_MET = (MET_RECO_PUPPI.Mag()-I.Vect().Mag())/MET_Resolution;
-        
+        Pull_MET = (MET_RECO_PUPPI.Mag()-I.Vect().Mag())/MET_Mag_Resolution; //Magnitude
+        //Pull_MET = (MET_RECO_PUPPI.Cross(Zhat).Mag()-I.Vect().Cross(Zhat).Mag())/MET_Dir_Resolution; //Direction
         
         
         E_Z_Parent_Resolution = test_Resolution.Energy_Z_Parent_Resolution(vBetaaGen,L1a_RECO,L2a_RECO,L1a_RECO.E()*PUPPI_Detector.GetMuonResolution(L1a_Gen.GetFourVector()),L2a_RECO.E()*PUPPI_Detector.GetMuonResolution(L2a_Gen.GetFourVector()),Sigma_Angle1,Sigma_Angle2,Sigma_Beta_Mag); //see Resolution.hh for calculation
@@ -504,14 +509,14 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         Pull_E_Z = Ereco_Egen/E_Z_Parent_Resolution; //get the pull of the energy of the Z in the parent's rest frame
         
         
-        double MP_Resolution = test_Resolution.Mass_Parent_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECOt,L2a_RECOt,MET_Resolution,L1a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1a_Gent),L2a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2a_Gent),Sigma_Beta_Mag);
+        double MP_Resolution = test_Resolution.Mass_Parent_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECOt,L2a_RECOt,MET_Mag_Resolution,L1a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1a_Gent),L2a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2a_Gent),Sigma_Beta_Mag);
         
         double MXa_Gen = test_Resolution.Mass_Parent(vPtaGen,vBetaaGen);
         MXa = test_Resolution.Mass_Parent(vPta,Smeared_vBetaa);
         MassReco_MassGen = MXa-MXa_Gen;
         Pull_Mass_Parent = MassReco_MassGen/MP_Resolution;
 
-        Mass_Invisible_Resolution = test_Resolution.Mass_Invisible_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECO,L2a_RECO,MET_Resolution,Sigma_Beta_Mag);
+        Mass_Invisible_Resolution = test_Resolution.Mass_Invisible_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECO,L2a_RECO,MET_Mag_Resolution,Sigma_Beta_Mag);
         
         double MI_Gen = sqrt(MXa_Gen*MXa_Gen-2.*MXa_Gen*vZaGen.E()+((L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M2()));
         MIa = sqrt(MXa*MXa-2.*MXa*EZa+((L1a_RECO+L2a_RECO).M2()));
@@ -532,7 +537,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
             continue;
         }
 */
-        double Sigma_Par = test_Resolution.Par_Resolution(MET_RECO_PUPPI,L1a_RECOt.Vect(),L2a_RECOt.Vect(),L1b_RECOt.Vect(),L2b_RECOt.Vect(),MET_Resolution,L1a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1a_Gent),L2a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2a_Gent),L1b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1b_Gent),L2b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2b_Gent));
+
+        double Sigma_Par = test_Resolution.Par_Resolution(MET_RECO_PUPPI,L1a_RECOt.Vect(),L2a_RECOt.Vect(),L1b_RECOt.Vect(),L2b_RECOt.Vect(),MET_Mag_Resolution,L1a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1a_Gent),L2a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2a_Gent),L1b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1b_Gent),L2b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2b_Gent));
         
         Pull_Par = (Par_Gen.Mag()-Par_RECO.Mag())/Sigma_Par;
         
@@ -544,9 +550,9 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         Pull_Cos = Perp_Gen.Unit().Dot(vBetabGen.Unit()) - Perp_RECO.Unit().Dot(Smeared_vBetab.Unit());
         
         double MPa_Gen = test_Resolution.Mass_Parents2(Par_Gen,vBetaaGen,vBetabGen);
-        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+        MXa2 = test_Resolution.Mass_Parents2(MET_Par,MET_Perp,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
         MassReco_MassGen = MPa_Gen - MXa2;
-        Pull_MXa2 = (MPa_Gen-MXa2)/test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Resolution);
+        Pull_MXa2 = (MPa_Gen-MXa2)/test_Resolution.Mass_Parents2_Resolution(MET_Par,MET_Perp,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution);
         histPlot->Fill(cat_list[m]);
         acp_events++;
     }
