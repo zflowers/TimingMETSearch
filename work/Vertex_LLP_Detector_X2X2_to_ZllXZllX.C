@@ -56,6 +56,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     }
     */
 
+    ctau.push_back(1.);
+    ctau.push_back(5.);
     ctau.push_back(50.);
     
     int Nctau = ctau.size();
@@ -79,6 +81,19 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     InvisibleGenFrame X1a_Gen("X1a_Gen","#tilde{#chi}^{ 0}_{1 a}");
     InvisibleGenFrame X1b_Gen("X1b_Gen","#tilde{#chi}^{ 0}_{1 b}");
     
+    LabRecoFrame LAB_Reco("LAB_Reco","LAB");
+    DecayRecoFrame     X2X2_Reco("X2X2_Reco","#tilde{#chi}^{ 0}_{2} #tilde{#chi}^{ 0}_{2}");
+    DecayRecoFrame     X2a_Reco("X2a_Reco","#tilde{#chi}^{ 0}_{2 a}");
+    DecayRecoFrame     X2b_Reco("X2b_Reco","#tilde{#chi}^{ 0}_{2 b}");
+    DecayRecoFrame Za_Reco("Za_Reco","Z_{a}");
+    DecayRecoFrame Zb_Reco("Zb_Reco","Z_{b}");
+    VisibleRecoFrame   L1a_Reco("L1a_Reco","#it{l}_{1a}");
+    VisibleRecoFrame   L2a_Reco("L2a_Reco","#it{l}_{2a}");
+    VisibleRecoFrame   L1b_Reco("L1b_Reco","#it{l}_{1b}");
+    VisibleRecoFrame   L2b_Reco("L2b_Reco","#it{l}_{2b}");
+    VisibleRecoFrame X1a_Reco("X1a_Reco","#tilde{#chi}^{ 0}_{1 a}");
+    VisibleRecoFrame X1b_Reco("X1b_Reco","#tilde{#chi}^{ 0}_{1 b}");
+    
     //
     //LAB_Gen.SetEnergyP1(20000.0);
     //LAB_Gen.SetEnergyP2(20000.0);
@@ -94,10 +109,26 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     Zb_Gen.AddChildFrame(L1b_Gen);
     Zb_Gen.AddChildFrame(L2b_Gen);
     
+    LAB_Reco.SetChildFrame(X2X2_Reco);
+    X2X2_Reco.AddChildFrame(X2a_Reco);
+    X2X2_Reco.AddChildFrame(X2b_Reco);
+    X2a_Reco.AddChildFrame(Za_Reco);
+    X2a_Reco.AddChildFrame(X1a_Reco);
+    X2b_Reco.AddChildFrame(Zb_Reco);
+    X2b_Reco.AddChildFrame(X1b_Reco);
+    Za_Reco.AddChildFrame(L1a_Reco);
+    Za_Reco.AddChildFrame(L2a_Reco);
+    Zb_Reco.AddChildFrame(L1b_Reco);
+    Zb_Reco.AddChildFrame(L2b_Reco);
+    
     if(LAB_Gen.InitializeTree())
         g_Log << LogInfo << "...Successfully initialized generator tree" << LogEnd;
     else
         g_Log << LogError << "...Failed initializing generator tree" << LogEnd;
+    if(LAB_Reco.InitializeTree())
+        g_Log << LogInfo << "...Successfully initialized reconstructed tree" << LogEnd;
+    else
+        g_Log << LogError << "...Failed initializing reconstructed tree" << LogEnd;
     
   //-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//
     
@@ -112,11 +143,15 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     
     
     //For now we remove any cuts
-  //L1a_Gen.SetPtCut(10.);        L1a_Gen.SetEtaCut(2.5);
-  //L2a_Gen.SetPtCut(10.);        L2a_Gen.SetEtaCut(2.5);
-  //L1b_Gen.SetPtCut(10.);        L1b_Gen.SetEtaCut(2.5);
-  //L2b_Gen.SetPtCut(10.);        L2b_Gen.SetEtaCut(2.5);
+  L1a_Gen.SetPtCut(10.);        L1a_Gen.SetEtaCut(2.5);
+  L2a_Gen.SetPtCut(10.);        L2a_Gen.SetEtaCut(2.5);
+  L1b_Gen.SetPtCut(10.);        L1b_Gen.SetEtaCut(2.5);
+  L2b_Gen.SetPtCut(10.);        L2b_Gen.SetEtaCut(2.5);
   
+    if(LAB_Reco.InitializeAnalysis())
+        g_Log << LogInfo << "...Successfully initialized reconstructed analysis" << LogEnd;
+    else
+        g_Log << LogError << "...Failed initializing reconstructed analysis" << LogEnd;
   if(LAB_Gen.InitializeAnalysis())
     g_Log << LogInfo << "...Successfully initialized generator analysis" << LogEnd;
   else
@@ -201,6 +236,16 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& MXb3 = histPlot->GetNewVar("MXb3", "M(#tilde{#chi}_{2b}^{0})", 0., 2000., "[GeV]");
     const HistPlotVar& MIb3 = histPlot->GetNewVar("MIb3", "M(#tilde{#chi}_{1b}^{0})", 0., 1800., "[GeV]");
     
+    
+    
+    const HistPlotVar& CosX2a = histPlot->GetNewVar("CosX2a", "Cos_X2a", -1, 1., "");
+    const HistPlotVar& CosX2b = histPlot->GetNewVar("CosX2b", "Cos_X2b", -1, 1., "");
+    const HistPlotVar& CosX2a_Gen = histPlot->GetNewVar("CosX2a_Gen", "Cos_X2a_Gen", -1, 1., "");
+    const HistPlotVar& CosX2b_Gen = histPlot->GetNewVar("CosX2b_Gen", "Cos_X2b_Gen", -1, 1., "");
+    
+    
+    
+    
     //comment in/out whatever plots are interesting
     //histPlot->AddPlot(MassReco_MassGen, cat_list);
     //histPlot->AddPlot(Pull_Mass_Parent, cat_list);
@@ -250,6 +295,14 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_Par, cat_list);
     //histPlot->AddPlot(Par, cat_list);
+    histPlot->AddPlot(CosX2a, cat_list);
+    histPlot->AddPlot(CosX2b, cat_list);
+    histPlot->AddPlot(Pull_Beta_Mag, CosX2a, cat_list);
+    histPlot->AddPlot(MXa2, CosX2a, cat_list);
+    //histPlot->AddPlot(CosX2a_Gen, cat_list);
+    //histPlot->AddPlot(CosX2b_Gen, cat_list);
+    //histPlot->AddPlot(CosX2a_Gen, CosX2a, cat_list);
+    //histPlot->AddPlot(CosX2b_Gen, CosX2b, cat_list);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -370,12 +423,12 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         
         Vertex SVa = physics.Get_SV(ToFa,Pa);
         Vertex SVb = physics.Get_SV(ToFb,Pb);
-        Vertex Smeared_PV = PV;//PUPPI_Detector.Smear_PV(PV);
-        Vertex Smeared_SVa = SVa;//PUPPI_Detector.Smear_SV(SVa);
-        Vertex Smeared_SVb = SVb;//PUPPI_Detector.Smear_SV(SVb);
-        TVector3 Smeared_vBetaa = vBetaaGen;//PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
+        Vertex Smeared_PV = PUPPI_Detector.Smear_PV(PV);
+        Vertex Smeared_SVa = PUPPI_Detector.Smear_SV(SVa);
+        Vertex Smeared_SVb = PUPPI_Detector.Smear_SV(SVb);
+        TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
         //TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta_Mag(PV,SVa);
-        TVector3 Smeared_vBetab = vBetabGen;//PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
+        TVector3 Smeared_vBetab = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
         TVector3 Smeared_vBetaaT = Smeared_vBetaa;
         Smeared_vBetaaT.SetZ(0.0);
         TVector3 Smeared_vBetabT = Smeared_vBetab;
@@ -384,16 +437,16 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         L1a_Gent.SetZ(0.0);
         TLorentzVector L2a_Gent = L2a_Gen.GetFourVector();
         L2a_Gent.SetZ(0.0);
-        TLorentzVector Ia_Gent = Ia;
-        Ia_Gent.SetZ(0.0);
+        //TLorentzVector Ia_Gent = Ia;
+        //Ia_Gent.SetZ(0.0);
         TLorentzVector L1a_RECOt = L1a_Gent;//PUPPI_Detector.Smear_Muon(L1a_Gent);
         TLorentzVector L2a_RECOt = L2a_Gent;//PUPPI_Detector.Smear_Muon(L2a_Gent);
         TLorentzVector L1b_Gent = L1b_Gen.GetFourVector();
         L1b_Gent.SetZ(0.0);
         TLorentzVector L2b_Gent = L2b_Gen.GetFourVector();
         L2b_Gent.SetZ(0.0);
-        TLorentzVector Ib_Gent = Ib;
-        Ib_Gent.SetZ(0.0);
+        //TLorentzVector Ib_Gent = Ib;
+        //Ib_Gent.SetZ(0.0);
         TLorentzVector L1b_RECOt = L1b_Gent;//PUPPI_Detector.Smear_Muon(L1b_Gent);
         TLorentzVector L2b_RECOt = L2b_Gent;//PUPPI_Detector.Smear_Muon(L2b_Gent);
         
@@ -422,6 +475,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
             continue;
         }
         */
+        
+        
         
         //set some resolutions
         MuonResolution = PUPPI_Detector.GetMuonResolution(L2a_Gen.GetFourVector());
@@ -551,8 +606,42 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         
         double MPa_Gen = test_Resolution.Mass_Parents2(Par_Gen,vBetaaGen,vBetabGen);
         MXa2 = test_Resolution.Mass_Parents2(MET_Par,MET_Perp,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+        MXb2 = test_Resolution.Mass_Parents2(MET_Par,MET_Perp,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
         MassReco_MassGen = MPa_Gen - MXa2;
         Pull_MXa2 = (MPa_Gen-MXa2)/test_Resolution.Mass_Parents2_Resolution(MET_Par,MET_Perp,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution);
+        
+        TLorentzVector PX2a;
+        PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
+        TLorentzVector PX2b;
+        PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
+        PX2a.Boost(Smeared_vBetaa);
+        PX2b.Boost(Smeared_vBetab);
+        
+        //RECO Tree
+        LAB_Reco.ClearEvent();
+        L1a_Reco.SetLabFrameFourVector(L1a_RECO);
+        L1b_Reco.SetLabFrameFourVector(L1b_RECO);
+        L2a_Reco.SetLabFrameFourVector(L2a_RECO);
+        L2b_Reco.SetLabFrameFourVector(L2b_RECO);
+        X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
+        X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
+        /*
+         VisibleRecoFrame   L1a_Reco("L1a_Reco","#it{l}_{1a}");
+         VisibleRecoFrame   L2a_Reco("L2a_Reco","#it{l}_{2a}");
+         VisibleRecoFrame   L1b_Reco("L1b_Reco","#it{l}_{1b}");
+         VisibleRecoFrame   L2b_Reco("L2b_Reco","#it{l}_{2b}");
+         VisibleRecoFrame X1a_Reco("X1a_Reco","#tilde{#chi}^{ 0}_{1 a}");
+         VisibleRecoFrame X1b_Reco("X1b_Reco","#tilde{#chi}^{ 0}_{1 b}");
+         */
+        
+        LAB_Reco.AnalyzeEvent();
+        
+        CosX2a = X2a_Reco.GetCosDecayAngle();
+        CosX2b = X2b_Reco.GetCosDecayAngle();
+        CosX2a_Gen = X2a_Gen.GetCosDecayAngle();
+        CosX2b_Gen = X2b_Gen.GetCosDecayAngle();
+        
+        
         histPlot->Fill(cat_list[m]);
         acp_events++;
     }
