@@ -131,7 +131,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
   //-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//
     
   
-  X2X2_Gen.SetVariableMass();
+  X2X2_Gen.SetVariableMass(); //Reset this down below from a 3D histogram
   X2a_Gen.SetMass(mX2);       X2b_Gen.SetMass(mX2);
   X1a_Gen.SetMass(mX1);       X1b_Gen.SetMass(mX1);
   Za_Gen.SetMass(mZ);
@@ -308,13 +308,13 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     
     //string PTEta_histname = "hist_PTvsEta_1000";
     
-    string PTEta_histname = "hist_PTvsEta_";
+    string PTEta_histname = "hist_PTvsEtavsMass_";
     int hist_mX2 = mX2;
     PTEta_histname += std::to_string(hist_mX2);
     
-    TH2* hist = (TH2*)input->Get(PTEta_histname.c_str());
+    TH3* hist = (TH3*)input->Get(PTEta_histname.c_str());
     Physics physics;
-    physics.SetEtaPtCM(*hist);
+    physics.SetEtaPtMCM(*hist);
     input->Close();
     delete input;
     
@@ -334,6 +334,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     Resolution test_Resolution(PUPPI_Detector); //seting up the Resolution "calculator"
     double LAB_Pt;
     double LAB_eta;
+    double LAB_M;
     
     TVector3 Zhat(0.,0.,1.);
     TVector3 RefVect(1.,1.,1.);
@@ -354,7 +355,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     g_Log << "mX2 = " << mX2 << ", ";
     g_Log << "ctau = " << ctau[m] << LogEnd;
     
-    LAB_Gen.InitializeAnalysis();
+    //LAB_Gen.InitializeAnalysis();
       
     for(int igen = 0; igen < Ngen; igen++){
       if(igen%((std::max(Ngen,10))/10) == 0)
@@ -363,16 +364,17 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
       // generate event
       LAB_Gen.ClearEvent();                           // clear the gen tree
       //set momentum based upon the mass
-        physics.GetEtaPtCM(LAB_eta,LAB_Pt);
+        physics.GetEtaPtMCM(LAB_eta,LAB_Pt,LAB_M);
         //Fix the momentum by hand
         
         //LAB_Pt = gRandom->Gaus(10000.0,100.);
         //LAB_eta = gRandom->Gaus(0.0,2.4);
-        
         //
       LAB_Gen.SetTransverseMomentum(LAB_Pt);
       LAB_Gen.SetLongitudinalMomentum(LAB_Pt*TMath::SinH(LAB_eta));
-    
+      X2X2_Gen.SetMass(LAB_M);
+      LAB_Gen.InitializeAnalysis();
+        
       LAB_Gen.AnalyzeEvent();                         // generate a new event
         gen_events++;
         

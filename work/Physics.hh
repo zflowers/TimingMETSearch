@@ -1,7 +1,7 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 #include <TRandom.h>
-#include <TH2.h>
+#include <TH3.h>
 #include "TLorentzVector.h"
 #include "TVector3.h"
 
@@ -10,14 +10,14 @@ class Physics
     
 private:
     
-    TH2* m_histPtvsEta;
+    TH3* m_histPtvsEta;
 
 public:
     Physics();
     Physics(const Physics& old_physics);
     ~Physics();
-    void SetEtaPtCM(const TH2& hist);
-    void GetEtaPtCM(double& PT, double& eta);
+    void SetEtaPtMCM(const TH3& hist);
+    void GetEtaPtMCM(double& PT, double& eta, double& M);
     Vertex Get_PV(double User_PV_X, double User_PV_Y, double User_PV_Z, double User_PV_T);
     Vertex Get_SV(double User_ctau, TLorentzVector P);
     double Get_Beta(TLorentzVector P);
@@ -37,7 +37,7 @@ inline Physics::Physics()
 
 inline Physics::Physics(const Physics& old_physics)
 {
-    m_histPtvsEta = (TH2*)old_physics.m_histPtvsEta->Clone("copy");
+    m_histPtvsEta = (TH3*)old_physics.m_histPtvsEta->Clone("copy");
 }
 
 inline Physics::~Physics()
@@ -46,18 +46,18 @@ inline Physics::~Physics()
         delete m_histPtvsEta;
 }
 
-inline void Physics::SetEtaPtCM(const TH2& hist)
+inline void Physics::SetEtaPtMCM(const TH3& hist)
 {
     string name = "m_";
     string histname = hist.GetName();
     name+=histname;
-    m_histPtvsEta=(TH2*)hist.Clone(name.c_str());
+    m_histPtvsEta=(TH3*)hist.Clone(name.c_str());
     m_histPtvsEta->SetDirectory(0);
 }
 
-inline void Physics::GetEtaPtCM(double& eta, double& PT)
+inline void Physics::GetEtaPtMCM(double& eta, double& PT, double& M)
 {
-    m_histPtvsEta->GetRandom2(eta,PT);
+    m_histPtvsEta->GetRandom3(eta,PT,M);
 }
 
 inline Vertex Physics::Get_PV(double User_PV_X, double User_PV_Y, double User_PV_Z, double User_PV_T)
