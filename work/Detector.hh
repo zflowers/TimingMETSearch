@@ -82,8 +82,6 @@ public:
     
     TVector3 Smear_Beta(Vertex User_PV, Vertex User_SV);
     
-    TVector3 Smear_Beta_Mag(Vertex User_PV, Vertex User_SV);
-    
     Vertex Smear_Vertex(Vertex User_Vertex, double sigmaV, double sigmaT);
 
 };
@@ -573,23 +571,6 @@ inline TVector3 Detector::Smear_Beta(Vertex User_PV, Vertex User_SV)
 {
     TVector3 Smeared_Beta = (1./30./(User_SV.GetTPos()-User_PV.GetTPos()))*(User_SV.GetXYZPos()-User_PV.GetXYZPos());
     return Smeared_Beta;
-}
-
-inline TVector3 Detector::Smear_Beta_Mag(Vertex User_PV, Vertex User_SV)
-{
-    TVector3 Beta_True = (1./30./(User_SV.GetTPos()-User_PV.GetTPos()))*(User_SV.GetXYZPos()-User_PV.GetXYZPos());
-    
-    TVector3 RefVec(1.0,1.0,1.0);
-    
-    TVector3 parhat  = Beta_True.Unit();
-    TVector3 perphat = Beta_True.Cross(RefVec).Unit();
-    double sigma_par_beta = Beta_True.Mag()*.1;
-    //double sigma_perp = ;
-    
-    //NOTE: Set divide PerpHat by 10 to turn down the direction smearing
-    TVector3 Beta = Beta_True + gRandom->Gaus(0.,sigma_par_beta)*parhat;// + gRandom->Gaus(0.,sigma_perp)*perphat;
-    
-    return Beta;
 }
 
 inline Vertex Detector::Smear_Vertex(Vertex User_Vertex, double User_sigmaV, double User_sigmaT)

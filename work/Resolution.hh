@@ -31,7 +31,7 @@ public:
     double Visible_Resolution(TVector3 L1a, TVector3 L2a, TVector3 L1b, TVector3 L2b, double sigma_L1a, double sigma_L2a, double sigma_L1b, double sigma_L2b);
     double Mass_Parents2(TVector3 Par, TVector3 Betaa, TVector3 Betab);
     double Mass_Parents2(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab);
-    double Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir);
+    double Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis);
 };
 #endif
 
@@ -251,7 +251,7 @@ inline double Resolution::Mass_Parents2(TVector3 MET_Mag, TVector3 MET_Dir, TVec
     return num/den;
 }
 
-inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir)
+inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis)
 {
     TVector3 Zhat(0.0,0.0,1.0);
     double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
@@ -259,7 +259,7 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 ME
     TVector3 BetabT = Betab;
     BetaaT.SetZ(0.);
     BetabT.SetZ(0.);
-    //new angles
+    //Angles
     //m: MET_Mag
     //d: MET_Dir
     //v: Vis
@@ -290,17 +290,19 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 ME
 
     double dnum_dMag = 3.*MET_Mag.Mag2()*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*sbd+4.*MET_Mag.Mag()*Vis.Mag()*cmv*sbm+MET_Dir.Mag2()*sbm+2.*MET_Dir.Mag()*Vis.Mag()*cmv*sbd+2.*MET_Mag.Mag()*Vis.Mag()*sbv+2.*MET_Dir.Mag()*Vis.Mag()*cdv*sbm+2.*Vis.Mag2()*cmv*sbv+Vis.Mag2()*sbm;
     double dden_dMag = 2.*MET_Mag.Mag()*(cam*sbm-cbm*sam)+MET_Dir.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam)+Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    double dnum_dDir = MET_Mag.Mag2()*sbd+2.*MET_Mag.Mag()*Vis.Mag()*cdv*sbm+3.*MET_Dir.Mag2()*sbd+2.*MET_Mag.Mag()*MET_Dir.Mag()*sbm+2.*MET_Dir.Mag()*Vis.Mag()*cmv*sbd+4.*MET_Dir.Mag()*Vis.Mag()*cdv*sbd+2.*MET_Dir.Mag()*Vis.Mag()*sbv+2.*Vis.Mag2()*cdv*sbv+Vis.Mag2()*sbd;
+    double dnum_dDir = 3.*MET_Dir.Mag2()*sbd+MET_Mag.Mag2()*sbd+2.*MET_Mag.Mag()*Vis.Mag()*cdv*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*sbm+2.*MET_Mag.Mag()*Vis.Mag()*cmv*sbd+4.*MET_Dir.Mag()*Vis.Mag()*cdv*sbd+2.*MET_Dir.Mag()*Vis.Mag()*sbv+2.*Vis.Mag2()*cdv*sbv+Vis.Mag2()*sbd;
     double dden_dDir = 2.*MET_Dir.Mag()*(cad*sbd-cbd*sad)+MET_Mag.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam)+Vis.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
-    //double dnum_dVis = 2.*MET_Mag.Mag2()*cmv*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*cdv*sbm+4.*MET_Mag.Mag()*Vis.Mag()*cmv*sbv+Vis.Mag2()*sbm+2.*MET_Dir.Mag2()*cdv*sbd+MET_Dir.Mag2()*sbv+4.*MET_Dir.Mag()*cdv*sbv+2.*MET_Dir.Mag()*Vis.Mag()*sbd+3.*Vis.Mag2()*sbv+MET_Mag.Mag2()*sbv+2.*MET_Mag.Mag()*MET_Dir.Mag()*cmv*sbd;
-    //double dden_dVis = 2.*Vis.Mag()*(cav*sbv-cbv*sav)+MET_Mag.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam)+MET_Dir.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
+    double dnum_dVis = 2.*MET_Mag.Mag2()*cmv*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*cdv*sbm+4.*MET_Mag.Mag()*Vis.Mag()*cmv*sbv+2.*MET_Mag.Mag()*Vis.Mag()*sbm+2.*MET_Dir.Mag2()*cdv*sbd+MET_Dir.Mag2()*sbv+4.*MET_Dir.Mag()*Vis.Mag()*cdv*sbv+2.*MET_Dir.Mag()*Vis.Mag()*sbd+3.*Vis.Mag2()*sbv+MET_Mag.Mag2()*sbv+2.*MET_Mag.Mag()*MET_Dir.Mag()*cmv*sbd;
+    double dden_dVis = 2.*Vis.Mag()*(cav*sbv-cbv*sav)+MET_Mag.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam)+MET_Dir.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
+    
     double f_MET_Mag = (1./num)*(dnum_dMag)-(1./den)*(dden_dMag);
     double f_MET_Dir = (1./num)*(dnum_dDir)-(1./den)*(dden_dDir);
-    //double f_Vis = (1./num)*(dnum_dVis)-(1./den)*(dden_dVis);
+    double f_Vis = (1./num)*(dnum_dVis)-(1./den)*(dden_dVis);
+    
     double MET_MAG_RES = sigma_MET_Mag*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_MET_Mag;
     double MET_DIR_RES = sigma_MET_Dir*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_MET_Dir;
-    //double VIS_RES = sigma_Vis*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_Vis;
+    double VIS_RES = sigma_Vis*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_Vis;
+    double BETA_RES = sigma_Beta_Maga*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)/Betaa.Mag();
     
-    double BETA_RES = sigma_Beta_Maga*gamma*gamma*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)/Betaa.Mag();
-    return sqrt(BETA_RES*BETA_RES + MET_MAG_RES*MET_MAG_RES + MET_DIR_RES*MET_DIR_RES);
+    return sqrt(BETA_RES*BETA_RES + MET_MAG_RES*MET_MAG_RES + MET_DIR_RES*MET_DIR_RES + VIS_RES*VIS_RES);
 }
