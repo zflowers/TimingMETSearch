@@ -48,13 +48,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     double wZ = 2.50;
     
     vector<double> ctau;
-    //setting ctau values
-    /*
-    for(int i = 1; i <= 100; i++)
-    {
-        ctau.push_back(i);
-    }
-    */
+    
     ctau.push_back(50.);
     
     int Nctau = ctau.size();
