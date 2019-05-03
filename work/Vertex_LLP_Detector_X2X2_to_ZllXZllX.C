@@ -43,7 +43,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     
     //setting masses and widths
     double mX2 = 1000.0;
-    double mX1 = 500.0;
+    double mX1 = 100.0;
     double mZ = 91.19;
     double wZ = 2.50;
     
@@ -195,6 +195,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& Pull_Mass_Invisible = histPlot->GetNewVar("Pull_Mass_Inv","Pull of M(#tilde{#chi}_{1a}^{0})",-5.0,5.0,"");
     const HistPlotVar& MIa = histPlot->GetNewVar("MIa", "M(#tilde{#chi}_{1a}^{0})", 0., 1000., "[GeV]");
     const HistPlotVar& Pull_MXa2 = histPlot->GetNewVar("Pull_MXa2", "Pull of M(#tilde{#chi}_{2a}^{0})", -5.0, 5.0, "");
+    const HistPlotVar& Pull_MXb2 = histPlot->GetNewVar("Pull_MXb2", "Pull of M(#tilde{#chi}_{2b}^{0})", -5.0, 5.0, "");
     const HistPlotVar& Pull_Vis = histPlot->GetNewVar("Pull_Vis", "Pull of Vis", -5.0, 5.0, "");
     const HistPlotVar& MX2X2 = histPlot->GetNewVar("MX2X2", "M(#tilde{#chi}_{2}^{0})(#tilde{#chi}_{2}^{0})", 0., 3000., "[GeV]");
     const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 2000., "[GeV]");
@@ -204,8 +205,12 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& CosX2b = histPlot->GetNewVar("CosX2b", "Cos_X2b", -1, 1., "");
     const HistPlotVar& CosX2a_Gen = histPlot->GetNewVar("CosX2a_Gen", "Cos_X2a_Gen", -1, 1., "");
     const HistPlotVar& CosX2b_Gen = histPlot->GetNewVar("CosX2b_Gen", "Cos_X2b_Gen", -1, 1., "");
+    const HistPlotVar& X2X2_Frame_X2a = histPlot->GetNewVar("X2X2_Frame_X2a","X2X2_Frame_X2a",-0.1,6.5,"");
     
-    
+    //Various Pulls of mass
+    const HistPlotVar& Pull_MXa2L = histPlot->GetNewVar("Pull_MXa2L", "Pull of M(#tilde{#chi}_{2a}^{0})L", -5.0, 5.0, ""); //turn off lepton
+    const HistPlotVar& Pull_MXa2B = histPlot->GetNewVar("Pull_MXa2B", "Pull of M(#tilde{#chi}_{2a}^{0})B", -5.0, 5.0, ""); //turn off beta
+    const HistPlotVar& Pull_MXa2D = histPlot->GetNewVar("Pull_MXa2D", "Pull of M(#tilde{#chi}_{2a}^{0})D", -5.0, 5.0, ""); //turn off MET Direction
     
     
     //comment in/out whatever plots are interesting
@@ -229,17 +234,23 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Pull_Mass_Invisible, cat_list); //need ~1 TeV MX2 & ~500 MX1, to look ok
     //histPlot->AddPlot(MIa, cat_list);
     //histPlot->AddPlot(MXa, cat_list);
-    //histPlot->AddPlot(MXa2, cat_list);
+    histPlot->AddPlot(MXa2, cat_list);
+    histPlot->AddPlot(MXa2, MXb2, cat_list);
     histPlot->AddPlot(Pull_MXa2, cat_list);
+    histPlot->AddPlot(Pull_MXa2, Pull_MXb2, cat_list);
+    histPlot->AddPlot(Pull_MXa2L, cat_list);
+    histPlot->AddPlot(Pull_MXa2B, cat_list);
+    histPlot->AddPlot(Pull_MXa2D, cat_list);
     //histPlot->AddPlot(Pull_Vis, cat_list);
-    //histPlot->AddPlot(CosX2a, cat_list);
-    //histPlot->AddPlot(CosX2b, cat_list);
-    //histPlot->AddPlot(Pull_Beta_Mag, CosX2a, cat_list);
-    //histPlot->AddPlot(MXa2, CosX2a, cat_list);
+    histPlot->AddPlot(CosX2a, cat_list);
+    histPlot->AddPlot(CosX2b, cat_list);
+    histPlot->AddPlot(Pull_Beta_Mag, CosX2a, cat_list);
+    histPlot->AddPlot(Pull_MXa2, CosX2a, cat_list);
     //histPlot->AddPlot(CosX2a_Gen, cat_list);
     //histPlot->AddPlot(CosX2b_Gen, cat_list);
     //histPlot->AddPlot(CosX2a_Gen, CosX2a, cat_list);
     //histPlot->AddPlot(CosX2b_Gen, CosX2b, cat_list);
+    histPlot->AddPlot(X2X2_Frame_X2a, cat_list);
     //histPlot->AddPlot(MX2X2, cat_list);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
@@ -357,6 +368,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         }
         
         double Smeared_ToFa = PUPPI_Detector.Smear_ToF(ToFa);
+        double Smeared_ToFb = PUPPI_Detector.Smear_ToF(ToFb);
         Vertex SVa = physics.Get_SV(ToFa,Pa);
         Vertex SVb = physics.Get_SV(ToFb,Pb);
         Vertex Smeared_PV = PUPPI_Detector.Smear_PV(PV);
@@ -431,6 +443,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         double Sigma_Angle2 = test_Resolution.GetAngleError(vBetaaGen,L2a_Gen.GetFourVector().Vect(),Smeared_vBetaa,L2a_RECO.Vect());
         
         double Sigma_Beta_Mag = sqrt((1.0/(Smeared_ToFa*Smeared_ToFa))*(sigmaDistance*sigmaDistance+2.*Smeared_vBetaa.Mag()*Smeared_vBetaa.Mag()*PUPPI_Detector.Get_sigmaT()*PUPPI_Detector.Get_sigmaT()));
+        double Sigma_Beta_Magb = sqrt((1.0/(Smeared_ToFb*Smeared_ToFb))*(sigmaDistance*sigmaDistance+2.*Smeared_vBetab.Mag()*Smeared_vBetab.Mag()*PUPPI_Detector.Get_sigmaT()*PUPPI_Detector.Get_sigmaT()));
         
         
         ToFaL = log(ToFa)/log_10;
@@ -483,14 +496,22 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         Pull_Vis = ((L1a_RECOt.Vect()+L2a_RECOt.Vect()+L1b_RECOt.Vect()+L2b_RECOt.Vect()).Mag()-(L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect()).Mag())/Sigma_Vis;
         
         double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
+        double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
         MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
         MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
         double MXa2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
+        double MXb2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa,Sigma_Beta_Magb,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
         
         Pull_MXa2 = (MPa_Gen-MXa2)/MXa2_Resolution;
+        Pull_MXb2 = (MPb_Gen-MXb2)/MXb2_Resolution;
         
+        double MXa2_ResolutionL = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,0.);
+        double MXa2_ResolutionB = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,MET_Dir_Resolution,0.);
+        double MXa2_ResolutionD = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,0.,0.);
         
-        
+        Pull_MXa2L = (MPa_Gen-MXa2)/MXa2_ResolutionL;
+        Pull_MXa2B = (MPa_Gen-MXa2)/MXa2_ResolutionB;
+        Pull_MXa2D = (MPa_Gen-MXa2)/MXa2_ResolutionD;
         
         
         //Decay Angle Analysis
@@ -516,6 +537,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         CosX2b = X2b_Reco.GetCosDecayAngle();
         CosX2a_Gen = X2a_Gen.GetCosDecayAngle();
         CosX2b_Gen = X2b_Gen.GetCosDecayAngle();
+        X2X2_Frame_X2a = X2X2_Reco.GetDeltaPhiDecayPlanes(X2a_Reco);
         
         
         histPlot->Fill(cat_list[m]);

@@ -144,7 +144,7 @@ inline double Resolution::Mass_Parent(TVector3 Decay, TVector3 Beta)
 inline double Resolution::Mass_Parent_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_L1, double sigma_L2, double sigma_Beta_Mag){
     
     double gamma = 1.0/sqrt(1.0-Beta.Mag2());
-    
+    //Beta not transverse
     double a = sigma_MET*(1.0/(gamma*Beta.Pt()))*TMath::Cos(Beta.DeltaPhi(MET));
     double b = sigma_L1*(1.0/(gamma*Beta.Pt()))*TMath::Cos(Beta.DeltaPhi(L1.Vect()));
     double c = sigma_L2*(1.0/(gamma*Beta.Pt()))*TMath::Cos(Beta.DeltaPhi(L2.Vect()));
@@ -299,7 +299,8 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 ME
     double MET_MAG_RES = sigma_MET_Mag*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_MET_Mag;
     double MET_DIR_RES = sigma_MET_Dir*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_MET_Dir;
     double VIS_RES = sigma_Vis*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_Vis;
-    double BETA_RES = sigma_Beta_Maga*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)/Betaa.Mag();
+    double BETA_RES = sigma_Beta_Maga*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*gamma*gamma/Betaa.Mag();
+    
     
     return sqrt(BETA_RES*BETA_RES + MET_MAG_RES*MET_MAG_RES + MET_DIR_RES*MET_DIR_RES + VIS_RES*VIS_RES);
 }
