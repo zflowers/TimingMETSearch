@@ -33,11 +33,12 @@
 #include "Physics.hh"
 #include "Resolution.hh"
 #include <TSystem.h>
+#include "Analysis.h"
 
 using namespace RestFrames;
 
-void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
-			      "output_Vertex_LLP_Detector_X2X2_to_ZallXZbllX.root"){
+void ctau_X2X2_to_ZllXZllX(std::string output_name =
+			      "output_ctau_X2X2_to_ZallXZbllX.root"){
 
     Long64_t start = gSystem->Now();
     
@@ -206,7 +207,9 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& CosX2a_Gen = histPlot->GetNewVar("CosX2a_Gen", "Cos_X2a_Gen", -1, 1., "");
     const HistPlotVar& CosX2b_Gen = histPlot->GetNewVar("CosX2b_Gen", "Cos_X2b_Gen", -1, 1., "");
     const HistPlotVar& X2X2_Frame_X2a = histPlot->GetNewVar("X2X2_Frame_X2a","X2X2_Frame_X2a",-0.1,6.5,"");
-    
+    const HistPlotVar& X2X2_Frame_X2b = histPlot->GetNewVar("X2X2_Frame_X2b","X2X2_Frame_X2b",-0.1,6.5,"");
+    const HistPlotVar& X2a_Frame_X2b = histPlot->GetNewVar("X2a_Frame_X2b","X2a_Frame_X2b",-0.1,6.5,"");
+    const HistPlotVar& tReco_tTrue = histPlot->GetNewVar("tReco_tTrue","#theta^{R}_{X^{0}_{2a}} - #theta^{G}_{X^{0}_{2a}}",-1.,1.,"");
     //Various Pulls of mass
     const HistPlotVar& Pull_MXa2L = histPlot->GetNewVar("Pull_MXa2L", "Pull of M(#tilde{#chi}_{2a}^{0})L", -5.0, 5.0, ""); //turn off lepton
     const HistPlotVar& Pull_MXa2B = histPlot->GetNewVar("Pull_MXa2B", "Pull of M(#tilde{#chi}_{2a}^{0})B", -5.0, 5.0, ""); //turn off beta
@@ -234,24 +237,25 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Pull_Mass_Invisible, cat_list); //need ~1 TeV MX2 & ~500 MX1, to look ok
     //histPlot->AddPlot(MIa, cat_list);
     //histPlot->AddPlot(MXa, cat_list);
-    histPlot->AddPlot(MXa2, cat_list);
-    histPlot->AddPlot(MXa2, MXb2, cat_list);
+    //histPlot->AddPlot(MXa2, cat_list);
+    //histPlot->AddPlot(MXa2, MXb2, cat_list);
     histPlot->AddPlot(Pull_MXa2, cat_list);
-    histPlot->AddPlot(Pull_MXa2, Pull_MXb2, cat_list);
-    histPlot->AddPlot(Pull_MXa2L, cat_list);
-    histPlot->AddPlot(Pull_MXa2B, cat_list);
-    histPlot->AddPlot(Pull_MXa2D, cat_list);
+    //histPlot->AddPlot(Pull_MXa2, Pull_MXb2, cat_list);
+    //histPlot->AddPlot(Pull_MXa2L, cat_list);
+    //histPlot->AddPlot(Pull_MXa2B, cat_list);
+    //histPlot->AddPlot(Pull_MXa2D, cat_list);
     //histPlot->AddPlot(Pull_Vis, cat_list);
-    histPlot->AddPlot(CosX2a, cat_list);
-    histPlot->AddPlot(CosX2b, cat_list);
-    histPlot->AddPlot(Pull_Beta_Mag, CosX2a, cat_list);
-    histPlot->AddPlot(Pull_MXa2, CosX2a, cat_list);
+    //histPlot->AddPlot(CosX2a, cat_list);
+    //histPlot->AddPlot(CosX2b, cat_list);
+    //histPlot->AddPlot(Pull_Beta_Mag, CosX2a, cat_list);
+    //histPlot->AddPlot(Pull_MXa2, CosX2a, cat_list);
     //histPlot->AddPlot(CosX2a_Gen, cat_list);
     //histPlot->AddPlot(CosX2b_Gen, cat_list);
     //histPlot->AddPlot(CosX2a_Gen, CosX2a, cat_list);
     //histPlot->AddPlot(CosX2b_Gen, CosX2b, cat_list);
-    histPlot->AddPlot(X2X2_Frame_X2a, cat_list);
+    //histPlot->AddPlot(X2X2_Frame_X2a, cat_list);
     //histPlot->AddPlot(MX2X2, cat_list);
+    //histPlot->AddPlot(tReco_tTrue, cat_list);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -280,7 +284,7 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     PUPPI_Detector.Set_sigmaPV(20.0/10000.0); //Primary Vertex resolution
     PUPPI_Detector.Set_sigmaSV(65.0/10000.0); //secondary Vertex resolution
     Vertex PV(0.0,0.0,0.0,0.0); //nominal PV at 0
-    Resolution test_Resolution(PUPPI_Detector); //seting up the Resolution "calculator"
+    Resolution test_Resolution(PUPPI_Detector); //setting up the Resolution "calculator"
     double LAB_Pt;
     double LAB_eta;
     double LAB_M;
@@ -514,7 +518,8 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         Pull_MXa2D = (MPa_Gen-MXa2)/MXa2_ResolutionD;
         
         
-        //Decay Angle Analysis
+        
+        //RJR Analysis
         TLorentzVector PX2a;
         PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
         TLorentzVector PX2b;
@@ -538,7 +543,9 @@ void Vertex_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         CosX2a_Gen = X2a_Gen.GetCosDecayAngle();
         CosX2b_Gen = X2b_Gen.GetCosDecayAngle();
         X2X2_Frame_X2a = X2X2_Reco.GetDeltaPhiDecayPlanes(X2a_Reco);
-        
+        X2X2_Frame_X2b = X2X2_Reco.GetDeltaPhiDecayPlanes(X2b_Reco);
+        X2a_Frame_X2b = X2a_Reco.GetDeltaPhiDecayPlanes(X2b_Reco);
+        tReco_tTrue = TMath::ACos(CosX2a) - TMath::ACos(CosX2a_Gen);
         
         histPlot->Fill(cat_list[m]);
         acp_events++;
