@@ -47,20 +47,18 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     double mX1 = 100.0;
     double mZ = 91.19;
     double wZ = 2.50;
-    double ctau = 50.;
+    double ctau = 10.;
     
     vector<double> MET_Mag_Resolution_Factor;
     
     MET_Mag_Resolution_Factor.push_back(0.5);
-    MET_Mag_Resolution_Factor.push_back(0.75);
     MET_Mag_Resolution_Factor.push_back(1.);
-    MET_Mag_Resolution_Factor.push_back(1.25);
     MET_Mag_Resolution_Factor.push_back(1.5);
     
     int NMET_Mag = MET_Mag_Resolution_Factor.size();
 
     //Number of events
-    int Ngen = 100000;
+    int Ngen = 1000000;
     
     g_Log << LogInfo << "Initializing generator frames and tree..." << LogEnd;
     
@@ -173,7 +171,9 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         char sname[200], scat[50];
         sprintf(scat, "MET_Mag_Resolution_Factor_%d", m);
         sprintf(sname, "%.1f ", MET_Mag_Resolution_Factor[m]*100.);
-        cat_list += histPlot->GetNewCategory(scat, sMET_Mag_Resolution_Factor+std::string(sname));
+        string str_name = sname;
+        str_name += "%";
+        cat_list += histPlot->GetNewCategory(scat, sMET_Mag_Resolution_Factor+std::string(str_name.c_str()));
     }
     
     //setting up all the variables that could be potentially plotted
@@ -211,6 +211,9 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& X2X2_Frame_X2a = histPlot->GetNewVar("X2X2_Frame_X2a","X2X2_Frame_X2a",-0.1,6.5,"");
     const HistPlotVar& X2X2_Frame_X2b = histPlot->GetNewVar("X2X2_Frame_X2b","X2X2_Frame_X2b",-0.1,6.5,"");
     const HistPlotVar& X2a_Frame_X2b = histPlot->GetNewVar("X2a_Frame_X2b","X2a_Frame_X2b",-0.1,6.5,"");
+    const HistPlotVar& X2X2_Frame_X2a_Gen = histPlot->GetNewVar("X2X2_Frame_X2a_Gen","X2X2_Frame_X2a_Gen",-0.1,6.5,"");
+    const HistPlotVar& X2X2_Frame_X2b_Gen = histPlot->GetNewVar("X2X2_Frame_X2b_Gen","X2X2_Frame_X2b_Gen",-0.1,6.5,"");
+    const HistPlotVar& X2a_Frame_X2b_Gen = histPlot->GetNewVar("X2a_Frame_X2b_Gen","X2a_Frame_X2b_Gen",-0.1,6.5,"");
     const HistPlotVar& tReco_tTrue = histPlot->GetNewVar("tReco_tTrue","#theta^{R}_{X^{0}_{2a}} - #theta^{G}_{X^{0}_{2a}}",-1.,1.,"");
     //Various Pulls of mass
     const HistPlotVar& Pull_MXa2L = histPlot->GetNewVar("Pull_MXa2L", "Pull of M(#tilde{#chi}_{2a}^{0})L", -5.0, 5.0, ""); //turn off lepton
@@ -241,7 +244,7 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(MXa, cat_list);
     //histPlot->AddPlot(MXa2, cat_list);
     //histPlot->AddPlot(MXa2, MXb2, cat_list);
-    histPlot->AddPlot(Pull_MXa2, cat_list);
+    //histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_MXa2, Pull_MXb2, cat_list);
     //histPlot->AddPlot(Pull_MXa2L, cat_list);
     //histPlot->AddPlot(Pull_MXa2B, cat_list);
@@ -255,7 +258,15 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(CosX2b_Gen, cat_list);
     //histPlot->AddPlot(CosX2a_Gen, CosX2a, cat_list);
     //histPlot->AddPlot(CosX2b_Gen, CosX2b, cat_list);
-    //histPlot->AddPlot(X2X2_Frame_X2a, cat_list);
+    histPlot->AddPlot(X2X2_Frame_X2a, cat_list);
+    histPlot->AddPlot(X2X2_Frame_X2b, cat_list);
+    histPlot->AddPlot(X2a_Frame_X2b, cat_list);
+    histPlot->AddPlot(X2X2_Frame_X2a, Pull_MXa2, cat_list);
+    //histPlot->AddPlot(X2X2_Frame_X2a, CosX2a, cat_list);
+    //histPlot->AddPlot(X2X2_Frame_X2a, X2X2_Frame_X2b, cat_list);
+    histPlot->AddPlot(X2X2_Frame_X2a_Gen, cat_list);
+    histPlot->AddPlot(X2X2_Frame_X2b_Gen, cat_list);
+    histPlot->AddPlot(X2a_Frame_X2b_Gen, cat_list);
     //histPlot->AddPlot(MX2X2, cat_list);
     //histPlot->AddPlot(tReco_tTrue, cat_list);
     
@@ -331,7 +342,6 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         
       LAB_Gen.AnalyzeEvent();                         // generate a new event
         gen_events++;
-        
         MX2X2 = X2X2_Gen.GetMass();
         TLorentzVector Pa = X2a_Gen.GetFourVector();
         TLorentzVector Pb = X2b_Gen.GetFourVector();
@@ -341,7 +351,7 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         TLorentzVector I   = Ia+Ib;
         I.SetZ(0.0);
         
-        double MET_Mag_Resolution = MET_Mag_Resolution_Factor[m]*PUPPI_Detector.Get_Sigma_Par(sys);
+        double MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
         double MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
         
         //The smearing begins
@@ -424,12 +434,12 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         Db = 30.*ToFa*betab;
         
         /*
-        if(betaa < VelocityUncertainty || betab < VelocityUncertainty) //require significant displacement
-        {
-            igen--;
-            continue;
-        }
-        */
+         if(betaa < VelocityUncertainty || betab < VelocityUncertainty) //require significant displacement
+         {
+         igen--;
+         continue;
+         }
+         */
         
         
         
@@ -489,7 +499,8 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         double MXa_Gen = test_Resolution.Mass_Parent(vPtaGen,vBetaaGen);
         MXa = test_Resolution.Mass_Parent(vPta,Smeared_vBetaa);
         Pull_Mass_Parent = (MXa-MXa_Gen)/MP_Resolution;
-
+        //one LLP
+        
         double Mass_Invisible_Resolution = test_Resolution.Mass_Invisible_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECO,L2a_RECO,MET_Mag_Resolution,Sigma_Beta_Mag);
         
         double MI_Gen = sqrt(MXa_Gen*MXa_Gen-2.*MXa_Gen*vZaGen.E()+((L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M2()));
@@ -521,8 +532,14 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         Pull_MXa2B = (MPa_Gen-MXa2)/MXa2_ResolutionB;
         Pull_MXa2D = (MPa_Gen-MXa2)/MXa2_ResolutionD;
         
-        
-        
+        //Two LLPs
+        /*
+         double Mass_Invisible_Resolution = test_Resolution.Mass_Invisible_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECO,L2a_RECO,MET_Mag_Resolution,Sigma_Beta_Mag);
+         
+         double MI_Gen = sqrt(MXa_Gen*MXa_Gen-2.*MXa_Gen*vZaGen.E()+((L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M2()));
+         MIa = sqrt(MXa*MXa-2.*MXa*EZa+((L1a_RECO+L2a_RECO).M2()));
+         Pull_Mass_Invisible = (MI_Gen-MIa)/Mass_Invisible_Resolution;
+         */
         //RJR Analysis
         TLorentzVector PX2a;
         PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
@@ -550,6 +567,10 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         X2X2_Frame_X2b = X2X2_Reco.GetDeltaPhiDecayPlanes(X2b_Reco);
         X2a_Frame_X2b = X2a_Reco.GetDeltaPhiDecayPlanes(X2b_Reco);
         tReco_tTrue = TMath::ACos(CosX2a) - TMath::ACos(CosX2a_Gen);
+        
+        X2X2_Frame_X2a_Gen = X2X2_Gen.GetDeltaPhiDecayPlanes(X2a_Gen);
+        X2X2_Frame_X2b_Gen = X2X2_Gen.GetDeltaPhiDecayPlanes(X2b_Gen);
+        X2a_Frame_X2b_Gen = X2a_Gen.GetDeltaPhiDecayPlanes(X2b_Gen);
         
         histPlot->Fill(cat_list[m]);
         acp_events++;

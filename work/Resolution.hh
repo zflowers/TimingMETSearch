@@ -31,7 +31,9 @@ public:
     double Visible_Resolution(TVector3 L1a, TVector3 L2a, TVector3 L1b, TVector3 L2b, double sigma_L1a, double sigma_L2a, double sigma_L1b, double sigma_L2b);
     double Mass_Parents2(TVector3 Par, TVector3 Betaa, TVector3 Betab);
     double Mass_Parents2(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab);
-    double Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis);
+    double Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis, double& f_MET_Mag);
+    double Mass_Invisible2(double Mass_P, double E_V_P, double Mass_V);
+    double Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET, double& dM_dMET);
 };
 #endif
 
@@ -154,7 +156,6 @@ inline double Resolution::Mass_Parent_Resolution(TVector3 Beta, TVector3 MET, TL
 
 inline double Resolution::Mass_Invisible_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_Beta_Mag)
 {
-    
     TLorentzVector L1t = L1;
     TLorentzVector L2t = L2;
     L1t.SetZ(0.0);
@@ -248,7 +249,7 @@ inline double Resolution::Mass_Parents2(TVector3 MET_Mag, TVector3 MET_Dir, TVec
     return num/den;
 }
 
-inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis)
+inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis, double& f_MET_Mag)
 {
     TVector3 Zhat(0.0,0.0,1.0);
     double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
@@ -292,7 +293,7 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 ME
     double dnum_dVis = 2.*MET_Mag.Mag2()*cmv*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*cdv*sbm+4.*MET_Mag.Mag()*Vis.Mag()*cmv*sbv+2.*MET_Mag.Mag()*Vis.Mag()*sbm+2.*MET_Dir.Mag2()*cdv*sbd+MET_Dir.Mag2()*sbv+4.*MET_Dir.Mag()*Vis.Mag()*cdv*sbv+2.*MET_Dir.Mag()*Vis.Mag()*sbd+3.*Vis.Mag2()*sbv+MET_Mag.Mag2()*sbv+2.*MET_Mag.Mag()*MET_Dir.Mag()*cmv*sbd;
     double dden_dVis = 2.*Vis.Mag()*(cav*sbv-cbv*sav)+MET_Mag.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam)+MET_Dir.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
     
-    double f_MET_Mag = (1./num)*(dnum_dMag)-(1./den)*(dden_dMag);
+    f_MET_Mag = (1./num)*(dnum_dMag)-(1./den)*(dden_dMag);
     double f_MET_Dir = (1./num)*(dnum_dDir)-(1./den)*(dden_dDir);
     double f_Vis = (1./num)*(dnum_dVis)-(1./den)*(dden_dVis);
     
@@ -303,4 +304,19 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 ME
     
     
     return sqrt(BETA_RES*BETA_RES + MET_MAG_RES*MET_MAG_RES + MET_DIR_RES*MET_DIR_RES + VIS_RES*VIS_RES);
+}
+
+inline double Resolution::Mass_Invisible2(double Mass_P, double E_V_P, double Mass_V)
+{
+    return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
+}
+
+inline double Resolution::Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET, double& dM_dMET)
+{
+    double gamma = 1.0/sqrt(1.0-Beta.Mag2());
+    double dE_dB = gamma*gamma*gamma*(Beta.Mag()*(L1a.E()+L2a.E())-Beta.Unit().Dot((L1a+L2a).Vect()));
+    double dM_dB = -Mass_P*gamma*gamma/Beta.Mag();
+    double a = sigma_Beta_Mag/Mass_I*(Mass_P*dM_dB-E_V_P*dM_dB-Mass_P*dE_dB);
+    double b = sigma_MET/Mass_I*(dM_dMET*(Mass_P-E_V_P));
+    return sqrt(a*a+b*b);
 }
