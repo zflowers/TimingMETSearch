@@ -50,7 +50,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     double wZ = 2.50;
     
     vector<double> ctau;
-    vector<double> Sigma_MX2;
     
     ctau.push_back(50.);
     //ctau.push_back(25.);
@@ -59,8 +58,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     
     int Nctau = ctau.size();
 
-    TCanvas* canvas_graph = new TCanvas("canvas_graph","canvas_graph",750,500);
-    TGraph* graph_Sigma_MX2_Sigma_Ctau = new TGraph(Nctau);
     //Number of events
     int Ngen = 100000;
     
@@ -329,7 +326,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     //for checking generator efficiency
     int gen_events = 0;
     int acp_events = 0;
-    TVector3 null_vect(0.0,0.0,0.0);
     
   for(int m = 0; m < Nctau; m++){
     g_Log << LogInfo << "Generating events for ";
@@ -531,11 +527,10 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         double f_MET_MAG = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
         double f_MET_DIR = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
         
-        double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
-        double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
-        TVector3 null_vect(0.,0.,0.);
-        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
-        MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
+        double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
+        double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
+        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+        MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
         
         double MXa2_ResolutionL = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
         double MXa2_ResolutionB = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
@@ -547,8 +542,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         
         double MXb2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa,Sigma_Beta_Magb,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
         double MXa2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
-        
-        Sigma_MX2.push_back(MXa2_Resolution);
         
         Pull_MXa2 = (MPa_Gen-MXa2)/MXa2_Resolution;
         Pull_MXb2 = (MPb_Gen-MXb2)/MXb2_Resolution;
@@ -605,15 +598,10 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         acp_events++;
     }
     LAB_Gen.PrintGeneratorEfficiency();
-    graph_Sigma_MX2_Sigma_Ctau->SetPoint(m,ctau[m],One_Sigma_Interval(Sigma_MX2));
   }
   histPlot->Draw();
 
   TFile fout(output_name.c_str(),"RECREATE");
-  canvas_graph->cd();
-  graph_Sigma_MX2_Sigma_Ctau->SetMarkerStyle(22);
-  graph_Sigma_MX2_Sigma_Ctau->Draw("AP");
-  canvas_graph->Write();
   fout.Close();
   histPlot->WriteOutput(output_name);
   histPlot->WriteHist(output_name);

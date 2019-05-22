@@ -80,7 +80,9 @@ public:
     
     double Smear_ToF(double ToF);
     
-    TVector3 Smear_Beta(Vertex User_PV, Vertex User_SV);
+    TVector3 Get_Beta(Vertex User_PV, Vertex User_SV);
+    
+    TVector3 Smear_Beta(Vertex PV, Vertex SV);
     
     Vertex Smear_Vertex(Vertex User_Vertex, double sigmaV, double sigmaT);
 
@@ -567,7 +569,7 @@ inline double Detector::Get_sigmaSV()
     return sigmaSV;
 }
 
-inline TVector3 Detector::Smear_Beta(Vertex User_PV, Vertex User_SV)
+inline TVector3 Detector::Get_Beta(Vertex User_PV, Vertex User_SV)
 {
     TVector3 Smeared_Beta = (1./30./(User_SV.GetTPos()-User_PV.GetTPos()))*(User_SV.GetXYZPos()-User_PV.GetXYZPos());
     return Smeared_Beta;
@@ -579,4 +581,11 @@ inline Vertex Detector::Smear_Vertex(Vertex User_Vertex, double User_sigmaV, dou
     Smeared.SetXYZPos(gRandom->Gaus(User_Vertex.GetXPos(),User_sigmaV),gRandom->Gaus(User_Vertex.GetYPos(),User_sigmaV),gRandom->Gaus(User_Vertex.GetZPos(),User_sigmaV));
     Smeared.SetTPos(gRandom->Gaus(User_Vertex.GetTPos(),User_sigmaT));
     return Smeared;
+}
+
+inline TVector3 Detector::Smear_Beta(Vertex PV, Vertex SV)
+{
+    Smear_PV(PV);
+    Smear_SV(SV);
+    return Get_Beta(PV,SV);
 }

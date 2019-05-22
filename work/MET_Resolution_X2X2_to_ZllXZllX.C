@@ -37,8 +37,8 @@
 
 using namespace RestFrames;
 
-void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
-			      "output_METPar_Resolution_X2X2_to_ZallXZbllX.root"){
+void MET_Resolution_X2X2_to_ZllXZllX(std::string output_name =
+			      "output_MET_Resolution_X2X2_to_ZallXZbllX.root"){
 
     Long64_t start = gSystem->Now();
     
@@ -49,22 +49,22 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     double wZ = 2.50;
     double ctau = 10.;
     
-    vector<double> MET_Mag_Resolution_Factor;
+    vector<double> MET_Resolution_Factor;
     vector<double> Sigma_MX2;
     vector<double> Sigma_MX2_MET_Perp; //turn off MET Perp Contribution
     vector<double> Sigma_MX2_MET_Par; //turn off MET Par Contribution
     vector<double> Sigma_MX2_MET; //turn off both MET contributions
     vector<double> Sigma_MX2_Timing; //turn off Velocity Contribution
     
-    //MET_Mag_Resolution_Factor.push_back(0.5);
-    //MET_Mag_Resolution_Factor.push_back(1.);
-    //MET_Mag_Resolution_Factor.push_back(1.5);
+    //MET_Resolution_Factor.push_back(0.5);
+    //MET_Resolution_Factor.push_back(1.);
+    //MET_Resolution_Factor.push_back(1.5);
     for(double i = 10.; i <= 300.; i+=10)
     {
-        MET_Mag_Resolution_Factor.push_back(i);
+        MET_Resolution_Factor.push_back(i);
     }
     
-    int NMET_Mag = MET_Mag_Resolution_Factor.size();
+    int NMET_Mag = MET_Resolution_Factor.size();
 
     //Number of events
     int Ngen = 100000;
@@ -188,14 +188,14 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     histPlot->SetRebin(1);
     
     RFList<const HistPlotCategory> cat_list;
-    string sMET_Mag_Resolution_Factor = "#sigma_{MET_{||}} = ";
+    string sMET_Resolution_Factor = "#sigma_{MET_{||}} = ";
     for(int m = 0; m < NMET_Mag; m++){
         char sname[200], scat[50];
-        sprintf(scat, "MET_Mag_Resolution_Factor_%d", m);
-        sprintf(sname, "%.1f ", MET_Mag_Resolution_Factor[m]);
+        sprintf(scat, "MET_Resolution_Factor_%d", m);
+        sprintf(sname, "%.1f ", MET_Resolution_Factor[m]);
         string str_name = sname;
         str_name += "%";
-        cat_list += histPlot->GetNewCategory(scat, sMET_Mag_Resolution_Factor+std::string(str_name.c_str()));
+        cat_list += histPlot->GetNewCategory(scat, sMET_Resolution_Factor+std::string(str_name.c_str()));
     }
     
     //setting up all the variables that could be potentially plotted
@@ -346,13 +346,12 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //for checking generator efficiency
     int gen_events = 0;
     int acp_events = 0;
-    TVector3 null_vect(0.0,0.0,0.0);
     
   for(int m = 0; m < NMET_Mag; m++){
     g_Log << LogInfo << "Generating events for ";
     g_Log << "mX2 = " << mX2 << ", ";
     g_Log << "mX1 = " << mX1 << ", ";
-    g_Log << "MET_Par_Resolution = " << MET_Mag_Resolution_Factor[m] << "%" << LogEnd;
+    g_Log << "MET_Par_Resolution = " << MET_Resolution_Factor[m] << "%" << LogEnd;
     
       
     LAB_Gen.InitializeAnalysis(); //Comment for "Official" Plots
@@ -383,8 +382,8 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         TLorentzVector I   = Ia+Ib;
         I.SetZ(0.0);
         
-        double MET_Mag_Resolution = (MET_Mag_Resolution_Factor[m]/100.)*PUPPI_Detector.Get_Sigma_Par(sys);
-        double MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
+        double MET_Mag_Resolution = (MET_Resolution_Factor[m]/100.)*PUPPI_Detector.Get_Sigma_Par(sys);
+        double MET_Dir_Resolution = (MET_Resolution_Factor[m]/100.)*PUPPI_Detector.Get_Sigma_Perp(sys);
         
         //The smearing begins
         TVector3 I_Vect = I.Vect();
@@ -549,11 +548,10 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         double f_MET_MAG = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
         double f_MET_DIR = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
         
-        double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
-        double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
-        TVector3 null_vect(0.,0.,0.);
-        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
-        MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
+        double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
+        double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
+        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+        MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
         
         double MXa2_ResolutionL = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
         double MXa2_ResolutionB = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
@@ -628,11 +626,11 @@ void METPar_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         acp_events++;
     }
       LAB_Gen.PrintGeneratorEfficiency();
-      graph_Sigma_MX2_SigmaMET->SetPoint(m,MET_Mag_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2));
-      graph_Sigma_MX2_MET_Perp_SigmaMET->SetPoint(m,MET_Mag_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2_MET_Perp));
-      graph_Sigma_MX2_MET_Par_SigmaMET->SetPoint(m,MET_Mag_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2_MET_Par));
-      graph_Sigma_MX2_MET_SigmaMET->SetPoint(m,MET_Mag_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2_MET));
-      graph_Sigma_MX2_Timing_SigmaMET->SetPoint(m,MET_Mag_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2_Timing));
+      graph_Sigma_MX2_SigmaMET->SetPoint(m,MET_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2));
+      graph_Sigma_MX2_MET_Perp_SigmaMET->SetPoint(m,MET_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2_MET_Perp));
+      graph_Sigma_MX2_MET_Par_SigmaMET->SetPoint(m,MET_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2_MET_Par));
+      graph_Sigma_MX2_MET_SigmaMET->SetPoint(m,MET_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2_MET));
+      graph_Sigma_MX2_Timing_SigmaMET->SetPoint(m,MET_Resolution_Factor[m],One_Sigma_Interval(Sigma_MX2_Timing));
   }
     histPlot->Draw();
     

@@ -15,6 +15,12 @@
 #include <TLegend.h>
 #include <TColor.h>
 #include <TMinuit.h>
+#include <numeric>
+
+double Vector_Mean(std::vector<double> vect) //returns mean of a vector
+{
+    return std::accumulate(vect.begin(),vect.end(),0.0)/vect.size();
+}
 
 double One_Sigma_Interval(std::vector<double> Sigma_Var) //Pass a vector of analytic calculations of some mass
 {
