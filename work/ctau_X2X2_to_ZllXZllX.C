@@ -32,8 +32,9 @@
 #include "Detector.hh"
 #include "Physics.hh"
 #include "Resolution.hh"
+#include <TGraph.h>
 #include <TSystem.h>
-#include "Analysis.h"
+#include "Bonus.h"
 
 using namespace RestFrames;
 
@@ -49,6 +50,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     double wZ = 2.50;
     
     vector<double> ctau;
+    vector<double> Sigma_MX2;
     
     ctau.push_back(50.);
     //ctau.push_back(25.);
@@ -57,6 +59,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     
     int Nctau = ctau.size();
 
+    TCanvas* canvas_graph = new TCanvas("canvas_graph","canvas_graph",750,500);
+    TGraph* graph_Sigma_MX2_Sigma_Ctau = new TGraph(Nctau);
     //Number of events
     int Ngen = 100000;
     
@@ -199,6 +203,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& Pull_Mass_Invisible = histPlot->GetNewVar("Pull_Mass_Inv","Pull of M(#tilde{#chi}_{1a}^{0})",-5.0,5.0,"");
     const HistPlotVar& MIa = histPlot->GetNewVar("MIa", "M(#tilde{#chi}_{1a}^{0})", 0., 1000., "[GeV]");
     const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", 0., 1000., "[GeV]");
+    const HistPlotVar& Delta_MIa2 = histPlot->GetNewVar("Delta_MIa2", "#DeltaM(#tilde{#chi}_{1a}^{0})", -1000.0, 1000.0, "");
     const HistPlotVar& Pull_MIa2 = histPlot->GetNewVar("Pull_MIa2", "Pull of M(#tilde{#chi}_{1a}^{0})", -5.0, 5.0, "");
     const HistPlotVar& Pull_MXa2 = histPlot->GetNewVar("Pull_MXa2", "Pull of M(#tilde{#chi}_{2a}^{0})", -5.0, 5.0, "");
     const HistPlotVar& Pull_MXb2 = histPlot->GetNewVar("Pull_MXb2", "Pull of M(#tilde{#chi}_{2b}^{0})", -5.0, 5.0, "");
@@ -246,8 +251,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(MIa, cat_list);
     //histPlot->AddPlot(MXa, cat_list);
     histPlot->AddPlot(MXa2, cat_list);
-    histPlot->AddPlot(MIa2, cat_list);
-    histPlot->AddPlot(Pull_MIa2, cat_list);
+    //histPlot->AddPlot(MIa2, cat_list);
+    //histPlot->AddPlot(Delta_MIa2, cat_list);
+    //histPlot->AddPlot(Pull_MIa2, cat_list);
     //histPlot->AddPlot(MXa2, MXb2, cat_list);
     histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_MXa2, Pull_MXb2, cat_list);
@@ -523,22 +529,26 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         Pull_Vis = ((L1a_RECOt.Vect()+L2a_RECOt.Vect()+L1b_RECOt.Vect()+L2b_RECOt.Vect()).Mag()-(L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect()).Mag())/Sigma_Vis;
         
         double f_MET_MAG = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
+        double f_MET_DIR = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
         
         double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
         double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
-        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
-        MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
+        TVector3 null_vect(0.,0.,0.);
+        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+        MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
         
-        double MXa2_ResolutionL = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG);
-        double MXa2_ResolutionB = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG);
-        double MXa2_ResolutionD = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,0.,0.,f_MET_MAG);
+        double MXa2_ResolutionL = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
+        double MXa2_ResolutionB = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
+        double MXa2_ResolutionD = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,0.,0.,f_MET_MAG,f_MET_DIR);
         
         Pull_MXa2L = (MPa_Gen-MXa2)/MXa2_ResolutionL;
         Pull_MXa2B = (MPa_Gen-MXa2)/MXa2_ResolutionB;
         Pull_MXa2D = (MPa_Gen-MXa2)/MXa2_ResolutionD;
         
-        double MXb2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa,Sigma_Beta_Magb,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG);
-        double MXa2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG);
+        double MXb2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa,Sigma_Beta_Magb,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
+        double MXa2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
+        
+        Sigma_MX2.push_back(MXa2_Resolution);
         
         Pull_MXa2 = (MPa_Gen-MXa2)/MXa2_Resolution;
         Pull_MXb2 = (MPb_Gen-MXb2)/MXb2_Resolution;
@@ -546,8 +556,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         //Two LLPs
         MIa2 = test_Resolution.Mass_Invisible2(MXa2,EZa,(L1a_RECO+L2a_RECO).M());
         double MIa2_Gen = test_Resolution.Mass_Invisible2(MPa_Gen,vZaGen.E(),(L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M());
-        double MIa2_Res = test_Resolution.Mass_Invisible_Resolution2(MIa2,MXa2,EZa,Smeared_vBetaa,L1a_RECO,L2a_RECO,Sigma_Beta_Mag,MET_Mag_Resolution,f_MET_MAG);
-        Pull_MIa2 = (MIa2-MIa2_Gen)/MIa2_Gen;
+        double MIa2_Res = test_Resolution.Mass_Invisible_Resolution2(MIa2,MXa2,EZa,Smeared_vBetaa,L1a_RECO,L2a_RECO,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,f_MET_MAG,f_MET_DIR);
+        Delta_MIa2 = MIa2-MIa2_Gen;
+        Pull_MIa2 = Delta_MIa2/MIa2_Gen;
         
         
         /*
@@ -557,7 +568,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         MIa = sqrt(MXa*MXa-2.*MXa*EZa+((L1a_RECO+L2a_RECO).M2()));
         Pull_Mass_Invisible = (MI_Gen-MIa)/Mass_Invisible_Resolution;
         */
-        //RJR Analysis
+        
+        //Angle Analysis
         TLorentzVector PX2a;
         PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
         TLorentzVector PX2b;
@@ -593,14 +605,20 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         acp_events++;
     }
     LAB_Gen.PrintGeneratorEfficiency();
+    graph_Sigma_MX2_Sigma_Ctau->SetPoint(m,ctau[m],One_Sigma_Interval(Sigma_MX2));
   }
   histPlot->Draw();
 
   TFile fout(output_name.c_str(),"RECREATE");
+  canvas_graph->cd();
+  graph_Sigma_MX2_Sigma_Ctau->SetMarkerStyle(22);
+  graph_Sigma_MX2_Sigma_Ctau->Draw("AP");
+  canvas_graph->Write();
   fout.Close();
   histPlot->WriteOutput(output_name);
   histPlot->WriteHist(output_name);
   treePlot->WriteOutput(output_name);
+    
     
   g_Log << LogInfo << "Finished" << LogEnd;
     g_Log << LogInfo << "Generated a Total of " << gen_events << " Events " << LogEnd;

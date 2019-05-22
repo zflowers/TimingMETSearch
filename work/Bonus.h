@@ -16,6 +16,20 @@
 #include <TColor.h>
 #include <TMinuit.h>
 
+double One_Sigma_Interval(std::vector<double> Sigma_Var) //Pass a vector of analytic calculations of some mass
+{
+    std::sort(Sigma_Var.begin(),Sigma_Var.end()); //sort the vector in ascending order
+    std::vector<double> Interval; //For keeping the widths of the intervals
+    int N = Sigma_Var.size();
+    int N68 = N*0.68;
+    for(int i = 0; i < (N - N68); i++) //loop over the given vector and stop at the last entry
+    {
+        Interval.push_back(Sigma_Var.at(N68+i)-Sigma_Var.at(i)); //push back the width of an interval
+    }
+    std::sort(Interval.begin(),Interval.end());
+    return Interval.at(0); //return the smallest interval
+}
+
 void CreatePalette()
 {
     //From Prof. Chris Rogan
@@ -390,10 +404,10 @@ Double_t Fit_TGE_func(Double_t *x,Double_t *par)
     return fitnum;
 }
 
-TH1* res_TH1_TF1(TH1* hist, TF1* fit_func)
+TH1F* res_TH1_TF1(TH1* hist, TF1* fit_func)
 {
     int Bins=hist->GetNbinsX();
-    TH1* res_hist = new TH1("res_hist","",Bins,hist->GetXaxis()->GetXmin(),hist->GetXaxis()->GetXmax());
+    TH1F* res_hist = new TH1F("res_hist","",Bins,hist->GetXaxis()->GetXmin(),hist->GetXaxis()->GetXmax());
     for(int i=0; i < Bins; i++)
     {
         //res_hist->SetBinContent(i+2, (hist->GetBinError(i+2) > 0. ? 1.0/((fit_func->Eval(hist->GetBinCenter(i+2)))-hist->GetBinContent(i+2))/hist->GetBinError(i+2) : 0.) );

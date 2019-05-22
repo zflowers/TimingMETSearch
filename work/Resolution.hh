@@ -31,9 +31,9 @@ public:
     double Visible_Resolution(TVector3 L1a, TVector3 L2a, TVector3 L1b, TVector3 L2b, double sigma_L1a, double sigma_L2a, double sigma_L1b, double sigma_L2b);
     double Mass_Parents2(TVector3 Par, TVector3 Betaa, TVector3 Betab);
     double Mass_Parents2(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab);
-    double Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis, double& f_MET_Mag);
+    double Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis, double& f_MET_Mag, double& f_MET_Dir);
     double Mass_Invisible2(double Mass_P, double E_V_P, double Mass_V);
-    double Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET, double& dM_dMET);
+    double Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET_Mag, double sigma_MET_Dir, double& dM_dMET_Mag, double& dM_dMET_Dir);
 };
 #endif
 
@@ -220,36 +220,38 @@ inline double Resolution::Mass_Parents2(TVector3 MET_Mag, TVector3 MET_Dir, TVec
     //v: Vis
     
     double cmv = MET_Mag.Unit().Dot(Vis.Unit());
-    double cdv = MET_Dir.Unit().Dot(Vis.Unit());
+    //double cdv = MET_Dir.Unit().Dot(Vis.Unit());
     double sbm = MET_Mag.Unit().Cross(BetabT.Unit()).Dot(Zhat);
-    double sbd = MET_Dir.Unit().Cross(BetabT.Unit()).Dot(Zhat);
+    //double sbd = MET_Dir.Unit().Cross(BetabT.Unit()).Dot(Zhat);
     double sbv = Vis.Unit().Cross(BetabT.Unit()).Dot(Zhat);
     double cam = MET_Mag.Unit().Dot(BetaaT.Unit());
-    double cad = MET_Dir.Unit().Dot(BetaaT.Unit());
+    //double cad = MET_Dir.Unit().Dot(BetaaT.Unit());
     double cav = Vis.Unit().Dot(BetaaT.Unit());
     double cbm = MET_Mag.Unit().Dot(BetabT.Unit());
-    double cbd = MET_Dir.Unit().Dot(BetabT.Unit());
+    //double cbd = MET_Dir.Unit().Dot(BetabT.Unit());
     double cbv = Vis.Unit().Dot(BetabT.Unit());
     double sam = MET_Mag.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
-    double sad = MET_Dir.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
+    //double sad = MET_Dir.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
     double sav = Vis.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
 
     
     double den1 = MET_Mag.Mag2()*(cam*sbm-cbm*sam);
-    double den2 = MET_Dir.Mag2()*(cad*sbd-cbd*sad);
     double den3 = Vis.Mag2()*(cav*sbv-cbv*sav);
-    double den4 = MET_Mag.Mag()*MET_Dir.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam);
     double den5 = MET_Mag.Mag()*Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    double den6 = MET_Dir.Mag()*Vis.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
     
+    /*
     double den = gamma*Betaa.Pt()*(den1+den2+den3+den4+den5+den6);
 
     double num = MET_Mag.Mag2()*MET_Mag.Mag()*sbm+MET_Mag.Mag2()*MET_Dir.Mag()*sbd+2.*MET_Mag.Mag2()*Vis.Mag()*cmv*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*Vis.Mag()*cdv*sbm+2.*MET_Mag.Mag()*Vis.Mag2()*cmv*sbv+MET_Mag.Mag()*Vis.Mag2()*sbm+MET_Dir.Mag2()*MET_Dir.Mag()*sbd+2.*MET_Dir.Mag2()*Vis.Mag()*cdv*sbd+MET_Dir.Mag2()*Vis.Mag()*sbv+2.*MET_Dir.Mag()*Vis.Mag2()*cdv*sbv+MET_Dir.Mag()*Vis.Mag2()*sbd+Vis.Mag2()*Vis.Mag()*sbv+MET_Mag.Mag2()*Vis.Mag()*sbv+MET_Mag.Mag()*MET_Dir.Mag2()*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*Vis.Mag()*cmv*sbd;
+    */
+    double den = gamma*Betaa.Pt()*(den1+den3+den5);
+    
+    double num = MET_Mag.Mag2()*MET_Mag.Mag()*sbm+2.*MET_Mag.Mag2()*Vis.Mag()*cmv*sbm+2.*MET_Mag.Mag()*Vis.Mag2()*cmv*sbv+MET_Mag.Mag()*Vis.Mag2()*sbm+Vis.Mag2()*Vis.Mag()*sbv+MET_Mag.Mag2()*Vis.Mag()*sbv;
     
     return num/den;
 }
-
-inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis, double& f_MET_Mag)
+/*
+inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis, double& f_MET_Mag, double& f_MET_Dir)
 {
     TVector3 Zhat(0.0,0.0,1.0);
     double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
@@ -286,15 +288,74 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 ME
     double den6 = MET_Dir.Mag()*Vis.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
     double den = (den1+den2+den3+den4+den5+den6);
 
-    double dnum_dMag = 3.*MET_Mag.Mag2()*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*sbd+4.*MET_Mag.Mag()*Vis.Mag()*cmv*sbm+MET_Dir.Mag2()*sbm+2.*MET_Dir.Mag()*Vis.Mag()*cmv*sbd+2.*MET_Mag.Mag()*Vis.Mag()*sbv+2.*MET_Dir.Mag()*Vis.Mag()*cdv*sbm+2.*Vis.Mag2()*cmv*sbv+Vis.Mag2()*sbm;
+    double dnum_dMag = (MET_Mag.Unit()*(3.*MET_Mag.Mag2()+MET_Dir.Mag2()+Vis.Mag2()+2.*Vis.Dot(2.*MET_Mag+MET_Dir))+2.*(MET_Dir+Vis)*(MET_Mag.Mag()+Vis.Dot(MET_Mag.Unit()))).Cross(BetabT.Unit()).Dot(Zhat);
     double dden_dMag = 2.*MET_Mag.Mag()*(cam*sbm-cbm*sam)+MET_Dir.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam)+Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    double dnum_dDir = 3.*MET_Dir.Mag2()*sbd+MET_Mag.Mag2()*sbd+2.*MET_Mag.Mag()*Vis.Mag()*cdv*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*sbm+2.*MET_Mag.Mag()*Vis.Mag()*cmv*sbd+4.*MET_Dir.Mag()*Vis.Mag()*cdv*sbd+2.*MET_Dir.Mag()*Vis.Mag()*sbv+2.*Vis.Mag2()*cdv*sbv+Vis.Mag2()*sbd;
+    double dnum_dDir = (MET_Dir.Unit()*(3.*MET_Dir.Mag2()+MET_Mag.Mag2()+Vis.Mag2()+2.*Vis.Dot(2.*MET_Dir+MET_Mag))+2.*(MET_Mag+Vis)*(MET_Dir.Mag()+Vis.Dot(MET_Dir.Unit()))).Cross(BetabT.Unit()).Dot(Zhat);
+    
     double dden_dDir = 2.*MET_Dir.Mag()*(cad*sbd-cbd*sad)+MET_Mag.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam)+Vis.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
+    
+    
     double dnum_dVis = 2.*MET_Mag.Mag2()*cmv*sbm+2.*MET_Mag.Mag()*MET_Dir.Mag()*cdv*sbm+4.*MET_Mag.Mag()*Vis.Mag()*cmv*sbv+2.*MET_Mag.Mag()*Vis.Mag()*sbm+2.*MET_Dir.Mag2()*cdv*sbd+MET_Dir.Mag2()*sbv+4.*MET_Dir.Mag()*Vis.Mag()*cdv*sbv+2.*MET_Dir.Mag()*Vis.Mag()*sbd+3.*Vis.Mag2()*sbv+MET_Mag.Mag2()*sbv+2.*MET_Mag.Mag()*MET_Dir.Mag()*cmv*sbd;
     double dden_dVis = 2.*Vis.Mag()*(cav*sbv-cbv*sav)+MET_Mag.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam)+MET_Dir.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
     
     f_MET_Mag = (1./num)*(dnum_dMag)-(1./den)*(dden_dMag);
-    double f_MET_Dir = (1./num)*(dnum_dDir)-(1./den)*(dden_dDir);
+    f_MET_Dir = (1./num)*(dnum_dDir)-(1./den)*(dden_dDir);
+    double f_Vis = (1./num)*(dnum_dVis)-(1./den)*(dden_dVis);
+    
+    double MET_MAG_RES = sigma_MET_Mag*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_MET_Mag;
+    double MET_DIR_RES = sigma_MET_Dir*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_MET_Dir;
+    double VIS_RES = sigma_Vis*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_Vis;
+    double BETA_RES = sigma_Beta_Maga*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*gamma*gamma/Betaa.Mag();
+    
+    
+    return sqrt(BETA_RES*BETA_RES + MET_MAG_RES*MET_MAG_RES + MET_DIR_RES*MET_DIR_RES + VIS_RES*VIS_RES);
+}
+*/
+inline double Resolution::Mass_Parents2_Resolution(TVector3 MET_Mag, TVector3 MET_Dir, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET_Mag, double sigma_MET_Dir, double sigma_Vis, double& f_MET_Mag, double& f_MET_Dir)
+{
+    TVector3 Zhat(0.0,0.0,1.0);
+    double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
+    TVector3 BetaaT = Betaa;
+    TVector3 BetabT = Betab;
+    BetaaT.SetZ(0.);
+    BetabT.SetZ(0.);
+    //Angles
+    //m: MET_Mag
+    //d: MET_Dir
+    //v: Vis
+    
+    double cmv = MET_Mag.Unit().Dot(Vis.Unit());
+    double sbm = MET_Mag.Unit().Cross(BetabT.Unit()).Dot(Zhat);
+    double sbd = MET_Dir.Unit().Cross(BetabT.Unit()).Dot(Zhat); //
+    double sbv = Vis.Unit().Cross(BetabT.Unit()).Dot(Zhat);
+    double cam = MET_Mag.Unit().Dot(BetaaT.Unit());
+    double cad = MET_Dir.Unit().Dot(BetaaT.Unit()); //
+    double cav = Vis.Unit().Dot(BetaaT.Unit());
+    double cbm = MET_Mag.Unit().Dot(BetabT.Unit());
+    double cbd = MET_Dir.Unit().Dot(BetabT.Unit()); //
+    double cbv = Vis.Unit().Dot(BetabT.Unit());
+    double sam = MET_Mag.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
+    double sad = MET_Dir.Unit().Cross(BetaaT.Unit()).Dot(Zhat); //
+    double sav = Vis.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
+    
+    double num = MET_Mag.Mag2()*MET_Mag.Mag()*sbm+2.*MET_Mag.Mag2()*Vis.Mag()*cmv*sbm+2.*MET_Mag.Mag()*Vis.Mag2()*cmv*sbv+MET_Mag.Mag()*Vis.Mag2()*sbm+Vis.Mag2()*Vis.Mag()*sbv+MET_Mag.Mag2()*Vis.Mag()*sbv;
+    
+    double den1 = MET_Mag.Mag2()*(cam*sbm-cbm*sam);
+    double den3 = Vis.Mag2()*(cav*sbv-cbv*sav);
+    double den5 = MET_Mag.Mag()*Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
+    double den = (den1+den3+den5);
+    
+    double dnum_dMag = (MET_Mag.Unit()*(3.*MET_Mag.Mag2()+Vis.Mag2()+4.*Vis.Dot(MET_Mag))+2.*Vis*(MET_Mag.Mag()+Vis.Dot(MET_Mag.Unit()))).Cross(BetabT.Unit()).Dot(Zhat);
+    double dden_dMag = 2.*MET_Mag.Mag()*(cam*sbm-cbm*sam)+Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
+    double dnum_dDir = (MET_Dir*(MET_Mag.Mag2()+Vis.Mag2()+2.*Vis.Dot(MET_Mag))+2.*(MET_Mag+Vis)*(Vis.Dot(MET_Dir))).Cross(BetabT.Unit()).Dot(Zhat); //
+    
+    double dden_dDir = MET_Mag.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam)+Vis.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
+    
+    double dnum_dVis = 2.*MET_Mag.Mag2()*cmv*sbm+4.*MET_Mag.Mag()*Vis.Mag()*cmv*sbv+2.*MET_Mag.Mag()*Vis.Mag()*sbm+3.*Vis.Mag2()*sbv+MET_Mag.Mag2()*sbv;
+    double dden_dVis = 2.*Vis.Mag()*(cav*sbv-cbv*sav)+MET_Mag.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
+    
+    f_MET_Mag = (1./num)*(dnum_dMag)-(1./den)*(dden_dMag);
+    f_MET_Dir = (1./num)*(dnum_dDir)-(1./den)*(dden_dDir);
     double f_Vis = (1./num)*(dnum_dVis)-(1./den)*(dden_dVis);
     
     double MET_MAG_RES = sigma_MET_Mag*Mass_Parents2(MET_Mag,MET_Dir,Vis,Betaa,Betab)*f_MET_Mag;
@@ -311,12 +372,13 @@ inline double Resolution::Mass_Invisible2(double Mass_P, double E_V_P, double Ma
     return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
 }
 
-inline double Resolution::Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET, double& dM_dMET)
+inline double Resolution::Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET_Mag, double sigma_MET_Dir, double& dM_dMET_Mag, double& dM_dMET_Dir)
 {
     double gamma = 1.0/sqrt(1.0-Beta.Mag2());
     double dE_dB = gamma*gamma*gamma*(Beta.Mag()*(L1a.E()+L2a.E())-Beta.Unit().Dot((L1a+L2a).Vect()));
     double dM_dB = -Mass_P*gamma*gamma/Beta.Mag();
-    double a = sigma_Beta_Mag/Mass_I*(Mass_P*dM_dB-E_V_P*dM_dB-Mass_P*dE_dB);
-    double b = sigma_MET/Mass_I*(dM_dMET*(Mass_P-E_V_P));
-    return sqrt(a*a+b*b);
+    double a = (sigma_Beta_Mag/Mass_I)*(Mass_P*dM_dB-E_V_P*dM_dB-Mass_P*dE_dB);
+    double b = (sigma_MET_Mag/Mass_I)*(dM_dMET_Mag*Mass_P*(Mass_P-E_V_P));
+    double c = (sigma_MET_Dir/Mass_I)*(dM_dMET_Dir*Mass_P*(Mass_P-E_V_P));
+    return sqrt(a*a+b*b+c*c);
 }
