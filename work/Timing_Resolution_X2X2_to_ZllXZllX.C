@@ -50,20 +50,29 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     double ctau = 10.;
     
     vector<double> sigmaT;
-    vector<double> Sigma_MX2;
-    vector<double> Sigma_MX2_MET; //turn off both MET contributions
-    vector<double> Sigma_MX2_Timing; //turn off Velocity Contribution
     
     //sigmaT.push_back(0.3);
     //sigmaT.push_back(0.05);
     //sigmaT.push_back(0.03);
     
-    for(double i = 10.; i <= 350.; i+=10)
+    //Number of events
+    int Ngen = 1000000;
+    double cut = 1.0e7; //cut for LLP Mass Resolution
+    for(double i = 10.; i <= 350.; i+=10.)
     {
         sigmaT.push_back(i);
     }
-    
     int NsigmaT = sigmaT.size();
+    double Sigma_MX2[NsigmaT];
+    double Sigma_MX2_MET[NsigmaT];
+    double Sigma_MX2_Timing[NsigmaT];
+    for(int j = 0; j < NsigmaT; j++)
+    {
+        Sigma_MX2[j]=0.;
+        Sigma_MX2_MET[j]=0.;
+        Sigma_MX2_Timing[j]=0.;
+    }
+    double arr_MX2_Res[NsigmaT], arr_MX2_Res_MET[NsigmaT], arr_MX2_Res_Timing[NsigmaT];
     TCanvas* canvas_graph = new TCanvas("canvas_graph","canvas_graph",750,500);
     canvas_graph->SetGridx();
     canvas_graph->SetGridy();
@@ -75,9 +84,12 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     TGraph* graph_Sigma_MX2_SigmaT = new TGraph(NsigmaT);
     TGraph* graph_Sigma_MX2_MET_SigmaT = new TGraph(NsigmaT);
     TGraph* graph_Sigma_MX2_Timing_SigmaT = new TGraph(NsigmaT);
-    
-    //Number of events
-    int Ngen = 100000;
+    TCanvas* canvas_graph_events = new TCanvas("canvas_graph_events","canvas_graph_events",750,500);
+    TGraph* graph_Sigma_MX2_Nevents = new TGraph(NsigmaT);
+    TCanvas* canvas_graph_events_MET = new TCanvas("canvas_graph_events_MET","canvas_graph_events_MET",750,500);
+    TGraph* graph_Sigma_MX2_MET_Nevents = new TGraph(NsigmaT);
+    TCanvas* canvas_graph_events_Timing = new TCanvas("canvas_graph_events_Timing","canvas_graph_events_Timing",750,500);
+    TGraph* graph_Sigma_MX2_Timing_Nevents = new TGraph(NsigmaT);
     
     g_Log << LogInfo << "Initializing generator frames and tree..." << LogEnd;
     
@@ -189,9 +201,17 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     for(int m = 0; m < NsigmaT; m++){
         char sname[200], scat[50];
         sprintf(scat, "sigmaT_%d", m);
-        sprintf(sname, "%.1f ps", sigmaT[m]*1000.);
+        sprintf(sname, "%.1f ps", sigmaT[m]);
         cat_list += histPlot->GetNewCategory(scat, ssigmaT+std::string(sname));
     }
+    /*
+     for(int m = 0; m < NsigmaT; m++){
+     char sname[200], scat[50];
+     sprintf(scat, "sigmaT_%d", m);
+     sprintf(sname, "%.1f ps", sigmaT[m]);
+     cat_list += histPlot->GetNewCategory(scat, ssigmaT+std::string(sname));
+     }
+    */
     
     //setting up all the variables that could be potentially plotted
     const HistPlotVar& Pull_Mass_Parent = histPlot->GetNewVar("Pull_Mass_Parent","Pull of M(#tilde{#chi}_{2}^{0})",-5.0,5.0,"");
@@ -221,7 +241,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& Pull_MXb2 = histPlot->GetNewVar("Pull_MXb2", "Pull of M(#tilde{#chi}_{2b}^{0})", -5.0, 5.0, "");
     const HistPlotVar& Pull_Vis = histPlot->GetNewVar("Pull_Vis", "Pull of Vis", -5.0, 5.0, "");
     const HistPlotVar& MX2X2 = histPlot->GetNewVar("MX2X2", "M(#tilde{#chi}_{2}^{0})(#tilde{#chi}_{2}^{0})", 0., 3000., "[GeV]");
-    const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 2000., "[GeV]");
+    const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 10000., 1000000., "[GeV]");
     const HistPlotVar& MXb2 = histPlot->GetNewVar("MXb2", "M(#tilde{#chi}_{2b}^{0})", 0., 2000., "[GeV]");
     const HistPlotVar& MXa = histPlot->GetNewVar("MXa", "M(#tilde{#chi}_{2}^{0})", 0., 2000., "[GeV]");
     const HistPlotVar& CosX2a = histPlot->GetNewVar("CosX2a", "Cos_X2a", -1, 1., "");
@@ -239,7 +259,9 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& Pull_MXa2L = histPlot->GetNewVar("Pull_MXa2L", "Pull of M(#tilde{#chi}_{2a}^{0})L", -5.0, 5.0, ""); //turn off lepton
     const HistPlotVar& Pull_MXa2B = histPlot->GetNewVar("Pull_MXa2B", "Pull of M(#tilde{#chi}_{2a}^{0})B", -5.0, 5.0, ""); //turn off beta
     const HistPlotVar& Pull_MXa2D = histPlot->GetNewVar("Pull_MXa2D", "Pull of M(#tilde{#chi}_{2a}^{0})D", -5.0, 5.0, ""); //turn off MET Direction
-    
+    const HistPlotVar& MXa2_Res = histPlot->GetNewVar("MXa2_Res","Resolution of M(#tilde{#chi}_{2a}^{0})", 10000.0, 1000000.0, "");
+    const HistPlotVar& MXa2_Res_MET = histPlot->GetNewVar("MXa2_Res_MET","Resolution of M(#tilde{#chi}_{2a}^{0}) MET", 0.0, 10000.0, "");
+    const HistPlotVar& MXa2_Res_Timing = histPlot->GetNewVar("MXa2_Res_Timing","Resolution of M(#tilde{#chi}_{2a}^{0}) Timing", 0.0, 10000.0, "");
     
     //comment in/out whatever plots are interesting
     //histPlot->AddPlot(Pull_Mass_Parent, cat_list); //need ~1 TeV MX2 & ~300 MX1, to look good
@@ -262,7 +284,11 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(Pull_Mass_Invisible, cat_list); //need ~1 TeV MX2 & ~500 MX1, to look ok
     //histPlot->AddPlot(MIa, cat_list);
     //histPlot->AddPlot(MXa, cat_list);
-    histPlot->AddPlot(MXa2, cat_list);
+    //histPlot->AddPlot(MXa2, cat_list);
+    histPlot->AddPlot(MXa2, MXa2_Res, cat_list);
+    histPlot->AddPlot(MXa2_Res, cat_list);
+    histPlot->AddPlot(MXa2_Res_MET, cat_list);
+    histPlot->AddPlot(MXa2_Res_Timing, cat_list);
     //histPlot->AddPlot(MIa2, cat_list);
     //histPlot->AddPlot(Delta_MIa2, cat_list);
     //histPlot->AddPlot(Pull_MIa2, cat_list);
@@ -340,9 +366,9 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //for checking generator efficiency
     int gen_events = 0;
     int acp_events = 0;
-    TVector3 null_vect(0.0,0.0,0.0);
     
-  for(int m = 0; m < NsigmaT; m++){
+    //for(int m = 0; m < NsigmaT; m++){
+    for(int m = 0; m < 1; m++){
     g_Log << LogInfo << "Generating events for ";
     g_Log << "mX2 = " << mX2 << ", ";
     g_Log << "mX1 = " << mX1 << ", ";
@@ -350,11 +376,6 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     
       PUPPI_Detector.Set_sigmaT((sigmaT[m]/1000.0)/sqrt(2.));
     LAB_Gen.InitializeAnalysis(); //Comment for "Official" Plots
-      
-    sigmaT.clear();
-    Sigma_MX2.clear();
-    Sigma_MX2_MET.clear();
-    Sigma_MX2_Timing.clear();
       
     for(int igen = 0; igen < Ngen; igen++){
       if(igen%((std::max(Ngen,10))/10) == 0)
@@ -446,11 +467,6 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         TLorentzVector L1b_RECOt = PUPPI_Detector.Smear_Muon(L1b_Gent);
         TLorentzVector L2b_RECOt = PUPPI_Detector.Smear_Muon(L2b_Gent);
         
-        //Make Velocity without Time Smearing
-        PUPPI_Detector.Set_sigmaT(0.);
-        TVector3 Smeared_vBetaa_No_Time = PUPPI_Detector.Smear_Beta(PV,SVa);
-        TVector3 Smeared_vBetab_No_Time = PUPPI_Detector.Smear_Beta(PV,SVb);
-        PUPPI_Detector.Set_sigmaT((sigmaT[m]/1000.0)/sqrt(2.));
         
         if(Smeared_vBetaa.Mag() >= 1.)
         {
@@ -497,6 +513,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         double Sigma_Angle2 = test_Resolution.GetAngleError(vBetaaGen,L2a_Gen.GetFourVector().Vect(),Smeared_vBetaa,L2a_RECO.Vect());
         
         double Sigma_Beta_Mag = sqrt((1.0/(Smeared_ToFa*Smeared_ToFa))*(sigmaDistance*sigmaDistance+2.*Smeared_vBetaa.Mag()*Smeared_vBetaa.Mag()*PUPPI_Detector.Get_sigmaT()*PUPPI_Detector.Get_sigmaT()));
+        
         double Sigma_Beta_Magb = sqrt((1.0/(Smeared_ToFb*Smeared_ToFb))*(sigmaDistance*sigmaDistance+2.*Smeared_vBetab.Mag()*Smeared_vBetab.Mag()*PUPPI_Detector.Get_sigmaT()*PUPPI_Detector.Get_sigmaT()));
         
         
@@ -553,11 +570,10 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         double f_MET_MAG = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
         double f_MET_DIR = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
         
-        double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
-        double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,I_Vect.Cross(Zhat).Unit(),L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
-        TVector3 null_vect(0.,0.,0.);
-        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
-        MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
+        double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
+        double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
+        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+        MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
         
         double MXa2_ResolutionL = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
         double MXa2_ResolutionB = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
@@ -581,10 +597,63 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         Pull_MIa2 = Delta_MIa2/MIa2_Gen;
         
         
-        Sigma_MX2.push_back(test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab));
-        Sigma_MX2_MET.push_back(test_Resolution.Mass_Parents2(I.Vect(),null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab));
-        Sigma_MX2_Timing.push_back(test_Resolution.Mass_Parents2(MET_RECO_PUPPI,null_vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time));
+        PUPPI_Detector.Set_sigmaT(0.);
+        TVector3 Smeared_vBetaa_No_Time = PUPPI_Detector.Smear_Beta(PV,SVa);
+        TVector3 Smeared_vBetab_No_Time = PUPPI_Detector.Smear_Beta(PV,SVb);
         
+        if(Smeared_vBetaa_No_Time.Mag() >= 1. || Smeared_vBetab_No_Time.Mag() >= 1.)
+        {
+            igen--;
+            continue;
+        }
+        double Sigma_Beta_Mag_No_Time = sqrt((1.0/(ToFa*ToFa))*(sigmaDistance*sigmaDistance+2.*Smeared_vBetaa_No_Time.Mag()*Smeared_vBetaa_No_Time.Mag()*PUPPI_Detector.Get_sigmaT()*PUPPI_Detector.Get_sigmaT()));
+        
+        MXa2_Res = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
+        MXa2_Res_MET = test_Resolution.Mass_Parents2_Resolution(I_Vect,I_Vect.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,0.,0.,Sigma_Vis,f_MET_MAG,f_MET_DIR);
+        MXa2_Res_Timing = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
+        
+        
+        //cout << "NEW EVENT " << endl;
+        
+        bool skip = false;
+        
+        for(int i = 0; i < NsigmaT; i++)
+        {
+            PUPPI_Detector.Set_sigmaT((sigmaT[i]/1000.0)/sqrt(2.));
+            TVector3 Smeared_vBetaa_Time = PUPPI_Detector.Smear_Beta(PV,SVa);
+            TVector3 Smeared_vBetab_Time = PUPPI_Detector.Smear_Beta(PV,SVb);
+            
+            if(Smeared_vBetaa_Time.Mag() >= 1. || Smeared_vBetab_Time.Mag() >= 1.)
+            {
+                i--;
+                continue;
+            }
+            double Sigma_Beta_Mag_Time = sqrt((1.0/(ToFa*ToFa))*(sigmaDistance*sigmaDistance));
+            arr_MX2_Res[i] = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time,Sigma_Beta_Mag_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
+            arr_MX2_Res_MET[i] = test_Resolution.Mass_Parents2_Resolution(I_Vect,I_Vect.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time,Sigma_Beta_Mag_Time,0.,0.,Sigma_Vis,f_MET_MAG,f_MET_DIR);
+            arr_MX2_Res_Timing[i] = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
+            //if((arr_MX2_Res[i] > 10.*Sigma_MX2[i]/(igen+1) || arr_MX2_Res_MET[i] > 10.*Sigma_MX2_MET[i]/(igen+1) || arr_MX2_Res_Timing[i] > 10.*Sigma_MX2_Timing[i]/(igen+1)) && igen > 1)
+            if(arr_MX2_Res[i] > cut || arr_MX2_Res_MET[i] > cut || arr_MX2_Res_Timing[i] > cut)
+            //if(skip)
+            {
+                igen--;
+                skip = true;
+                break;
+            }
+            
+        }
+        if(skip) continue;
+        for(int i = 0; i < NsigmaT; i++)
+        {
+            Sigma_MX2[i]+=arr_MX2_Res[i];
+            Sigma_MX2_MET[i]+=arr_MX2_Res_MET[i];
+            Sigma_MX2_Timing[i]+=arr_MX2_Res_Timing[i];
+        }
+        
+        PUPPI_Detector.Set_sigmaT((sigmaT[m]/1000.0)/sqrt(2.));
+        graph_Sigma_MX2_Nevents->SetPoint(igen,igen+1.,Sigma_MX2[1]/(igen+1.));
+        graph_Sigma_MX2_MET_Nevents->SetPoint(igen,igen+1.,Sigma_MX2_MET[1]/(igen+1.));
+        graph_Sigma_MX2_Timing_Nevents->SetPoint(igen,igen+1.,Sigma_MX2_Timing[1]/(igen+1.));
         
         /*
          double Mass_Invisible_Resolution = test_Resolution.Mass_Invisible_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECO,L2a_RECO,MET_Mag_Resolution,Sigma_Beta_Mag);
@@ -630,11 +699,15 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         acp_events++;
     }
       LAB_Gen.PrintGeneratorEfficiency();
-      graph_Sigma_MX2_SigmaT->SetPoint(m,sigmaT[m],Vector_Mean(Sigma_MX2));
-      graph_Sigma_MX2_MET_SigmaT->SetPoint(m,sigmaT[m],Vector_Mean(Sigma_MX2_MET));
-      graph_Sigma_MX2_Timing_SigmaT->SetPoint(m,sigmaT[m],Vector_Mean(Sigma_MX2_Timing));
   }
     histPlot->Draw();
+    
+    for(int i = 0; i < NsigmaT; i++)
+    {
+        graph_Sigma_MX2_SigmaT->SetPoint(i,sigmaT[i],Sigma_MX2[i]/double(Ngen));
+        graph_Sigma_MX2_MET_SigmaT->SetPoint(i,sigmaT[i],Sigma_MX2_MET[i]/double(Ngen));
+        graph_Sigma_MX2_Timing_SigmaT->SetPoint(i,sigmaT[i],Sigma_MX2_Timing[i]/double(Ngen));
+    }
     
     TFile fout(output_name.c_str(),"RECREATE");
     canvas_graph->cd();
@@ -656,10 +729,10 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     mg->GetYaxis()->SetLabelSize(.04);
     mg->GetXaxis()->SetLabelSize(.04);
     mg->Draw("AP");
-    TLegend* leg = new TLegend(0.1,0.645,0.353,0.95);
+    TLegend* leg = new TLegend(0.15,0.65,0.353,0.95);
     TLegendEntry* leg_none = leg->AddEntry(graph_Sigma_MX2_SigmaT,"All Uncertainties On","P");
-    TLegendEntry* leg_MET = leg->AddEntry(graph_Sigma_MX2_MET_SigmaT,"#sigma_{MET_{#perp}} & #sigma_{MET} Off","P");
-    TLegendEntry* leg_Beta = leg->AddEntry(graph_Sigma_MX2_Timing_SigmaT,"#sigma_{#beta} Off","P");
+    TLegendEntry* leg_MET = leg->AddEntry(graph_Sigma_MX2_MET_SigmaT,"#sigma_{MET} Off","P");
+    TLegendEntry* leg_Beta = leg->AddEntry(graph_Sigma_MX2_Timing_SigmaT,"#sigma_{t} Off","P");
     leg->Draw("SAMES");
     canvas_graph->SaveAs("MLLP_Timing.pdf");
     canvas_graph->Write();
@@ -667,6 +740,28 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     mg->Draw("AP");
     leg->Draw("SAMES");
     canvas_graph_log->SaveAs("MLLP_Timing_Log.pdf");
+    
+    canvas_graph_events->cd();
+    graph_Sigma_MX2_Nevents->SetMarkerStyle(22);
+    graph_Sigma_MX2_Nevents->SetMarkerColor(kBlue);
+    graph_Sigma_MX2_MET_Nevents->SetMarkerStyle(22);
+    graph_Sigma_MX2_MET_Nevents->SetMarkerColor(kRed);
+    graph_Sigma_MX2_Timing_Nevents->SetMarkerStyle(22);
+    graph_Sigma_MX2_Timing_Nevents->SetMarkerColor(kGreen+2);
+    TMultiGraph* mg_events = new TMultiGraph();
+    mg_events->Add(graph_Sigma_MX2_Nevents);
+    mg_events->Add(graph_Sigma_MX2_MET_Nevents);
+    mg_events->Add(graph_Sigma_MX2_Timing_Nevents);
+    mg_events->GetYaxis()->SetTitle("#sigma_{M_{LLP}} Mean [GeV]");
+    mg_events->GetXaxis()->SetTitle("NEvents");
+    mg_events->GetYaxis()->SetTitleOffset(1.05);
+    mg_events->GetYaxis()->SetTitleSize(.04);
+    mg_events->GetXaxis()->SetTitleSize(.04);
+    mg_events->GetYaxis()->SetLabelSize(.04);
+    mg_events->GetXaxis()->SetLabelSize(.04);
+    mg_events->Draw("AP");
+    leg->Draw("SAMES");
+    
     fout.Close();
     histPlot->WriteOutput(output_name);
     histPlot->WriteHist(output_name);

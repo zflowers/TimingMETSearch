@@ -585,7 +585,5 @@ inline Vertex Detector::Smear_Vertex(Vertex User_Vertex, double User_sigmaV, dou
 
 inline TVector3 Detector::Smear_Beta(Vertex PV, Vertex SV)
 {
-    Smear_PV(PV);
-    Smear_SV(SV);
-    return Get_Beta(PV,SV);
+    return Get_Beta(Smear_PV(PV),Smear_SV(SV));
 }

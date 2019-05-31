@@ -19,7 +19,26 @@
 
 double Vector_Mean(std::vector<double> vect) //returns mean of a vector
 {
-    return std::accumulate(vect.begin(),vect.end(),0.0)/vect.size();
+    return accumulate(vect.begin(),vect.end(),0.0)/vect.size();
+}
+
+double Vector_Mode(std::vector<double> vect) //returns mean of a vector
+{
+    std::sort(vect.begin(),vect.end());
+    int mode = int(vect.at(0));
+    int count = 1;
+    int ModeCount = 1;
+    for(int i = 1; i < int(vect.size()); i++)
+    {
+        if(vect[i] > vect[i-1]) {count=1;}
+        else count++;
+        if(count >= ModeCount)
+        {
+            ModeCount = count;
+            mode = vect[i];
+        }
+    }
+    return mode;
 }
 
 double One_Sigma_Interval(std::vector<double> Sigma_Var) //Pass a vector of analytic calculations of some mass
