@@ -39,7 +39,7 @@ using namespace RestFrames;
 
 void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
 			      "output_Timing_Resolution_X2X2_to_ZallXZbllX.root"){
-
+    
     Long64_t start = gSystem->Now();
     
     //setting masses and widths
@@ -56,23 +56,33 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(0.03);
     bool flag = true;
     //Number of events
-    int Ngen = 100000;
+    int Ngen = 1000000;
     vector<TH1F*> vect_hist_Sigma_MX2;
     vector<TH1F*> vect_hist_Sigma_MX2_MET;
     vector<TH1F*> vect_hist_Sigma_MX2_Timing;
-    int Bins=150;
-    double xmax = 5.;
-    for(double i = 10.; i <= 300.; i+=10.)
+    vector<TH1F*> vect_hist_Sigma_MX2_Measured;
+    vector<TH1F*> vect_hist_Sigma_MX2_MET_Measured;
+    vector<TH1F*> vect_hist_Sigma_MX2_Timing_Measured;
+    int Bins=50;
+    double xmax = 1.;
+    for(double i = 10.; i <= 350.; i+=10.)
     {
         sigmaT.push_back(i);
         TH1F* hist_Sigma_MX2 = new TH1F(("hist_Sigma_MX2"+std::to_string(i)).c_str(),("hist_Sigma_MX2"+std::to_string(i)).c_str(),Bins,0.,xmax);
         TH1F* hist_Sigma_MX2_MET = new TH1F(("hist_Sigma_MX2_MET"+std::to_string(i)).c_str(),("hist_Sigma_MX2_MET"+std::to_string(i)).c_str(),Bins,0.,xmax);
         TH1F* hist_Sigma_MX2_Timing = new TH1F(("hist_Sigma_MX2_Timing"+std::to_string(i)).c_str(),("hist_Sigma_MX2_Timing"+std::to_string(i)).c_str(),Bins,0.,xmax);
+        TH1F* hist_Sigma_MX2_Measured = new TH1F(("hist_Sigma_MX2_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX2_Measured"+std::to_string(i)).c_str(),Bins,0.,2500.);
+        TH1F* hist_Sigma_MX2_MET_Measured = new TH1F(("hist_Sigma_MX2_MET_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX2_MET_Measured"+std::to_string(i)).c_str(),Bins,0.,2500.);
+        TH1F* hist_Sigma_MX2_Timing_Measured = new TH1F(("hist_Sigma_MX2_Timing_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX2_Timing_Measured"+std::to_string(i)).c_str(),Bins,0.,2500.);
         vect_hist_Sigma_MX2.push_back(hist_Sigma_MX2);
         vect_hist_Sigma_MX2_MET.push_back(hist_Sigma_MX2_MET);
         vect_hist_Sigma_MX2_Timing.push_back(hist_Sigma_MX2_Timing);
+        vect_hist_Sigma_MX2_Measured.push_back(hist_Sigma_MX2_Measured);
+        vect_hist_Sigma_MX2_MET_Measured.push_back(hist_Sigma_MX2_MET_Measured);
+        vect_hist_Sigma_MX2_Timing_Measured.push_back(hist_Sigma_MX2_Timing_Measured);
     }
     int NsigmaT = sigmaT.size();
+    
     TCanvas* canvas_graph = new TCanvas("canvas_graph","canvas_graph",750,500);
     canvas_graph->SetGridx();
     canvas_graph->SetGridy();
@@ -84,6 +94,9 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     TGraph* graph_Sigma_MX2_SigmaT = new TGraph(NsigmaT);
     TGraph* graph_Sigma_MX2_MET_SigmaT = new TGraph(NsigmaT);
     TGraph* graph_Sigma_MX2_Timing_SigmaT = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX2_SigmaT_Measured = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX2_MET_SigmaT_Measured = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX2_Timing_SigmaT_Measured = new TGraph(NsigmaT);
     
     g_Log << LogInfo << "Initializing generator frames and tree..." << LogEnd;
     
@@ -610,6 +623,14 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
             vect_hist_Sigma_MX2.at(i)->Fill((test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time,Sigma_Beta_Mag_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR))/test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time));
             vect_hist_Sigma_MX2_MET.at(i)->Fill(test_Resolution.Mass_Parents2_Resolution(I_Vect,I_Vect.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time,Sigma_Beta_Mag_Time,0.,0.,Sigma_Vis,f_MET_MAG,f_MET_DIR)/(test_Resolution.Mass_Parents2(I_Vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time)));
             vect_hist_Sigma_MX2_Timing.at(i)->Fill(test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR)/(test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time)));
+            vect_hist_Sigma_MX2_Measured.at(i)->Fill(test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time));
+            vect_hist_Sigma_MX2_MET_Measured.at(i)->Fill(test_Resolution.Mass_Parents2(I_Vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time));
+            vect_hist_Sigma_MX2_Timing_Measured.at(i)->Fill(test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time));
+            
+            
+            //Sigma_MX2_Measured[i][igen] = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time);
+            //Sigma_MX2_MET_Measured[i][igen] = test_Resolution.Mass_Parents2(I_Vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time);
+            //Sigma_MX2_Timing_Measured[i][igen] = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time);
         }
         }
         MXa2_Res = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR)/test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
@@ -665,16 +686,19 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         graph_Sigma_MX2_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2.at(j)->GetMaximumBin()));
         graph_Sigma_MX2_MET_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_MET.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_MET.at(j)->GetMaximumBin()));
         graph_Sigma_MX2_Timing_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_Timing.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Timing.at(j)->GetMaximumBin()));
+        graph_Sigma_MX2_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX2_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Measured.at(j)->GetMaximumBin()));
+        graph_Sigma_MX2_MET_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_MET_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX2_MET_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_MET_Measured.at(j)->GetMaximumBin()));
+        graph_Sigma_MX2_Timing_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetMaximumBin()));
     }
     histPlot->Draw();
-    
+    /*
     TCanvas* can_1 = new TCanvas("can1","Sigma_MX2",750,500);
-    Draw_Hists(vect_hist_Sigma_MX2,can_1);
+    Draw_Hists(vect_hist_Sigma_MX2_Measured,can_1);
     TCanvas* can_2 = new TCanvas("can2","Sigma_MX2_MET",750,500);
-    Draw_Hists(vect_hist_Sigma_MX2_MET,can_2);
+    Draw_Hists(vect_hist_Sigma_MX2_MET_Measured,can_2);
     TCanvas* can_3 = new TCanvas("can3","Sigma_MX2_Timing",750,500);
-    Draw_Hists(vect_hist_Sigma_MX2_Timing,can_3);
-    
+    Draw_Hists(vect_hist_Sigma_MX2_Timing_Measured,can_3);
+    */
     TFile fout(output_name.c_str(),"RECREATE");
     canvas_graph->cd();
     graph_Sigma_MX2_SigmaT->SetMarkerStyle(22);
@@ -683,10 +707,19 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     graph_Sigma_MX2_MET_SigmaT->SetMarkerColor(kRed);
     graph_Sigma_MX2_Timing_SigmaT->SetMarkerStyle(22);
     graph_Sigma_MX2_Timing_SigmaT->SetMarkerColor(kGreen+2);
+    graph_Sigma_MX2_SigmaT_Measured->SetMarkerStyle(32);
+    graph_Sigma_MX2_SigmaT_Measured->SetMarkerColor(kBlue);
+    graph_Sigma_MX2_MET_SigmaT_Measured->SetMarkerStyle(32);
+    graph_Sigma_MX2_MET_SigmaT_Measured->SetMarkerColor(kRed);
+    graph_Sigma_MX2_Timing_SigmaT_Measured->SetMarkerStyle(32);
+    graph_Sigma_MX2_Timing_SigmaT_Measured->SetMarkerColor(kGreen+2);
     TMultiGraph* mg = new TMultiGraph();
     mg->Add(graph_Sigma_MX2_SigmaT);
     mg->Add(graph_Sigma_MX2_MET_SigmaT);
     mg->Add(graph_Sigma_MX2_Timing_SigmaT);
+    mg->Add(graph_Sigma_MX2_SigmaT_Measured);
+    mg->Add(graph_Sigma_MX2_MET_SigmaT_Measured);
+    mg->Add(graph_Sigma_MX2_Timing_SigmaT_Measured);
     mg->GetYaxis()->SetTitle("#sigma_{M_{LLP}}/M_{LLP} [GeV]");
     mg->GetXaxis()->SetTitle("#sigma_{t} [ps]");
     mg->GetYaxis()->SetTitleOffset(1.05);
@@ -696,10 +729,10 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     mg->GetXaxis()->SetLabelSize(.04);
     mg->Draw("AP");
     TLegend* leg = new TLegend(0.1,0.65,0.353,0.95);
-    TLegendEntry* leg_none = leg->AddEntry(graph_Sigma_MX2_SigmaT,"All Uncertainties On","P");
+    TLegendEntry* leg_none = leg->AddEntry(graph_Sigma_MX2_SigmaT,"Everything On","P");
     TLegendEntry* leg_MET = leg->AddEntry(graph_Sigma_MX2_MET_SigmaT,"#sigma_{MET} Off","P");
     TLegendEntry* leg_Beta = leg->AddEntry(graph_Sigma_MX2_Timing_SigmaT,"#sigma_{t} Off","P");
-    //leg->Draw("SAMES");
+    leg->Draw("SAMES");
     canvas_graph->SaveAs("MLLP_Timing.pdf");
     canvas_graph->Write();
     canvas_graph_log->cd();

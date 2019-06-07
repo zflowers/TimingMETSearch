@@ -17,6 +17,7 @@
 #include <TColor.h>
 #include <TMinuit.h>
 #include <numeric>
+#include <algorithm>
 
 TH1F* Histogram_1D(string name, double Nbins, double Xmin, double Xmax, string Xname)
 {
