@@ -11,34 +11,99 @@
 #include "TVector3.h"
 #include <vector>
 #include <TTree.h>
+#include <TLatex.h>
 #include <TFile.h>
 #include <TLegend.h>
 #include <TColor.h>
 #include <TMinuit.h>
 #include <numeric>
 
-double Vector_Mean(std::vector<double> vect) //returns mean of a vector
+TH1F* Histogram_1D(string name, double Nbins, double Xmin, double Xmax, string Xname)
 {
-    return accumulate(vect.begin(),vect.end(),0.0)/vect.size();
+    TH1F* hist = new TH1F(("hist_"+name).c_str(),"",Nbins,Xmin,Xmax);
+    hist->SetLineColor(kBlack);
+    hist->GetXaxis()->CenterTitle();
+    hist->GetXaxis()->SetTitleFont(42);
+    hist->GetXaxis()->SetTitleSize(0.06);
+    hist->GetXaxis()->SetTitleOffset(1.06);
+    hist->GetXaxis()->SetLabelFont(42);
+    hist->GetXaxis()->SetLabelSize(0.05);
+    hist->GetXaxis()->SetTitle(Xname.c_str());
+    hist->GetYaxis()->CenterTitle();
+    hist->GetYaxis()->SetTitleFont(42);
+    hist->GetYaxis()->SetTitleSize(0.06);
+    hist->GetYaxis()->SetTitleOffset(1.12);
+    hist->GetYaxis()->SetLabelFont(42);
+    hist->GetYaxis()->SetLabelSize(0.05);
+    hist->GetYaxis()->SetTitle("Number of Entries");
+    return hist;
 }
 
-double Vector_Mode(std::vector<double> vect) //returns mean of a vector
+TCanvas* Make_CMS_Canvas(string PlotTitle)
 {
-    std::sort(vect.begin(),vect.end());
-    int mode = int(vect.at(0));
-    int count = 1;
-    int ModeCount = 1;
-    for(int i = 1; i < int(vect.size()); i++)
+    TCanvas* can = new TCanvas(("can_"+PlotTitle).c_str(),PlotTitle.c_str(),700,600);
+    can->SetLeftMargin(0.15);
+    can->SetRightMargin(0.18);
+    can->SetBottomMargin(0.15);
+    can->SetGridx();
+    can->SetGridy();
+    can->Draw();
+    can->cd();
+    TLatex latex_CMS;
+    latex_CMS.SetTextFont(42);
+    latex_CMS.SetNDC();
+    latex_CMS.SetTextSize(0.035);
+    latex_CMS.SetTextFont(42);
+    latex_CMS.DrawLatex(0.41,0.943,PlotTitle.c_str());
+    latex_CMS.SetTextSize(0.04);
+    latex_CMS.SetTextFont(42);
+    latex_CMS.DrawLatex(0.01,0.943,"#bf{CMS} Simulation Preliminary");
+    return can;
+}
+
+/*
+void Loop_1DHist(TTree fChain, TH1F*& hist, string branchname, int Category)
+{
+    if (fChain == 0) return;
+    Long64_t nentries = fChain->GetEntriesFast();
+    TBranch* branch = fChain->GetBranch(branchname.c_str());
+    vector<double> *v_branch_var = 0;
+    double branch_var = 0;
+    if(Category < 0)
     {
-        if(vect[i] > vect[i-1]) {count=1;}
-        else count++;
-        if(count >= ModeCount)
+        cout << "Category is less than zero... Assume filling with non-vector variable" << endl;
+        fChain->SetBranchAddress(branchname.c_str(), &branch_var, &branch);
+    }
+    else
+    {
+        cout << "Category is greater than zero... Assume filling with vector variable" << endl;
+        fChain->SetBranchAddress(branchname.c_str(), &v_branch_var, &branch);
+    }
+    cout << "Filling Histogram with Branch: " << branch->GetName() << endl;
+    Long64_t nbytes = 0, nb = 0;
+    for (Long64_t jentry=0; jentry<nentries;jentry++) {
+        Long64_t ientry = LoadTree(jentry);
+        if (ientry < 0) break;
+        // nb = fChain->GetEntry(jentry);   nbytes += nb;
+        // if (Cut(ientry) < 0) continue;
+        b_weight->GetEntry(ientry);
+        branch->GetEntry(ientry);
+        // if(jentry > 1000) break; // for quick checks
+        if(Category < 0)
         {
-            ModeCount = count;
-            mode = vect[i];
+            hist->Fill(branch_var, weight);
+        }
+        else
+        {
+            hist->Fill(v_branch_var->at(Category), weight);
         }
     }
-    return mode;
+}
+*/
+
+double Vector_Mean(const std::vector<double>& vect) //returns mean of a vector
+{
+    return accumulate(vect.begin(),vect.end(),0.0)/vect.size();
 }
 
 double One_Sigma_Interval(std::vector<double> Sigma_Var) //Pass a vector of analytic calculations of some mass
@@ -551,8 +616,7 @@ void Draw_Two_Hists(TH1* hist1, TH1* hist2, TCanvas* canvas)
 void Draw_Hists(vector<TH1F*> hists, TCanvas* canvas)
 {
     canvas->cd();
-    int size = hists.size();
-    for(int i=0; i<size; i++)
+    for(int i=0; i<int(hists.size()); i++)
     {
         TRandom3 rndm_color;
         rndm_color.SetSeed(0);
@@ -561,14 +625,6 @@ void Draw_Hists(vector<TH1F*> hists, TCanvas* canvas)
         hists.at(i)->Draw("SAMES");
         canvas->Update();
         hists.at(i)->SetLineColor(color_index);
-        
-        TPaveStats *stats = (TPaveStats*)hists.at(i)->FindObject("stats");
-        string stats_name = hists.at(i)->GetName();
-        stats_name+="_stats";
-        stats->SetName(stats_name.c_str());
-        stats->SetTextColor(color_index);
-        stats->SetLineColor(color_index);
-        canvas->Update();
     }
 }
 
