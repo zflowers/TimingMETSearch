@@ -720,7 +720,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     mg->Add(graph_Sigma_MX2_SigmaT_Measured);
     mg->Add(graph_Sigma_MX2_MET_SigmaT_Measured);
     mg->Add(graph_Sigma_MX2_Timing_SigmaT_Measured);
-    mg->GetYaxis()->SetTitle("#sigma_{M_{LLP}}/M_{LLP} [GeV]");
+    mg->GetYaxis()->SetTitle("#sigma_{M_{LLP}}/M_{LLP}");
     mg->GetXaxis()->SetTitle("#sigma_{t} [ps]");
     mg->GetYaxis()->SetTitleOffset(1.05);
     mg->GetYaxis()->SetTitleSize(.04);
