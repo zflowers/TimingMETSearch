@@ -56,7 +56,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(0.03);
     bool flag = true;
     //Number of events
-    int Ngen = 1000000;
+    int Ngen = 10000;
     vector<TH1F*> vect_hist_Sigma_MX2;
     vector<TH1F*> vect_hist_Sigma_MX2_MET;
     vector<TH1F*> vect_hist_Sigma_MX2_Timing;
@@ -776,7 +776,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     vect_graphs_MX2.push_back(graph_Sigma_MX2_SigmaT_Measured);
     //vect_graphs_MX2.push_back(graph_Sigma_MX2_MET_SigmaT_Measured);
     //vect_graphs_MX2.push_back(graph_Sigma_MX2_Timing_SigmaT_Measured);
-    TMultiGraph* mg_MX2 = get_MG(vect_graphs_MX2);
+    TMultiGraph* mg_MX2 = get_MG(vect_graphs_MX2,canvas_graph_MX2);
     mg_MX2->GetYaxis()->SetTitle("#sigma_{M_{LLP}}/M_{LLP}");
     mg_MX2->GetXaxis()->SetTitle("#sigma_{t} [ps]");
     mg_MX2->Draw("AP");
@@ -796,7 +796,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     vect_graphs_MX1.push_back(graph_Sigma_MX1_SigmaT_Measured);
     //vect_graphs_MX1.push_back(graph_Sigma_MX1_MET_SigmaT_Measured);
     //vect_graphs_MX1.push_back(graph_Sigma_MX1_Timing_SigmaT_Measured);
-    TMultiGraph* mg_MX1 = get_MG(vect_graphs_MX1);
+    TMultiGraph* mg_MX1 = get_MG(vect_graphs_MX1,canvas_graph_MX1);
     mg_MX1->GetYaxis()->SetTitle("#sigma_{M_{LSP}}/M_{LSP}");
     mg_MX1->GetXaxis()->SetTitle("#sigma_{t} [ps]");
     mg_MX1->Draw("AP");

@@ -19,7 +19,7 @@
 #include <numeric>
 #include <algorithm>
 
-TMultiGraph* get_MG(vector<TGraph*>& vect_graph)
+TMultiGraph* get_MG(vector<TGraph*>& vect_graph, TCanvas* canvas)
 {
     vect_graph[0]->SetMarkerStyle(22);
     vect_graph[0]->SetMarkerColor(kBlue);
@@ -38,11 +38,13 @@ TMultiGraph* get_MG(vector<TGraph*>& vect_graph)
     }
     TMultiGraph* mg = new TMultiGraph();
     for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph[i]); }
+    canvas->Update();
     mg->GetYaxis()->SetTitleOffset(1.05);
     mg->GetYaxis()->SetTitleSize(.04);
     mg->GetXaxis()->SetTitleSize(.04);
     mg->GetYaxis()->SetLabelSize(.04);
     mg->GetXaxis()->SetLabelSize(.04);
+    canvas->Update();
     return mg;
 }
 
