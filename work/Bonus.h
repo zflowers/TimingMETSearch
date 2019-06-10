@@ -19,6 +19,44 @@
 #include <numeric>
 #include <algorithm>
 
+double Hist_68_Interval(const TH1F& hist_user)
+{
+    TH1F hist = hist_user;
+    hist.Scale(1./hist.GetEntries());
+    int mode_Bin = hist.GetBin(hist.GetMaximumBin());
+    int left_bin = mode_Bin-1;
+    int right_bin = mode_Bin+1;
+    double left_content = hist.GetBinContent(left_bin);
+    double right_content = hist.GetBinContent(right_bin);
+    double prob = hist.GetBinContent(mode_Bin);
+    if(prob > 0.68) return hist.GetBinCenter(mode_Bin)/2.;
+    else if((prob + right_content) > 0.68) return (hist.GetBinCenter(right_bin)-hist.GetBinCenter(mode_Bin))/2.;
+    else if((prob + left_content) > 0.68) return (hist.GetBinCenter(mode_Bin)-hist.GetBinCenter(left_bin))/2.;
+    else if((prob + left_content + right_content) > 0.68) return (hist.GetBinCenter(right_bin)-hist.GetBinCenter(left_bin))/2.;
+    else
+    {
+        prob = prob + left_content + right_content;
+        int left_it = 1;
+        int right_it = 1;
+        while(prob < 0.68)
+        {
+            if((prob + hist.GetBinContent(left_bin-left_it)) > (prob + hist.GetBinContent(right_bin+right_it)))
+            {
+                prob+=hist.GetBinContent(left_bin-left_it);
+                left_it++;
+            }
+            else
+            {
+                prob+=hist.GetBinContent(right_bin+right_it);
+                right_it++;
+            }
+        }
+        left_bin-=left_it;
+        right_bin+=right_it;
+        return (hist.GetBinCenter(right_bin)-hist.GetBinCenter(left_bin))/2.;
+    }
+}
+
 TMultiGraph* get_MG(vector<TGraph*>& vect_graph, TCanvas*& canvas)
 {
     vect_graph[0]->SetMarkerStyle(22);
