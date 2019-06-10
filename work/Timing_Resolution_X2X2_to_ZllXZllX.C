@@ -56,7 +56,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(0.03);
     bool flag = true;
     //Number of events
-    int Ngen = 1000000;
+    int Ngen = 100000;
     vector<TH1F*> vect_hist_Sigma_MX2;
     vector<TH1F*> vect_hist_Sigma_MX2_MET;
     vector<TH1F*> vect_hist_Sigma_MX2_Timing;

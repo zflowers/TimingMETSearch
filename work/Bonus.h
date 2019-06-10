@@ -38,6 +38,7 @@ TMultiGraph* get_MG(vector<TGraph*>& vect_graph, TCanvas*& canvas)
     }
     TMultiGraph* mg = new TMultiGraph();
     for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph[i]); }
+    mg->Draw("AP");
     canvas->Update();
     mg->GetYaxis()->SetTitleOffset(1.05);
     mg->GetYaxis()->SetTitleSize(.04);
