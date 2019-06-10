@@ -56,7 +56,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(0.03);
     bool flag = true;
     //Number of events
-    int Ngen = 10000;
+    int Ngen = 1000000;
     vector<TH1F*> vect_hist_Sigma_MX2;
     vector<TH1F*> vect_hist_Sigma_MX2_MET;
     vector<TH1F*> vect_hist_Sigma_MX2_Timing;
@@ -653,7 +653,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
             TLorentzVector vZa_Calc = L1a_RECO + L2a_RECO;
             vZa_Calc.Boost(-Smeared_vBetaa_Time);
             TLorentzVector vZa_Timing_Calc = L1a_RECO + L2a_RECO;
-            vZa_Timing_Calc.Boost(-Smeared_vBetaa_Time);
+            vZa_Timing_Calc.Boost(-Smeared_vBetaa_No_Time);
             
             double EZa_Calc = vZa_Calc.E(); //Same for MET
             double EZa_Timing_Calc = vZa_Timing_Calc.E();
@@ -765,6 +765,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     TLegendEntry* leg_none = leg->AddEntry(graph_Sigma_MX2_SigmaT,"Everything On","P");
     TLegendEntry* leg_MET = leg->AddEntry(graph_Sigma_MX2_MET_SigmaT,"#sigma_{MET} Off","P");
     TLegendEntry* leg_Beta = leg->AddEntry(graph_Sigma_MX2_Timing_SigmaT,"#sigma_{t} Off","P");
+    TLegendEntry* leg_Measured = leg->AddEntry(graph_Sigma_MX2_SigmaT_Measured,"Measured","P");
     
     TFile fout(output_name.c_str(),"RECREATE");
     
