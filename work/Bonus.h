@@ -19,6 +19,33 @@
 #include <numeric>
 #include <algorithm>
 
+TMultiGraph* get_MG(vector<TGraph*>& vect_graph)
+{
+    vect_graph[0]->SetMarkerStyle(22);
+    vect_graph[0]->SetMarkerColor(kBlue);
+    vect_graph[1]->SetMarkerStyle(22);
+    vect_graph[1]->SetMarkerColor(kRed);
+    vect_graph[2]->SetMarkerStyle(22);
+    vect_graph[2]->SetMarkerColor(kGreen+2);
+    vect_graph[3]->SetMarkerStyle(32);
+    vect_graph[3]->SetMarkerColor(kBlue);
+    if(vect_graph.size()>4)
+    {
+    vect_graph[4]->SetMarkerStyle(32);
+    vect_graph[4]->SetMarkerColor(kRed);
+    vect_graph[5]->SetMarkerStyle(32);
+    vect_graph[5]->SetMarkerColor(kGreen+2);
+    }
+    TMultiGraph* mg = new TMultiGraph();
+    for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph[i]); }
+    mg->GetYaxis()->SetTitleOffset(1.05);
+    mg->GetYaxis()->SetTitleSize(.04);
+    mg->GetXaxis()->SetTitleSize(.04);
+    mg->GetYaxis()->SetLabelSize(.04);
+    mg->GetXaxis()->SetLabelSize(.04);
+    return mg;
+}
+
 TH1F* Histogram_1D(string name, double Nbins, double Xmin, double Xmax, string Xname)
 {
     TH1F* hist = new TH1F(("hist_"+name).c_str(),"",Nbins,Xmin,Xmax);
