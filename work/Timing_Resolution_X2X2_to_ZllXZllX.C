@@ -109,12 +109,12 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     canvas_graph_log_MX2->SetGridy();
     canvas_graph_log_MX2->SetLogx();
     canvas_graph_log_MX2->SetLogy();
-    TGraphErrors* graph_Sigma_MX2_SigmaT = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX2_MET_SigmaT = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX2_Timing_SigmaT = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX2_SigmaT_Measured = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX2_MET_SigmaT_Measured = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX2_Timing_SigmaT_Measured = new TGraphErrors(NsigmaT);
+    TGraph* graph_Sigma_MX2_SigmaT = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX2_MET_SigmaT = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX2_Timing_SigmaT = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX2_SigmaT_Measured = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX2_MET_SigmaT_Measured = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX2_Timing_SigmaT_Measured = new TGraph(NsigmaT);
     TCanvas* canvas_graph_MX1 = new TCanvas("canvas_graph_MX1","canvas_graph_MX1",750,500);
     canvas_graph_MX1->SetGridx();
     canvas_graph_MX1->SetGridy();
@@ -123,12 +123,12 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     canvas_graph_log_MX1->SetGridy();
     canvas_graph_log_MX1->SetLogx();
     canvas_graph_log_MX1->SetLogy();
-    TGraphErrors* graph_Sigma_MX1_SigmaT = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX1_MET_SigmaT = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX1_Timing_SigmaT = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX1_SigmaT_Measured = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX1_MET_SigmaT_Measured = new TGraphErrors(NsigmaT);
-    TGraphErrors* graph_Sigma_MX1_Timing_SigmaT_Measured = new TGraphErrors(NsigmaT);
+    TGraph* graph_Sigma_MX1_SigmaT = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX1_MET_SigmaT = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX1_Timing_SigmaT = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX1_SigmaT_Measured = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX1_MET_SigmaT_Measured = new TGraph(NsigmaT);
+    TGraph* graph_Sigma_MX1_Timing_SigmaT_Measured = new TGraph(NsigmaT);
     
     g_Log << LogInfo << "Initializing generator frames and tree..." << LogEnd;
     
@@ -740,18 +740,21 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         graph_Sigma_MX2_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX2_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Measured.at(j)->GetMaximumBin()));
         graph_Sigma_MX2_MET_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_MET_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX2_MET_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_MET_Measured.at(j)->GetMaximumBin()));
         graph_Sigma_MX2_Timing_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetMaximumBin()));
+        
         graph_Sigma_MX1_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1.at(j)->GetMaximumBin()));
         graph_Sigma_MX1_MET_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_MET.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_MET.at(j)->GetMaximumBin()));
         graph_Sigma_MX1_Timing_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_Timing.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_Timing.at(j)->GetMaximumBin()));
         graph_Sigma_MX1_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX1_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_Measured.at(j)->GetMaximumBin()));
         graph_Sigma_MX1_MET_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_MET_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX1_MET_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_MET_Measured.at(j)->GetMaximumBin()));
         graph_Sigma_MX1_Timing_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_Timing_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX1_Timing_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_Timing_Measured.at(j)->GetMaximumBin()));
+        
         delete vect_hist_Sigma_MX2.at(j);
         delete vect_hist_Sigma_MX2_MET.at(j);
         delete vect_hist_Sigma_MX2_Timing.at(j);
         delete vect_hist_Sigma_MX2_Measured.at(j);
         delete vect_hist_Sigma_MX2_MET_Measured.at(j);
         delete vect_hist_Sigma_MX2_Timing_Measured.at(j);
+        
         delete vect_hist_Sigma_MX1.at(j);
         delete vect_hist_Sigma_MX1_MET.at(j);
         delete vect_hist_Sigma_MX1_Timing.at(j);
@@ -770,7 +773,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     TFile fout(output_name.c_str(),"RECREATE");
     
     canvas_graph_MX2->cd();
-    vector<TGraphErrors*> vect_graphs_MX2;
+    vector<TGraph*> vect_graphs_MX2;
     vect_graphs_MX2.push_back(graph_Sigma_MX2_SigmaT);
     vect_graphs_MX2.push_back(graph_Sigma_MX2_MET_SigmaT);
     vect_graphs_MX2.push_back(graph_Sigma_MX2_Timing_SigmaT);
@@ -789,7 +792,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     canvas_graph_log_MX2->SaveAs("MLLP_Timing_Log.pdf");
     
     canvas_graph_MX1->cd();
-    vector<TGraphErrors*> vect_graphs_MX1;
+    vector<TGraph*> vect_graphs_MX1;
     vect_graphs_MX1.push_back(graph_Sigma_MX1_SigmaT);
     vect_graphs_MX1.push_back(graph_Sigma_MX1_MET_SigmaT);
     vect_graphs_MX1.push_back(graph_Sigma_MX1_Timing_SigmaT);

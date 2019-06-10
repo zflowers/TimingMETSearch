@@ -19,7 +19,7 @@
 #include <numeric>
 #include <algorithm>
 
-TMultiGraph* get_MG(vector<TGraphErrors*>& vect_graph, TCanvas*& canvas)
+TMultiGraph* get_MG(vector<TGraph*>& vect_graph, TCanvas*& canvas)
 {
     vect_graph[0]->SetMarkerStyle(22);
     vect_graph[0]->SetMarkerColor(kBlue);
