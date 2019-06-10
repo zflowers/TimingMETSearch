@@ -780,7 +780,6 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     TMultiGraph* mg_MX2 = get_MG(vect_graphs_MX2,canvas_graph_MX2);
     mg_MX2->GetYaxis()->SetTitle("#sigma_{M_{LLP}}/M_{LLP}");
     mg_MX2->GetXaxis()->SetTitle("#sigma_{t} [ps]");
-    mg_MX2->Draw("AP");
     leg->Draw("SAMES");
     canvas_graph_MX2->SaveAs("MLLP_Timing.pdf");
     canvas_graph_MX2->Write();
@@ -800,7 +799,6 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     TMultiGraph* mg_MX1 = get_MG(vect_graphs_MX1,canvas_graph_MX1);
     mg_MX1->GetYaxis()->SetTitle("#sigma_{M_{LSP}}/M_{LSP}");
     mg_MX1->GetXaxis()->SetTitle("#sigma_{t} [ps]");
-    mg_MX1->Draw("AP");
     leg->Draw("SAMES");
     canvas_graph_MX1->SaveAs("MLSP_Timing.pdf");
     canvas_graph_MX1->Write();
