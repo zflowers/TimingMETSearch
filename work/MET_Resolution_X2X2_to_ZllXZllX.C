@@ -57,7 +57,7 @@ void MET_Resolution_X2X2_to_ZllXZllX(std::string output_name =
 
 		bool flag = true;
 		//Number of events
-		int Ngen = 100000;
+		int Ngen = 10000;
 
 		vector<TH1F*> vect_hist_Sigma_MX1;
 		vector<TH1F*> vect_hist_Sigma_MX1_MET;
@@ -669,8 +669,8 @@ void MET_Resolution_X2X2_to_ZllXZllX(std::string output_name =
 						 igen --;continue;
 					 }
 					 for(int i = 0; i < NMET_Mag; i++){
-						 PUPPI_Detector.Set_Sigma_Perp(sys,MET_Resolution_Factor[i]/100.)
-						 PUPPI_Detector.Set_Sigma_Par(sys,MET_Resolution_Factor[i]/100.)
+						 PUPPI_Detector.Set_Sigma_Perp(sys,MET_Resolution_Factor[i]/100.);
+						 PUPPI_Detector.Set_Sigma_Par(sys,MET_Resolution_Factor[i]/100.);
 						 MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par();
 						 MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp();
 		         TVector3 MET_RECO_PUPPI_LOOP = PUPPI_Detector.Smear_MET(I_Vect);
@@ -828,9 +828,32 @@ void MET_Resolution_X2X2_to_ZllXZllX(std::string output_name =
 		vect_graphs_MX2.push_back(graph_Sigma_MX2_SigmaMET_Measured);
 		vect_graphs_MX2.push_back(graph_Sigma_MX2_MET_SigmaMET_Measured);
 		vect_graphs_MX2.push_back(graph_Sigma_MX2_Timing_SigmaMET_Measured);
-		TMultiGraph* mg_MX2 = get_MG(vect_graphs_MX2,canvas_graph_MX2);
+
+		vect_graphs_MX2[0]->SetMarkerStyle(22);
+		vect_graphs_MX2[0]->SetMarkerColor(kBlue);
+		vect_graphs_MX2[1]->SetMarkerStyle(22);
+		vect_graphs_MX2[1]->SetMarkerColor(kRed);
+		vect_graphs_MX2[2]->SetMarkerStyle(22);
+		vect_graphs_MX2[2]->SetMarkerColor(kGreen+2);
+		vect_graphs_MX2[3]->SetMarkerStyle(32);
+		vect_graphs_MX2[3]->SetMarkerColor(kBlue);
+		vect_graphs_MX2[4]->SetMarkerStyle(32);
+		vect_graphs_MX2[4]->SetMarkerColor(kRed);
+		vect_graphs_MX2[5]->SetMarkerStyle(32);
+		vect_graphs_MX2[5]->SetMarkerColor(kGreen+2);
+
+		TMultiGraph* mg_MX2 = new TMultiGraph();
+		for(int j=0;j< int(vect_graphs_MX2.size());j++){
+			mg_MX2->Add(vect_graphs_MX2.at(j));
+		}
+		mg_MX2->Draw("AP");
+
+
+
+
+
 		mg_MX2->GetYaxis()->SetTitle("#sigma_{M_{LLP}}/M_{LLP}");
-    mg_MX2->GetXaxis()->SetTitle("#sigma_{MET} [\%]");
+    mg_MX2->GetXaxis()->SetTitle("#sigma_{MET_{CMS}}#sigma_{MET} [\%]");
     leg->Draw("SAMES");
     canvas_graph_MX2->SaveAs("MLLP_MET.pdf");
     canvas_graph_MX2->Write();
@@ -839,7 +862,7 @@ void MET_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     mg_MX2->Draw("AP");
     canvas_graph_log_MX2->SaveAs("MLLP_MET_Log.pdf");
 
-		canvas_graph_MX1->cd();
+	/*	canvas_graph_MX1->cd();
     vector<TGraph*> vect_graphs_MX1;
     vect_graphs_MX1.push_back(graph_Sigma_MX1_SigmaMET);
     vect_graphs_MX1.push_back(graph_Sigma_MX1_MET_SigmaMET);
@@ -848,6 +871,9 @@ void MET_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     vect_graphs_MX1.push_back(graph_Sigma_MX1_MET_SigmaMET_Measured);
     vect_graphs_MX1.push_back(graph_Sigma_MX1_Timing_SigmaMET_Measured);
     TMultiGraph* mg_MX1 = get_MG(vect_graphs_MX1,canvas_graph_MX1);
+		for(j=0;j< int(vect_graphs_MX2.size());j++){
+			mg_MX2->Add(vect_graphs_MX2.at(i));
+		}
     mg_MX1->GetYaxis()->SetTitle("#sigma_{M_{LSP}}/M_{LSP}");
     mg_MX1->GetXaxis()->SetTitle("#sigma_{MET} [\%]");
     leg->Draw("SAMES");
@@ -857,7 +883,7 @@ void MET_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     canvas_graph_log_MX1->cd();
     mg_MX1->Draw("AP");
     canvas_graph_log_MX1->SaveAs("MLSP_MET_Log.pdf");
-
+*/
     fout.Close();
 
 
