@@ -43,7 +43,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t start = gSystem->Now();
     
     //setting masses and widths
-    double mX2 = 1000.0;
+    double mX2 = 700.0;
     double mX1 = 500.0;
     double mZ = 91.19;
     double wZ = 2.50;
@@ -56,7 +56,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(0.03);
     bool flag = true;
     //Number of events
-    int Ngen = 100000;
+    int Ngen = 1000000;
     vector<TH1F*> vect_hist_Sigma_MX2;
     vector<TH1F*> vect_hist_Sigma_MX2_MET;
     vector<TH1F*> vect_hist_Sigma_MX2_Timing;
@@ -77,15 +77,15 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         TH1F* hist_Sigma_MX2 = new TH1F(("hist_Sigma_MX2"+std::to_string(i)).c_str(),("hist_Sigma_MX2"+std::to_string(i)).c_str(),Bins,0.,xmax);
         TH1F* hist_Sigma_MX2_MET = new TH1F(("hist_Sigma_MX2_MET"+std::to_string(i)).c_str(),("hist_Sigma_MX2_MET"+std::to_string(i)).c_str(),Bins,0.,xmax);
         TH1F* hist_Sigma_MX2_Timing = new TH1F(("hist_Sigma_MX2_Timing"+std::to_string(i)).c_str(),("hist_Sigma_MX2_Timing"+std::to_string(i)).c_str(),Bins,0.,xmax);
-        TH1F* hist_Sigma_MX2_Measured = new TH1F(("hist_Sigma_MX2_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX2_Measured"+std::to_string(i)).c_str(),Bins,0.,2500.);
-        TH1F* hist_Sigma_MX2_MET_Measured = new TH1F(("hist_Sigma_MX2_MET_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX2_MET_Measured"+std::to_string(i)).c_str(),Bins,0.,2500.);
-        TH1F* hist_Sigma_MX2_Timing_Measured = new TH1F(("hist_Sigma_MX2_Timing_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX2_Timing_Measured"+std::to_string(i)).c_str(),Bins,0.,2500.);
+        TH1F* hist_Sigma_MX2_Measured = new TH1F(("hist_Sigma_MX2_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX2_Measured"+std::to_string(i)).c_str(),Bins,0.,4000.);
+        TH1F* hist_Sigma_MX2_MET_Measured = new TH1F(("hist_Sigma_MX2_MET_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX2_MET_Measured"+std::to_string(i)).c_str(),Bins,0.,4000.);
+        TH1F* hist_Sigma_MX2_Timing_Measured = new TH1F(("hist_Sigma_MX2_Timing_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX2_Timing_Measured"+std::to_string(i)).c_str(),Bins,0.,4000.);
         TH1F* hist_Sigma_MX1 = new TH1F(("hist_Sigma_MX1"+std::to_string(i)).c_str(),("hist_Sigma_MX1"+std::to_string(i)).c_str(),Bins,0.,xmax);
         TH1F* hist_Sigma_MX1_MET = new TH1F(("hist_Sigma_MX1_MET"+std::to_string(i)).c_str(),("hist_Sigma_MX1_MET"+std::to_string(i)).c_str(),Bins,0.,xmax);
         TH1F* hist_Sigma_MX1_Timing = new TH1F(("hist_Sigma_MX1_Timing"+std::to_string(i)).c_str(),("hist_Sigma_MX1_Timing"+std::to_string(i)).c_str(),Bins,0.,xmax);
-        TH1F* hist_Sigma_MX1_Measured = new TH1F(("hist_Sigma_MX1_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX1_Measured"+std::to_string(i)).c_str(),Bins,0.,2500.);
-        TH1F* hist_Sigma_MX1_MET_Measured = new TH1F(("hist_Sigma_MX1_MET_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX1_MET_Measured"+std::to_string(i)).c_str(),Bins,0.,2500.);
-        TH1F* hist_Sigma_MX1_Timing_Measured = new TH1F(("hist_Sigma_MX1_Timing_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX1_Timing_Measured"+std::to_string(i)).c_str(),Bins,0.,2500.);
+        TH1F* hist_Sigma_MX1_Measured = new TH1F(("hist_Sigma_MX1_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX1_Measured"+std::to_string(i)).c_str(),Bins,0.,3000.);
+        TH1F* hist_Sigma_MX1_MET_Measured = new TH1F(("hist_Sigma_MX1_MET_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX1_MET_Measured"+std::to_string(i)).c_str(),Bins,0.,3000.);
+        TH1F* hist_Sigma_MX1_Timing_Measured = new TH1F(("hist_Sigma_MX1_Timing_Measured"+std::to_string(i)).c_str(),("hist_Sigma_MX1_Timing_Measured"+std::to_string(i)).c_str(),Bins,0.,3000.);
         vect_hist_Sigma_MX2.push_back(hist_Sigma_MX2);
         vect_hist_Sigma_MX2_MET.push_back(hist_Sigma_MX2_MET);
         vect_hist_Sigma_MX2_Timing.push_back(hist_Sigma_MX2_Timing);
@@ -737,16 +737,16 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         graph_Sigma_MX2_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2.at(j)->GetMaximumBin()));
         graph_Sigma_MX2_MET_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_MET.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_MET.at(j)->GetMaximumBin()));
         graph_Sigma_MX2_Timing_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_Timing.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Timing.at(j)->GetMaximumBin()));
-        graph_Sigma_MX2_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX2_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Measured.at(j)->GetMaximumBin()));
-        graph_Sigma_MX2_MET_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_MET_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX2_MET_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_MET_Measured.at(j)->GetMaximumBin()));
-        graph_Sigma_MX2_Timing_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetMaximumBin()));
+        graph_Sigma_MX2_SigmaT_Measured->SetPoint(j,sigmaT[j],Hist_68_Interval(*vect_hist_Sigma_MX2_Measured.at(j))/vect_hist_Sigma_MX2_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Measured.at(j)->GetMaximumBin()));
+        graph_Sigma_MX2_MET_SigmaT_Measured->SetPoint(j,sigmaT[j],Hist_68_Interval(*vect_hist_Sigma_MX2_MET_Measured.at(j))/vect_hist_Sigma_MX2_MET_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_MET_Measured.at(j)->GetMaximumBin()));
+        graph_Sigma_MX2_Timing_SigmaT_Measured->SetPoint(j,sigmaT[j],Hist_68_Interval(*vect_hist_Sigma_MX2_Timing_Measured.at(j))/vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX2_Timing_Measured.at(j)->GetMaximumBin()));
         
         graph_Sigma_MX1_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1.at(j)->GetMaximumBin()));
         graph_Sigma_MX1_MET_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_MET.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_MET.at(j)->GetMaximumBin()));
         graph_Sigma_MX1_Timing_SigmaT->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_Timing.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_Timing.at(j)->GetMaximumBin()));
-        graph_Sigma_MX1_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX1_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_Measured.at(j)->GetMaximumBin()));
-        graph_Sigma_MX1_MET_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_MET_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX1_MET_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_MET_Measured.at(j)->GetMaximumBin()));
-        graph_Sigma_MX1_Timing_SigmaT_Measured->SetPoint(j,sigmaT[j],vect_hist_Sigma_MX1_Timing_Measured.at(j)->GetRMS()/vect_hist_Sigma_MX1_Timing_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_Timing_Measured.at(j)->GetMaximumBin()));
+        graph_Sigma_MX1_SigmaT_Measured->SetPoint(j,sigmaT[j],Hist_68_Interval(*vect_hist_Sigma_MX1_Measured.at(j))/vect_hist_Sigma_MX1_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_Measured.at(j)->GetMaximumBin()));
+        graph_Sigma_MX1_MET_SigmaT_Measured->SetPoint(j,sigmaT[j],Hist_68_Interval(*vect_hist_Sigma_MX1_MET_Measured.at(j))/vect_hist_Sigma_MX1_MET_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_MET_Measured.at(j)->GetMaximumBin()));
+        graph_Sigma_MX1_Timing_SigmaT_Measured->SetPoint(j,sigmaT[j],Hist_68_Interval(*vect_hist_Sigma_MX1_Timing_Measured.at(j))/vect_hist_Sigma_MX1_Timing_Measured.at(j)->GetXaxis()->GetBinCenter(vect_hist_Sigma_MX1_Timing_Measured.at(j)->GetMaximumBin()));
         
         delete vect_hist_Sigma_MX2.at(j);
         delete vect_hist_Sigma_MX2_MET.at(j);
@@ -778,8 +778,8 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     vect_graphs_MX2.push_back(graph_Sigma_MX2_MET_SigmaT);
     vect_graphs_MX2.push_back(graph_Sigma_MX2_Timing_SigmaT);
     vect_graphs_MX2.push_back(graph_Sigma_MX2_SigmaT_Measured);
-    //vect_graphs_MX2.push_back(graph_Sigma_MX2_MET_SigmaT_Measured);
-    //vect_graphs_MX2.push_back(graph_Sigma_MX2_Timing_SigmaT_Measured);
+    vect_graphs_MX2.push_back(graph_Sigma_MX2_MET_SigmaT_Measured);
+    vect_graphs_MX2.push_back(graph_Sigma_MX2_Timing_SigmaT_Measured);
     TMultiGraph* mg_MX2 = get_MG(vect_graphs_MX2,canvas_graph_MX2);
     mg_MX2->GetYaxis()->SetTitle("#sigma_{M_{LLP}}/M_{LLP}");
     mg_MX2->GetXaxis()->SetTitle("#sigma_{t} [ps]");
@@ -797,8 +797,8 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     vect_graphs_MX1.push_back(graph_Sigma_MX1_MET_SigmaT);
     vect_graphs_MX1.push_back(graph_Sigma_MX1_Timing_SigmaT);
     vect_graphs_MX1.push_back(graph_Sigma_MX1_SigmaT_Measured);
-    //vect_graphs_MX1.push_back(graph_Sigma_MX1_MET_SigmaT_Measured);
-    //vect_graphs_MX1.push_back(graph_Sigma_MX1_Timing_SigmaT_Measured);
+    vect_graphs_MX1.push_back(graph_Sigma_MX1_MET_SigmaT_Measured);
+    vect_graphs_MX1.push_back(graph_Sigma_MX1_Timing_SigmaT_Measured);
     TMultiGraph* mg_MX1 = get_MG(vect_graphs_MX1,canvas_graph_MX1);
     mg_MX1->GetYaxis()->SetTitle("#sigma_{M_{LSP}}/M_{LSP}");
     mg_MX1->GetXaxis()->SetTitle("#sigma_{t} [ps]");

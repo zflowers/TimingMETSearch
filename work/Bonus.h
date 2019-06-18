@@ -19,136 +19,136 @@
 #include <numeric>
 #include <algorithm>
 
-TMultiGraph* get_MG(vector<TGraph*>& vect_graph, TCanvas*& canvas)
+double Hist_68_Interval(const TH1F& hist_user)
 {
-    vect_graph[0]->SetMarkerStyle(22);
-    vect_graph[0]->SetMarkerColor(kBlue);
-    vect_graph[1]->SetMarkerStyle(22);
-    vect_graph[1]->SetMarkerColor(kRed);
-    vect_graph[2]->SetMarkerStyle(22);
-    vect_graph[2]->SetMarkerColor(kGreen+2);
-    vect_graph[3]->SetMarkerStyle(32);
-    vect_graph[3]->SetMarkerColor(kBlue);
-    if(vect_graph.size()>4)
-    {
-    vect_graph[4]->SetMarkerStyle(32);
-    vect_graph[4]->SetMarkerColor(kRed);
-    vect_graph[5]->SetMarkerStyle(32);
-    vect_graph[5]->SetMarkerColor(kGreen+2);
-    }
-    TMultiGraph* mg = new TMultiGraph();
-    for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph[i]); }
-    mg->Draw("AP");
-    canvas->Update();
-    mg->GetYaxis()->SetTitleOffset(1.05);
-    mg->GetYaxis()->SetTitleSize(.04);
-    mg->GetXaxis()->SetTitleSize(.04);
-    mg->GetYaxis()->SetLabelSize(.04);
-    mg->GetXaxis()->SetLabelSize(.04);
-    canvas->Update();
-    return mg;
-}
-
-TH1F* Histogram_1D(string name, double Nbins, double Xmin, double Xmax, string Xname)
-{
-    TH1F* hist = new TH1F(("hist_"+name).c_str(),"",Nbins,Xmin,Xmax);
-    hist->SetLineColor(kBlack);
-    hist->GetXaxis()->CenterTitle();
-    hist->GetXaxis()->SetTitleFont(42);
-    hist->GetXaxis()->SetTitleSize(0.06);
-    hist->GetXaxis()->SetTitleOffset(1.06);
-    hist->GetXaxis()->SetLabelFont(42);
-    hist->GetXaxis()->SetLabelSize(0.05);
-    hist->GetXaxis()->SetTitle(Xname.c_str());
-    hist->GetYaxis()->CenterTitle();
-    hist->GetYaxis()->SetTitleFont(42);
-    hist->GetYaxis()->SetTitleSize(0.06);
-    hist->GetYaxis()->SetTitleOffset(1.12);
-    hist->GetYaxis()->SetLabelFont(42);
-    hist->GetYaxis()->SetLabelSize(0.05);
-    hist->GetYaxis()->SetTitle("Number of Entries");
-    return hist;
-}
-
-TCanvas* Make_CMS_Canvas(string PlotTitle)
-{
-    TCanvas* can = new TCanvas(("can_"+PlotTitle).c_str(),PlotTitle.c_str(),700,600);
-    can->SetLeftMargin(0.15);
-    can->SetRightMargin(0.18);
-    can->SetBottomMargin(0.15);
-    can->SetGridx();
-    can->SetGridy();
-    can->Draw();
-    can->cd();
-    TLatex latex_CMS;
-    latex_CMS.SetTextFont(42);
-    latex_CMS.SetNDC();
-    latex_CMS.SetTextSize(0.035);
-    latex_CMS.SetTextFont(42);
-    latex_CMS.DrawLatex(0.41,0.943,PlotTitle.c_str());
-    latex_CMS.SetTextSize(0.04);
-    latex_CMS.SetTextFont(42);
-    latex_CMS.DrawLatex(0.01,0.943,"#bf{CMS} Simulation Preliminary");
-    return can;
-}
-
-/*
-void Loop_1DHist(TTree fChain, TH1F*& hist, string branchname, int Category)
-{
-    if (fChain == 0) return;
-    Long64_t nentries = fChain->GetEntriesFast();
-    TBranch* branch = fChain->GetBranch(branchname.c_str());
-    vector<double> *v_branch_var = 0;
-    double branch_var = 0;
-    if(Category < 0)
-    {
-        cout << "Category is less than zero... Assume filling with non-vector variable" << endl;
-        fChain->SetBranchAddress(branchname.c_str(), &branch_var, &branch);
-    }
+    TH1F hist = hist_user;
+    hist.Scale(1./hist.GetEntries());
+    int mode_Bin = hist.GetBin(hist.GetMaximumBin());
+    int left_bin = mode_Bin-1;
+    int right_bin = mode_Bin+1;
+    double left_content = hist.GetBinContent(left_bin);
+    double right_content = hist.GetBinContent(right_bin);
+    double prob = hist.GetBinContent(mode_Bin);
+    if(prob > 0.68) return hist.GetBinCenter(mode_Bin)/2.;
+    else if((prob + right_content) > 0.68) return (hist.GetBinCenter(right_bin)-hist.GetBinCenter(mode_Bin))/2.;
+    else if((prob + left_content) > 0.68) return (hist.GetBinCenter(mode_Bin)-hist.GetBinCenter(left_bin))/2.;
+    else if((prob + left_content + right_content) > 0.68) return (hist.GetBinCenter(right_bin)-hist.GetBinCenter(left_bin))/2.;
     else
     {
-        cout << "Category is greater than zero... Assume filling with vector variable" << endl;
-        fChain->SetBranchAddress(branchname.c_str(), &v_branch_var, &branch);
-    }
-    cout << "Filling Histogram with Branch: " << branch->GetName() << endl;
-    Long64_t nbytes = 0, nb = 0;
-    for (Long64_t jentry=0; jentry<nentries;jentry++) {
-        Long64_t ientry = LoadTree(jentry);
-        if (ientry < 0) break;
-        // nb = fChain->GetEntry(jentry);   nbytes += nb;
-        // if (Cut(ientry) < 0) continue;
-        b_weight->GetEntry(ientry);
-        branch->GetEntry(ientry);
-        // if(jentry > 1000) break; // for quick checks
-        if(Category < 0)
+        prob = prob + left_content + right_content;
+        int left_it = 1;
+        int right_it = 1;
+        while(prob < 0.68)
         {
-            hist->Fill(branch_var, weight);
+            if((prob + hist.GetBinContent(left_bin-left_it)) > (prob + hist.GetBinContent(right_bin+right_it)))
+            {
+                prob+=hist.GetBinContent(left_bin-left_it);
+                left_it++;
+            }
+            else
+            {
+                prob+=hist.GetBinContent(right_bin+right_it);
+                right_it++;
+            }
         }
-        else
-        {
-            hist->Fill(v_branch_var->at(Category), weight);
-        }
+        left_bin-=left_it;
+        right_bin+=right_it;
+        return (hist.GetBinCenter(right_bin)-hist.GetBinCenter(left_bin))/2.;
     }
 }
-*/
+
+vector<TH1*> list_histos(const char *fname)
+{
+    std::vector<TH1*> vect_hist;
+    std::vector<string> vect_names;
+    TKey *key;
+    TKey *key2;
+    bool skip = true;
+    TFile *f = TFile::Open(fname, "READ");
+    if(!f || f->IsZombie())
+    {
+        cout << "Unable to open " << fname << " for reading..." << endl;
+        return vect_hist;
+    }
+    TDirectoryFile* folder = nullptr;
+    f->GetObject("Plots",folder);
+    TIter next((TList *)folder->GetListOfKeys());
+    while((key = (TKey *)next()))
+    {
+        TClass *cl = gROOT->GetClass(key->GetClassName());
+        if(cl->InheritsFrom("TCanvas"))
+        {
+            TCanvas* c = (TCanvas*)key->ReadObj();
+            TIter next2(c->GetListOfPrimitives());
+            while((key2 = (TKey *)next2())){
+                if(key2->InheritsFrom("TH1"))
+                {
+                    if(skip)
+                    {
+                        skip = false;
+                        continue;
+                    }
+                    TH1* h = (TH1*)key2;
+                    vect_hist.push_back(h);
+                }
+            }
+        }
+    }
+    return vect_hist;
+}
 
 double Vector_Mean(const std::vector<double>& vect) //returns mean of a vector
 {
     return accumulate(vect.begin(),vect.end(),0.0)/vect.size();
 }
 
-double One_Sigma_Interval(std::vector<double> Sigma_Var) //Pass a vector of analytic calculations of some mass
+double Vector_Mode(std::vector<double>& vect)
 {
-    std::sort(Sigma_Var.begin(),Sigma_Var.end()); //sort the vector in ascending order
-    std::vector<double> Interval; //For keeping the widths of the intervals
-    int N = Sigma_Var.size();
-    int N68 = N*0.68;
-    for(int i = 0; i < (N - N68); i++) //loop over the given vector and stop at the last entry
+    std::sort(vect.begin(),vect.end());
+    int N = vect.size();
+    int NWidth = N*0.1;
+    int left_edge = 0;
+    int left = left_edge;
+    int right_edge = NWidth;
+    int right = right_edge;
+    double width = fabs((vect.at(right)-vect.at(left)));
+    while(right < int(vect.size()))
     {
-        Interval.push_back(Sigma_Var.at(N68+i)-Sigma_Var.at(i)); //push back the width of an interval
+        if(fabs(((vect.at(right)-vect.at(left)))) < width)
+        {
+            width = fabs(((vect.at(right)-vect.at(left))));
+            left_edge = left;
+            right_edge = right;
+        }
+        left++;
+        right++;
     }
-    std::sort(Interval.begin(),Interval.end());
-    return Interval.at(0); //return the smallest interval
+    return ((vect.at(left_edge)+vect.at(right_edge))/2.);
+}
+
+double One_Sigma_Interval(std::vector<double> vect) //Pass a vector of analytic calculations of some mass
+{
+    std::sort(vect.begin(),vect.end()); //sort the vector in ascending order
+    int N = vect.size();
+    int NWidth = N*0.68;
+    int left_edge = 0;
+    int left = left_edge;
+    int right_edge = NWidth;
+    int right = right_edge;
+    double width = fabs((vect.at(right)-vect.at(left)));
+    while(right < int(vect.size()))
+    {
+        if(fabs(((vect.at(right)-vect.at(left)))) < width)
+        {
+            width = fabs(((vect.at(right)-vect.at(left))));
+            left_edge = left;
+            right_edge = right;
+        }
+        left++;
+        right++;
+    }
+    //return ((vect.at(right_edge)-vect.at(left_edge)));
+    return ((vect.at(right_edge)-vect.at(left_edge))/2.);
 }
 
 void CreatePalette()
@@ -248,6 +248,89 @@ TGraphErrors* TGE_TF1(TGraphErrors *plot, TF1 *fit_func)
     res_plot->SetTitle("");
     return res_plot;
 }
+
+TH1F* Histogram_1D(string name, double Nbins, double Xmin, double Xmax, string Xname)
+{
+    TH1F* hist = new TH1F(("hist_"+name).c_str(),"",Nbins,Xmin,Xmax);
+    hist->SetLineColor(kBlack);
+    hist->GetXaxis()->CenterTitle();
+    hist->GetXaxis()->SetTitleFont(42);
+    hist->GetXaxis()->SetTitleSize(0.06);
+    hist->GetXaxis()->SetTitleOffset(1.06);
+    hist->GetXaxis()->SetLabelFont(42);
+    hist->GetXaxis()->SetLabelSize(0.05);
+    hist->GetXaxis()->SetTitle(Xname.c_str());
+    hist->GetYaxis()->CenterTitle();
+    hist->GetYaxis()->SetTitleFont(42);
+    hist->GetYaxis()->SetTitleSize(0.06);
+    hist->GetYaxis()->SetTitleOffset(1.12);
+    hist->GetYaxis()->SetLabelFont(42);
+    hist->GetYaxis()->SetLabelSize(0.05);
+    hist->GetYaxis()->SetTitle("Number of Entries");
+    return hist;
+}
+
+TCanvas* Make_CMS_Canvas(string PlotTitle)
+{
+    TCanvas* can = new TCanvas(("can_"+PlotTitle).c_str(),PlotTitle.c_str(),700,600);
+    can->SetLeftMargin(0.15);
+    can->SetRightMargin(0.18);
+    can->SetBottomMargin(0.15);
+    can->SetGridx();
+    can->SetGridy();
+    can->Draw();
+    can->cd();
+    TLatex latex_CMS;
+    latex_CMS.SetTextFont(42);
+    latex_CMS.SetNDC();
+    latex_CMS.SetTextSize(0.035);
+    latex_CMS.SetTextFont(42);
+    latex_CMS.DrawLatex(0.41,0.943,PlotTitle.c_str());
+    latex_CMS.SetTextSize(0.04);
+    latex_CMS.SetTextFont(42);
+    latex_CMS.DrawLatex(0.01,0.943,"#bf{CMS} Simulation Preliminary");
+    return can;
+}
+
+/*
+ void Loop_1DHist(TTree fChain, TH1F*& hist, string branchname, int Category)
+ {
+ if (fChain == 0) return;
+ Long64_t nentries = fChain->GetEntriesFast();
+ TBranch* branch = fChain->GetBranch(branchname.c_str());
+ vector<double> *v_branch_var = 0;
+ double branch_var = 0;
+ if(Category < 0)
+ {
+ cout << "Category is less than zero... Assume filling with non-vector variable" << endl;
+ fChain->SetBranchAddress(branchname.c_str(), &branch_var, &branch);
+ }
+ else
+ {
+ cout << "Category is greater than zero... Assume filling with vector variable" << endl;
+ fChain->SetBranchAddress(branchname.c_str(), &v_branch_var, &branch);
+ }
+ cout << "Filling Histogram with Branch: " << branch->GetName() << endl;
+ Long64_t nbytes = 0, nb = 0;
+ for (Long64_t jentry=0; jentry<nentries;jentry++) {
+ Long64_t ientry = LoadTree(jentry);
+ if (ientry < 0) break;
+ // nb = fChain->GetEntry(jentry);   nbytes += nb;
+ // if (Cut(ientry) < 0) continue;
+ b_weight->GetEntry(ientry);
+ branch->GetEntry(ientry);
+ // if(jentry > 1000) break; // for quick checks
+ if(Category < 0)
+ {
+ hist->Fill(branch_var, weight);
+ }
+ else
+ {
+ hist->Fill(v_branch_var->at(Category), weight);
+ }
+ }
+ }
+ */
 
 void Plot_Res_vs_SumPT(TGraphErrors* gr_perp, TGraphErrors* gr_par, TCanvas* canvas)
 {

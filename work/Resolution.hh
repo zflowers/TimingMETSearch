@@ -361,7 +361,13 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 MET, TVector3 MET_Pe
 
 inline double Resolution::Mass_Invisible2(double Mass_P, double E_V_P, double Mass_V)
 {
-    return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
+    if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return -sqrt(fabs(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V));}
+    else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}
+    /*
+    if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return 0.;}
+    else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}
+    */
+    //return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
 }
 
 inline double Resolution::Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET, double sigma_MET_Perp, double dM_dMET, double dM_dMET_Perp)
