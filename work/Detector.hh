@@ -55,6 +55,11 @@ public:
     
     double Get_Sigma_Perp(const TLorentzVector& sys);
     double Get_Sigma_Par(const TLorentzVector& sys);
+    double Get_Sigma_Perp();
+    double Get_Sigma_Par();
+    
+    void Set_Sigma_Perp(const TLorentzVector& sys, double factor);
+    void Set_Sigma_Par(const TLorentzVector& sys, double factor);
     
     TVector3 Smear_MET(const TVector3& inv);
     
@@ -167,6 +172,26 @@ inline double Detector::Get_Sigma_Par(const TLorentzVector& sys)
 {
     sigma_par = (sys.Pt()*sqrt((con0_par*con0_par)/(sys.Pt()*sys.Pt())+(con1_par*con1_par)/sys.Pt()+con2_par*con2_par));
     return sigma_par;
+}
+
+inline double Detector::Get_Sigma_Perp()
+{
+    return sigma_perp;
+}
+
+inline double Detector::Get_Sigma_Par()
+{
+    return sigma_par;
+}
+
+inline void Detector::Set_Sigma_Perp(const TLorentzVector& sys, double factor)
+{
+    sigma_perp = factor*(sys.Pt()*sqrt((con0_perp*con0_perp)/(sys.Pt()*sys.Pt())+(con1_perp*con1_perp)/sys.Pt()+con2_perp*con2_perp));
+}
+
+inline void Detector::Set_Sigma_Par(const TLorentzVector& sys, double factor)
+{
+    sigma_par = factor*(sys.Pt()*sqrt((con0_par*con0_par)/(sys.Pt()*sys.Pt())+(con1_par*con1_par)/sys.Pt()+con2_par*con2_par));
 }
 
 // smear MET

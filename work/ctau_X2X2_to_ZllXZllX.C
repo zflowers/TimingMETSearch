@@ -37,6 +37,7 @@
 #include "Bonus.h"
 
 using namespace RestFrames;
+void Draw_Graphs(TFile& fout, const int& Nctau, const vector<double>& ctau, vector<TGraph*>& vect_graph, const string& leg_text, const string& YaxisText, const string& plotName);
 
 void ctau_X2X2_to_ZllXZllX(std::string output_name =
 			      "output_ctau_X2X2_to_ZallXZbllX.root"){
@@ -72,7 +73,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     bool LSP_Calc_flag = false;
     
     //Number of events
-    int Ngen = 1000000;
+    int Ngen = 10000;
 
     vector<vector<vector<double>>> vect3D_Sigma_MX2(Nctau, vector<vector<double>>(NsigmaT, vector<double>(Ngen)));
     vector<vector<vector<double>>> vect3D_Sigma_MX2_MET(Nctau, vector<vector<double>>(NsigmaT, vector<double>(Ngen)));
@@ -785,6 +786,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*Nctau << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*Nctau << " Events" << LogEnd;
+    histPlot->Draw();
+    TFile fout(output_name.c_str(),"RECREATE");
     if(timing_flag){
     for(int i = 0; i<Nctau; i++)
     {
@@ -847,89 +850,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     vect3D_Sigma_MX1_Measured.clear();
     vect3D_Sigma_MX1_MET_Measured.clear();
     vect3D_Sigma_MX1_Timing_Measured.clear();
-    }
-    histPlot->Draw();
-    TFile fout(output_name.c_str(),"RECREATE");
-    TLegend* leg = new TLegend(0.1,0.65,0.353,0.95);
-    vector<TLegendEntry*> vect_leg_entry;
-    for(int i = 0; i<Nctau; i++) { TLegendEntry* leg_entry = leg->AddEntry(vect_graph_Sigma_MX2_SigmaT_Measured.at(i),("c#tau "+std::to_string(int(ctau.at(i)))).c_str(),"P"); }
-        
-    TCanvas* canvas_graph_MX2 = new TCanvas("canvas_graph_MX2","canvas_graph_MX2",750,500);
-    canvas_graph_MX2->SetGridx();
-    canvas_graph_MX2->SetGridy();
-    TCanvas* canvas_graph_log_MX2 = new TCanvas("canvas_graph_log_MX2","canvas_graph_log_MX2",750,500);
-    canvas_graph_log_MX2->SetGridx();
-    canvas_graph_log_MX2->SetGridy();
-    canvas_graph_log_MX2->SetLogx();
-    canvas_graph_log_MX2->SetLogy();
-        
-    canvas_graph_MX2->cd();
-    
-    TMultiGraph* mg_MX2 = new TMultiGraph();
-    for(int i = 0; i < int(vect_graph_Sigma_MX2_SigmaT.size()); i++) { mg_MX2->Add(vect_graph_Sigma_MX2_SigmaT_Measured.at(i)); }
-    vect_graph_Sigma_MX2_SigmaT_Measured[0]->SetMarkerStyle(22);
-    vect_graph_Sigma_MX2_SigmaT_Measured[0]->SetMarkerColor(kBlue);
-    vect_graph_Sigma_MX2_SigmaT_Measured[1]->SetMarkerStyle(22);
-    vect_graph_Sigma_MX2_SigmaT_Measured[1]->SetMarkerColor(kRed);
-    vect_graph_Sigma_MX2_SigmaT_Measured[2]->SetMarkerStyle(22);
-    vect_graph_Sigma_MX2_SigmaT_Measured[2]->SetMarkerColor(kGreen+2);
-    if(vect_graph_Sigma_MX2_SigmaT_Measured.size() > 3.){
-    vect_graph_Sigma_MX2_SigmaT_Measured[3]->SetMarkerStyle(22);
-    vect_graph_Sigma_MX2_SigmaT_Measured[3]->SetMarkerColor(kMagenta);}
-    mg_MX2->Draw("AP");
-    mg_MX2->GetYaxis()->SetTitleOffset(1.05);
-    mg_MX2->GetYaxis()->SetTitleSize(.04);
-    mg_MX2->GetXaxis()->SetTitleSize(.04);
-    mg_MX2->GetYaxis()->SetLabelSize(.04);
-    mg_MX2->GetXaxis()->SetLabelSize(.04);
-    mg_MX2->GetYaxis()->SetTitle("#sigma_{M_{LLP}}/M_{LLP}");
-    mg_MX2->GetXaxis()->SetTitle("#sigma_{t} [ps]");
-    leg->Draw("SAMES");
-    canvas_graph_MX2->SaveAs("MLLP_Timing_ctau.pdf");
-    canvas_graph_MX2->Write();
-    
-    canvas_graph_log_MX2->cd();
-    mg_MX2->Draw("AP");
-    canvas_graph_log_MX2->SaveAs("MLLP_Timing_Log_ctau.pdf");
-        
-    if(LSP_flag){
-    TCanvas* canvas_graph_MX1 = new TCanvas("canvas_graph_MX1","canvas_graph_MX1",750,500);
-    canvas_graph_MX1->SetGridx();
-    canvas_graph_MX1->SetGridy();
-    TCanvas* canvas_graph_log_MX1 = new TCanvas("canvas_graph_log_MX1","canvas_graph_log_MX1",750,500);
-    canvas_graph_log_MX1->SetGridx();
-    canvas_graph_log_MX1->SetGridy();
-    canvas_graph_log_MX1->SetLogx();
-    canvas_graph_log_MX1->SetLogy();
-    
-    canvas_graph_MX1->cd();
-    TMultiGraph* mg_MX1 = new TMultiGraph();
-    for(int i = 0; i < int(vect_graph_Sigma_MX1_SigmaT.size()); i++) { mg_MX1->Add(vect_graph_Sigma_MX1_SigmaT_Measured.at(i)); }
-    vect_graph_Sigma_MX1_SigmaT_Measured[0]->SetMarkerStyle(22);
-    vect_graph_Sigma_MX1_SigmaT_Measured[0]->SetMarkerColor(kBlue);
-    vect_graph_Sigma_MX1_SigmaT_Measured[1]->SetMarkerStyle(22);
-    vect_graph_Sigma_MX1_SigmaT_Measured[1]->SetMarkerColor(kRed);
-    vect_graph_Sigma_MX1_SigmaT_Measured[2]->SetMarkerStyle(22);
-    vect_graph_Sigma_MX1_SigmaT_Measured[2]->SetMarkerColor(kGreen+2);
-    if(vect_graph_Sigma_MX2_SigmaT_Measured.size() > 3.){
-    vect_graph_Sigma_MX1_SigmaT_Measured[3]->SetMarkerStyle(22);
-    vect_graph_Sigma_MX1_SigmaT_Measured[3]->SetMarkerColor(kMagenta);}
-    mg_MX1->Draw("AP");
-    mg_MX1->GetYaxis()->SetTitleOffset(1.05);
-    mg_MX1->GetYaxis()->SetTitleSize(.04);
-    mg_MX1->GetXaxis()->SetTitleSize(.04);
-    mg_MX1->GetYaxis()->SetLabelSize(.04);
-    mg_MX1->GetXaxis()->SetLabelSize(.04);
-    mg_MX1->GetYaxis()->SetTitle("#sigma_{M_{LSP}}/M_{LSP}");
-    mg_MX1->GetXaxis()->SetTitle("#sigma_{t} [ps]");
-    leg->Draw("SAMES");
-    canvas_graph_MX1->SaveAs("MLSP_Timing_ctau.pdf");
-    canvas_graph_MX1->Write();
-    
-    canvas_graph_log_MX1->cd();
-    mg_MX1->Draw("AP");
-    canvas_graph_log_MX1->SaveAs("MLSP_Timing_Log_ctau.pdf");
-    }
+    Draw_Graphs(fout, Nctau, ctau, vect_graph_Sigma_MX2_SigmaT_Measured, "c#tau ", "#sigma_{M_{LLP}}/M_{LLP}", "MLLP_Timing_ctau");
     }
   fout.Close();
   histPlot->WriteOutput(output_name);
@@ -938,4 +859,50 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
   g_Log << LogInfo << "Finished" << LogEnd;
   end = gSystem->Now();
   g_Log << LogInfo << "Time to Process " << Ngen*Nctau << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
+}
+
+void Draw_Graphs(TFile& fout, const int& Nctau, const vector<double>& ctau, vector<TGraph*>& vect_graph, const string& leg_text, const string& YaxisText, const string& plotName)
+{
+    if(!(fout.IsOpen())) {cout << "Output File Not Open..." << endl;}
+    TLegend* leg = new TLegend(0.1,0.65,0.353,0.95);
+    vector<TLegendEntry*> vect_leg_entry;
+    for(int i = 0; i<Nctau; i++) { TLegendEntry* leg_entry = leg->AddEntry(vect_graph.at(i),(leg_text+std::to_string(int(ctau.at(i)))).c_str(),"P"); }
+    
+    TCanvas* canvas_graph = new TCanvas("canvas_graph","canvas_graph",750,500);
+    canvas_graph->SetGridx();
+    canvas_graph->SetGridy();
+    TCanvas* canvas_graph_log = new TCanvas("canvas_graph_log","canvas_graph_log",750,500);
+    canvas_graph_log->SetGridx();
+    canvas_graph_log->SetGridy();
+    canvas_graph_log->SetLogx();
+    canvas_graph_log->SetLogy();
+    
+    canvas_graph->cd();
+    
+    TMultiGraph* mg = new TMultiGraph();
+    for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph.at(i)); }
+    vect_graph[0]->SetMarkerStyle(22);
+    vect_graph[0]->SetMarkerColor(kBlue);
+    vect_graph[1]->SetMarkerStyle(22);
+    vect_graph[1]->SetMarkerColor(kRed);
+    vect_graph[2]->SetMarkerStyle(22);
+    vect_graph[2]->SetMarkerColor(kGreen+2);
+    if(vect_graph.size() > 3.){
+    vect_graph[3]->SetMarkerStyle(22);
+    vect_graph[3]->SetMarkerColor(kMagenta);}
+    mg->Draw("AP");
+    mg->GetYaxis()->SetTitleOffset(1.05);
+    mg->GetYaxis()->SetTitleSize(.04);
+    mg->GetXaxis()->SetTitleSize(.04);
+    mg->GetYaxis()->SetLabelSize(.04);
+    mg->GetXaxis()->SetLabelSize(.04);
+    mg->GetYaxis()->SetTitle(YaxisText.c_str());
+    mg->GetXaxis()->SetTitle("#sigma_{t} [ps]");
+    leg->Draw("SAMES");
+    canvas_graph->SaveAs((plotName+".pdf").c_str());
+    canvas_graph->Write();
+    
+    canvas_graph_log->cd();
+    mg->Draw("AP");
+    canvas_graph_log->SaveAs((plotName+"_Log"+".pdf").c_str());
 }
