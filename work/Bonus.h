@@ -105,7 +105,7 @@ double Vector_Mean(const std::vector<double>& vect) //returns mean of a vector
 double Vector_Mode(std::vector<double>& vect)
 {
     std::sort(vect.begin(),vect.end());
-    double binning = 0.1;
+    double binning = 0.5;
     int N = vect.size();
     double mode = 0.;
     int NWidth = N*binning;

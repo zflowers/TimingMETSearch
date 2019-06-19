@@ -53,9 +53,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     
     vector<double> ctau;
     
-    ctau.push_back(25.);
+    //ctau.push_back(25.);
     ctau.push_back(10.);
-    ctau.push_back(5.);
+    //ctau.push_back(5.);
     //ctau.push_back(1.);
     
     int Nctau = ctau.size();
@@ -71,13 +71,13 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(30.);
     int NsigmaT = sigmaT.size();
     int NsigmaMET = sigmaMET.size();
-    bool timing_flag = true; //set to false to turn off anything related to looping over sigmat
-    bool MET_flag = true;
+    bool timing_flag = false; //set to false to turn off anything related to looping over sigmat
+    bool MET_flag = false;
     bool LSP_flag = false; //set to false to turn off regenerating the event for non-real LSP reco masses
-    bool LSP_Calc_flag = false;
+    bool LSP_Calc_flag = false; //leave this alone
     
     //Number of events
-    int Ngen = 1000000;
+    int Ngen = 100000;
 
     vector<vector<vector<double>>> vect3D_Sigma_MX2_SigmaT(Nctau, vector<vector<double>>(NsigmaT, vector<double>(Ngen)));
     vector<vector<vector<double>>> vect3D_Sigma_MX2_MET_SigmaT(Nctau, vector<vector<double>>(NsigmaT, vector<double>(Ngen)));
@@ -381,7 +381,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& Pull_Vis = histPlot->GetNewVar("Pull_Vis", "Pull of Vis", -5.0, 5.0, "");
     const HistPlotVar& MX2X2 = histPlot->GetNewVar("MX2X2", "M(#tilde{#chi}_{2}^{0})(#tilde{#chi}_{2}^{0})", 0., 3000., "[GeV]");
     const HistPlotVar& MV = histPlot->GetNewVar("MV", "M(#it{la})", 0., 150., "[GeV]");
-    const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 2000., "[GeV]");
+    const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", -1000., 2000., "[GeV]");
     const HistPlotVar& MXb2 = histPlot->GetNewVar("MXb2", "M(#tilde{#chi}_{2b}^{0})", 0., 2000., "[GeV]");
     const HistPlotVar& MXa = histPlot->GetNewVar("MXa", "M(#tilde{#chi}_{2}^{0})", 0., 2000., "[GeV]");
     const HistPlotVar& CosX2a = histPlot->GetNewVar("CosX2a", "Cos_X2a", -1, 1., "");
