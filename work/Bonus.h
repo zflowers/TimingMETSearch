@@ -105,8 +105,10 @@ double Vector_Mean(const std::vector<double>& vect) //returns mean of a vector
 double Vector_Mode(std::vector<double>& vect)
 {
     std::sort(vect.begin(),vect.end());
+    double binning = 0.1;
     int N = vect.size();
-    int NWidth = N*0.1;
+    double mode = 0.;
+    int NWidth = N*binning;
     int left_edge = 0;
     int left = left_edge;
     int right_edge = NWidth;
@@ -123,7 +125,8 @@ double Vector_Mode(std::vector<double>& vect)
         left++;
         right++;
     }
-    return ((vect.at(left_edge)+vect.at(right_edge))/2.);
+    mode = ((vect.at(left_edge)+vect.at(right_edge))/2.);
+    return mode;
 }
 
 double One_Sigma_Interval(std::vector<double> vect) //Pass a vector of analytic calculations of some mass
