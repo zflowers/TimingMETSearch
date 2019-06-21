@@ -158,6 +158,7 @@ void CreatePalette()
 {
     //From Prof. Chris Rogan
     //Useful ROOT5 palette
+    //Call with CreatePalette()
     Int_t MyPalette[28];
     Int_t alpha=1;
     
@@ -172,6 +173,14 @@ void CreatePalette()
         MyPalette[i] = test+i;
     }
     gStyle->SetPalette(28,MyPalette);
+}
+
+void setMyStyle()
+{
+    CreatePalette();
+    TStyle* myStyle = new TStyle("myStyle","myStyle");
+    
+    myStyle->cd();
 }
 
 Double_t Expo_sqrt(Double_t *x,Double_t *par)
