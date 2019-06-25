@@ -621,7 +621,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         }
         
         Da = 30.*ToFa*vBetaaGen.Mag();
-        Db = 30.*ToFa*vBetabGen.Mag();
+        Db = 30.*ToFb*vBetabGen.Mag();
         
         /*
         if(betaa < VelocityUncertainty || betab < VelocityUncertainty) //require significant displacement

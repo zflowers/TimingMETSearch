@@ -17,12 +17,12 @@
 //   it under the terms of the GNU General Public License as published by
 //   the Free Software Foundation; either version 2 of the License, or
 //   (at your option) any later version.
-// 
+//
 //   RestFrames is distributed in the hope that it will be useful,
 //   but WITHOUT ANY WARRANTY; without even the implied warranty of
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //   GNU General Public License for more details.
-// 
+//
 //   You should have received a copy of the GNU General Public License
 //   along with RestFrames. If not, see <http://www.gnu.org/licenses/>.
 /////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ void LSP_testing(std::string output_name =
     
     //setting masses and widths
     double mX2 = 1000.0;
-    double mX1 = 500.0;
+    double mX1 = 100.0;
     double mZ = 91.19;
     double wZ = 2.50;
     
@@ -221,14 +221,15 @@ void LSP_testing(std::string output_name =
     const HistPlotVar& EZa = histPlot->GetNewVar("EZa", "E_{Za}^{#tilde{#chi}_{2a}^{0}}", 0., 800., "[GeV]");
     const HistPlotVar& Pull_Mass_Invisible = histPlot->GetNewVar("Pull_Mass_Inv","Pull of M(#tilde{#chi}_{1a}^{0})",-5.0,5.0,"");
     const HistPlotVar& MIa = histPlot->GetNewVar("MIa", "M(#tilde{#chi}_{1a}^{0})", 0., 1000., "[GeV]");
-    const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", -1000., 1000., "[GeV]");
+    const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", -50., 300., "[GeV]");
+    const HistPlotVar& MIa3 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0}) miniRJR", -700., 600., "[GeV]");
     const HistPlotVar& MX2X2 = histPlot->GetNewVar("MX2X2", "M(#tilde{#chi}_{2}^{0})(#tilde{#chi}_{2}^{0})", 0., 3000., "[GeV]");
     const HistPlotVar& MV = histPlot->GetNewVar("MV", "M(#it{la})", 0., 150., "[GeV]");
     const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", -1000., 2000., "[GeV]");
     
     
     histPlot->AddPlot(MIa2, cat_list_ctau);
-    //histPlot->AddPlot(MIa2, cat_list_timing);
+    histPlot->AddPlot(MIa3, cat_list_ctau);
     
     /*histPlot->AddPlot(MIa2, MV, cat_list_ctau);
     histPlot->AddPlot(MIa2, MET, cat_list_ctau);
@@ -260,6 +261,7 @@ void LSP_testing(std::string output_name =
     PUPPI_Detector.Set_con1_perp(1.41597);
     PUPPI_Detector.Set_con2_perp(-6.37947e-07);
     PUPPI_Detector.Set_sigmaT((sigmaT[0]/1000.)/sqrt(2.)); //timing resolution
+    //PUPPI_Detector.Set_sigmaT(0.); //timing resolution
     PUPPI_Detector.Set_sigmaPV(20.0/10000.0); //Primary Vertex resolution
     PUPPI_Detector.Set_sigmaSV(65.0/10000.0); //secondary Vertex resolution
     Vertex PV(0.0,0.0,0.0,0.0); //nominal PV at 0
@@ -316,24 +318,21 @@ void LSP_testing(std::string output_name =
         TLorentzVector Ia  = X1a_Gen.GetFourVector();
         TLorentzVector Ib  = X1b_Gen.GetFourVector();
         TLorentzVector I   = Ia+Ib;
-        I.SetZ(0.0);
         
-        double MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
-        double MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
+        PUPPI_Detector.Set_Sigma_Par(sys, 1.);
+        PUPPI_Detector.Set_Sigma_Perp(sys, 1.);
+        //PUPPI_Detector.Set_Sigma_Par(sys, .25);
+        //PUPPI_Detector.Set_Sigma_Perp(sys, .25);
         
         //The smearing begins
         TVector3 I_Vect = I.Vect();
-        TVector3 MET_RECO_PUPPI = PUPPI_Detector.Smear_MET(I_Vect);
+        TVector3 MET_RECO_PUPPI = I_Vect;// PUPPI_Detector.Smear_MET(I_Vect);
         MET_RECO_PUPPI.SetZ(0.0);
-        TVector3 Ia_RECO = PUPPI_Detector.Smear_MET(Ia.Vect());
-        Ia_RECO.SetZ(0.0);
-        TVector3 Ib_RECO = PUPPI_Detector.Smear_MET(Ib.Vect());
-        Ib_RECO.SetZ(0.0);
         
-        TLorentzVector L1a_RECO = PUPPI_Detector.Smear_Muon(L1a_Gen.GetFourVector());
-        TLorentzVector L1b_RECO = PUPPI_Detector.Smear_Muon(L1b_Gen.GetFourVector());
-        TLorentzVector L2a_RECO = PUPPI_Detector.Smear_Muon(L2a_Gen.GetFourVector());
-        TLorentzVector L2b_RECO = PUPPI_Detector.Smear_Muon(L2b_Gen.GetFourVector());
+        TLorentzVector L1a_RECO = L1a_Gen.GetFourVector();//PUPPI_Detector.Smear_Muon(L1a_Gen.GetFourVector());
+        TLorentzVector L1b_RECO = L1b_Gen.GetFourVector();//PUPPI_Detector.Smear_Muon(L1b_Gen.GetFourVector());
+        TLorentzVector L2a_RECO = L2a_Gen.GetFourVector();//PUPPI_Detector.Smear_Muon(L2a_Gen.GetFourVector());
+        TLorentzVector L2b_RECO = L2b_Gen.GetFourVector();//PUPPI_Detector.Smear_Muon(L2b_Gen.GetFourVector());
         
         TVector3 vBetaaGen = Pa.BoostVector();
         TVector3 vBetabGen = Pb.BoostVector();
@@ -356,32 +355,27 @@ void LSP_testing(std::string output_name =
         double Smeared_ToFb = PUPPI_Detector.Smear_ToF(ToFb);
         Vertex SVa = physics.Get_SV(ToFa,Pa);
         Vertex SVb = physics.Get_SV(ToFb,Pb);
-        Vertex Smeared_PV = PUPPI_Detector.Smear_PV(PV);
-        Vertex Smeared_SVa = PUPPI_Detector.Smear_SV(SVa);
-        Vertex Smeared_SVb = PUPPI_Detector.Smear_SV(SVb);
+        Vertex Smeared_PV = PV;//PUPPI_Detector.Smear_PV(PV);
+        Vertex Smeared_SVa = SVa;//PUPPI_Detector.Smear_SV(SVa);
+        Vertex Smeared_SVb = SVb;//PUPPI_Detector.Smear_SV(SVb);
         TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
         TVector3 Smeared_vBetab = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
-        TVector3 Smeared_vBetaaT = Smeared_vBetaa;
-        Smeared_vBetaaT.SetZ(0.0);
-        TVector3 Smeared_vBetabT = Smeared_vBetab;
-        Smeared_vBetabT.SetZ(0.0);
         TLorentzVector L1a_Gent = L1a_Gen.GetFourVector();
         L1a_Gent.SetZ(0.0);
         TLorentzVector L2a_Gent = L2a_Gen.GetFourVector();
         L2a_Gent.SetZ(0.0);
         TLorentzVector Ia_Gent = Ia;
         Ia_Gent.SetZ(0.0);
-        TLorentzVector L1a_RECOt = PUPPI_Detector.Smear_Muon(L1a_Gent);
-        TLorentzVector L2a_RECOt = PUPPI_Detector.Smear_Muon(L2a_Gent);
+        TLorentzVector L1a_RECOt = L1a_Gent;//PUPPI_Detector.Smear_Muon(L1a_Gent);
+        TLorentzVector L2a_RECOt = L2a_Gent;//PUPPI_Detector.Smear_Muon(L2a_Gent);
         TLorentzVector L1b_Gent = L1b_Gen.GetFourVector();
         L1b_Gent.SetZ(0.0);
         TLorentzVector L2b_Gent = L2b_Gen.GetFourVector();
         L2b_Gent.SetZ(0.0);
         TLorentzVector Ib_Gent = Ib;
         Ib_Gent.SetZ(0.0);
-        TLorentzVector L1b_RECOt = PUPPI_Detector.Smear_Muon(L1b_Gent);
-        TLorentzVector L2b_RECOt = PUPPI_Detector.Smear_Muon(L2b_Gent);
-        
+        TLorentzVector L1b_RECOt = L1b_Gent;//PUPPI_Detector.Smear_Muon(L1b_Gent);
+        TLorentzVector L2b_RECOt = L2b_Gent;//PUPPI_Detector.Smear_Muon(L2b_Gent);
         
         if(Smeared_vBetaa.Mag() >= 1.)
         {
@@ -394,26 +388,14 @@ void LSP_testing(std::string output_name =
             continue;
         }
         
-        Da = 30.*ToFa*vBetaaGen.Mag();
-        Db = 30.*ToFa*vBetabGen.Mag();
+        double Da = 30.*Smeared_ToFa*Smeared_vBetaa.Mag();
+        double Db = 30.*Smeared_ToFb*Smeared_vBetab.Mag();
         
-        
-        if(Smeared_ToFa < 2.*PUPPI_Detector.Get_sigmaT() || Smeared_ToFb < 2.*PUPPI_Detector.Get_sigmaT() || Da < 2.*sigmaDistance || Db < 2.*sigmaDistance) //require significant displacement in space and time
+        if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance) //require significant displacement in space and time
         {
             igen--;
             continue;
         }
-        
-        TVector3 vPta = (L1a_RECO+L2a_RECO).Vect()+Ia_RECO;
-        TVector3 vPtaGen = (L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()+Ia).Vect();
-        vPtaGen.SetZ(0.0);
-        TVector3 vPtb = (L1b_RECO+L2b_RECO).Vect()+Ib_RECO;
-        TVector3 vPt  = (L1a_RECO+L2a_RECO+L1b_RECO+L2b_RECO).Vect()+MET_RECO_PUPPI;
-        vPta.SetZ(0.);
-        vPtb.SetZ(0.);
-        vPt.SetZ(0.);
-        TVector3 vBetaaT_Gen = vBetaaGen;
-        vBetaaT_Gen.SetZ(0.0);
         
         TLorentzVector vZa = L1a_RECO + L2a_RECO;
         vZa.Boost(-Smeared_vBetaa);
@@ -427,8 +409,8 @@ void LSP_testing(std::string output_name =
         TLorentzVector Va = L1a_RECOt+L2a_RECOt;
         TLorentzVector Vb = L1b_RECOt+L2b_RECOt;
         
-        double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
         MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+        double MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
         
         //Two LLPs
         MV = (L1a_RECO+L2a_RECO).M();
@@ -438,7 +420,34 @@ void LSP_testing(std::string output_name =
             igen--;
             continue;
         }
-        double MIa2_Gen = test_Resolution.Mass_Invisible2(MPa_Gen,vZaGen.E(),(L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M());
+        
+        //Angle Analysis
+        TLorentzVector PX2a;
+        PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
+        TLorentzVector PX2b;
+        PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
+        PX2a.Boost(Smeared_vBetaa);
+        PX2b.Boost(Smeared_vBetab);
+        
+        //RECO Tree
+        LAB_Reco.ClearEvent();
+        L1a_Reco.SetLabFrameFourVector(L1a_RECO);
+        L1b_Reco.SetLabFrameFourVector(L1b_RECO);
+        L2a_Reco.SetLabFrameFourVector(L2a_RECO);
+        L2b_Reco.SetLabFrameFourVector(L2b_RECO);
+        X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
+        X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
+        LAB_Reco.AnalyzeEvent();
+        MIa3 = X1a_Reco.GetFourVector().M();
+        
+        double CosX2a = X2a_Reco.GetCosDecayAngle();
+        double CosX2b = X2b_Reco.GetCosDecayAngle();
+        
+        if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9)
+        {
+            igen--;
+            continue;
+        }
         
         histPlot->Fill(cat_list_ctau[m]);
         acp_events++;

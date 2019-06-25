@@ -443,7 +443,7 @@ void MET_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         betab = vBetabGen.Mag();
 
         Da = 30.*ToFa*betaa;
-        Db = 30.*ToFa*betab;
+        Db = 30.*ToFb*betab;
 
         /*
          if(betaa < VelocityUncertainty || betab < VelocityUncertainty) //require significant displacement

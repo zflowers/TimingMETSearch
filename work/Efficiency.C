@@ -75,12 +75,19 @@ void Efficiency(std::string output_name =
     //Number of events
     int Ngen = 10000;
     
+    vector<vector<int>> vect_timing_acp(Nctau, vector<int>(NsigmaT,0));
+    vector<vector<int>> vect_met_acp(Nctau, vector<int>(NsigmaMET,0));
+    
     vector<TGraph*> vect_graph_Efficiency_SigmaT;
+    vector<TGraph*> vect_graph_Efficiency_SigmaMET;
     for(int j = 0; j < Nctau; j++)
     {
         TGraph* graph_Efficiency_SigmaT = new TGraph(NsigmaT);
         graph_Efficiency_SigmaT->SetName(("graph_sigmaT"+std::to_string(j)).c_str());
         vect_graph_Efficiency_SigmaT.push_back(graph_Efficiency_SigmaT);
+        TGraph* graph_Efficiency_SigmaMET = new TGraph(NsigmaMET);
+        graph_Efficiency_SigmaMET->SetName(("graph_sigmaMET"+std::to_string(j)).c_str());
+        vect_graph_Efficiency_SigmaMET.push_back(graph_Efficiency_SigmaMET);
     }
     
     g_Log << LogInfo << "Initializing generator frames and tree..." << LogEnd;
@@ -214,162 +221,178 @@ void Efficiency(std::string output_name =
     //relative uncertainty on the distance between PV and SV
     double sigmaDistance = sqrt((PUPPI_Detector.Get_sigmaPV()*PUPPI_Detector.Get_sigmaPV()+PUPPI_Detector.Get_sigmaSV()*PUPPI_Detector.Get_sigmaSV()));
     
-  for(int m = 0; m < Nctau; m++){
-    
-    LAB_Gen.InitializeAnalysis(); //Comment for "Official" Plots
-      
-      for(int k = 0; k < NsigmaT; k++){
-          g_Log << LogInfo << "Generating events for ";
-          g_Log << "mX2 = " << mX2 << ", ";
-          g_Log << "mX1 = " << mX1 << ", ";
-          g_Log << "ctau = " << ctau[m] << ", ";
-          g_Log << "sigmaT = " << sigmaT[k] << LogEnd;
-          int gen_events = 0;
-          PUPPI_Detector.Set_sigmaT((sigmaT[k]/1000.)/sqrt(2.));
-      
     for(int igen = 0; igen < Ngen; igen++){
-      if(igen%((std::max(Ngen,2))/2) == 0)
-	g_Log << LogInfo << "Generating event " << igen << " of " << Ngen << LogEnd;
-
-      // generate event
-      LAB_Gen.ClearEvent();                           // clear the gen tree
-      //set momentum based upon the mass
+        if(igen%((std::max(Ngen,10))/10) == 0)
+            g_Log << LogInfo << "Generating event " << igen << " of " << Ngen << LogEnd;
+        
+        // generate event
+        LAB_Gen.ClearEvent();                           // clear the gen tree
+        //set momentum based upon the mass
         physics.GetEtaPtMCM(LAB_eta,LAB_Pt,LAB_M);
         //Fix the momentum by hand
-
-      LAB_Gen.SetTransverseMomentum(LAB_Pt);
-      LAB_Gen.SetLongitudinalMomentum(LAB_Pt*TMath::SinH(LAB_eta));
-      //X2X2_Gen.SetMass(LAB_M); //Uncomment for "Official" Plots
-      //LAB_Gen.InitializeAnalysis(); //Uncomment for "Official" Plots
         
-      LAB_Gen.AnalyzeEvent();                         // generate a new event
-        gen_events++;
+        LAB_Gen.SetTransverseMomentum(LAB_Pt);
+        LAB_Gen.SetLongitudinalMomentum(LAB_Pt*TMath::SinH(LAB_eta));
+        //X2X2_Gen.SetMass(LAB_M); //Uncomment for "Official" Plots
+        //LAB_Gen.InitializeAnalysis(); //Uncomment for "Official" Plots
+        
+        LAB_Gen.AnalyzeEvent();                         // generate a new event
         TLorentzVector Pa = X2a_Gen.GetFourVector();
         TLorentzVector Pb = X2b_Gen.GetFourVector();
         TLorentzVector sys = Pa+Pb;
         TLorentzVector Ia  = X1a_Gen.GetFourVector();
         TLorentzVector Ib  = X1b_Gen.GetFourVector();
         TLorentzVector I   = Ia+Ib;
-        I.SetZ(0.0);
         
-        double MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
-        double MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
-        
-        //The smearing begins
-        TVector3 I_Vect = I.Vect();
-        TVector3 MET_RECO_PUPPI = PUPPI_Detector.Smear_MET(I_Vect);
-        MET_RECO_PUPPI.SetZ(0.0);
-        
-        TLorentzVector L1a_RECO = PUPPI_Detector.Smear_Muon(L1a_Gen.GetFourVector());
-        TLorentzVector L1b_RECO = PUPPI_Detector.Smear_Muon(L1b_Gen.GetFourVector());
-        TLorentzVector L2a_RECO = PUPPI_Detector.Smear_Muon(L2a_Gen.GetFourVector());
-        TLorentzVector L2b_RECO = PUPPI_Detector.Smear_Muon(L2b_Gen.GetFourVector());
-        
-        double ToFa = physics.Get_ToF(ctau[m], Pa);
-        double ToFb = physics.Get_ToF(ctau[m], Pb);
-        
-        if(ToFa <= 0.0)
+        for(int m = 0; m < Nctau; m++)
         {
-            igen--;
-            continue;
+            LAB_Gen.InitializeAnalysis(); //Comment for "Official" Plots
+            
+            double ToFa = physics.Get_ToF(ctau[m], Pa);
+            double ToFb = physics.Get_ToF(ctau[m], Pb);
+            
+            if(ToFa <= 0.0)
+            {
+                igen--;
+                continue;
+            }
+            if(ToFb <= 0.0)
+            {
+                igen--;
+                continue;
+            }
+            Vertex SVa = physics.Get_SV(ToFa,Pa);
+            Vertex SVb = physics.Get_SV(ToFb,Pb);
+            Vertex Smeared_PV = PUPPI_Detector.Smear_PV(PV);
+            Vertex Smeared_SVa = PUPPI_Detector.Smear_SV(SVa);
+            Vertex Smeared_SVb = PUPPI_Detector.Smear_SV(SVb);
+            TLorentzVector L1a_RECO = PUPPI_Detector.Smear_Muon(L1a_Gen.GetFourVector());
+            TLorentzVector L1b_RECO = PUPPI_Detector.Smear_Muon(L1b_Gen.GetFourVector());
+            TLorentzVector L2a_RECO = PUPPI_Detector.Smear_Muon(L2a_Gen.GetFourVector());
+            TLorentzVector L2b_RECO = PUPPI_Detector.Smear_Muon(L2b_Gen.GetFourVector());
+            TLorentzVector L1a_Gent = L1a_Gen.GetFourVector();
+            L1a_Gent.SetZ(0.0);
+            TLorentzVector L2a_Gent = L2a_Gen.GetFourVector();
+            L2a_Gent.SetZ(0.0);
+            TLorentzVector Ia_Gent = Ia;
+            Ia_Gent.SetZ(0.0);
+            TLorentzVector L1a_RECOt = PUPPI_Detector.Smear_Muon(L1a_Gent);
+            TLorentzVector L2a_RECOt = PUPPI_Detector.Smear_Muon(L2a_Gent);
+            TLorentzVector L1b_Gent = L1b_Gen.GetFourVector();
+            L1b_Gent.SetZ(0.0);
+            TLorentzVector L2b_Gent = L2b_Gen.GetFourVector();
+            L2b_Gent.SetZ(0.0);
+            TLorentzVector Ib_Gent = Ib;
+            Ib_Gent.SetZ(0.0);
+            TLorentzVector L1b_RECOt = PUPPI_Detector.Smear_Muon(L1b_Gent);
+            TLorentzVector L2b_RECOt = PUPPI_Detector.Smear_Muon(L2b_Gent);
+            TLorentzVector Va = L1a_RECOt+L2a_RECOt;
+            TLorentzVector Vb = L1b_RECOt+L2b_RECOt;
+            
+             for(int k = 0; k < NsigmaT; k++){
+                 PUPPI_Detector.Set_sigmaT((sigmaT[k]/1000.)/sqrt(2.));
+                 
+                 double Smeared_ToFa = PUPPI_Detector.Smear_ToF(ToFa);
+                 double Smeared_ToFb = PUPPI_Detector.Smear_ToF(ToFb);
+                 TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
+                 TVector3 Smeared_vBetab = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
+                 if(Smeared_vBetaa.Mag() >= 1.) { continue; }
+                 if(Smeared_vBetab.Mag() >= 1.) { continue; }
+                 
+                 double Da = 30.*Smeared_ToFa*Smeared_vBetaa.Mag();
+                 double Db = 30.*Smeared_ToFb*Smeared_vBetab.Mag();
+                 
+                 //require significant displacement in space and time
+                 if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance) { continue; }
+                 
+                 if(sigmaT[k] < 31. && sigmaT[k] > 29.)
+                 {
+                     for(int h = 0; h < NsigmaMET; h++)
+                     {
+                         PUPPI_Detector.Set_Sigma_Par(sys, sigmaMET[h]);
+                         PUPPI_Detector.Set_Sigma_Perp(sys, sigmaMET[h]);
+                         
+                         //The smearing begins
+                         TVector3 I_Vect = I.Vect();
+                         TVector3 MET_RECO_PUPPI = PUPPI_Detector.Smear_MET(I_Vect);
+                         MET_RECO_PUPPI.SetZ(0.0);
+                         double MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+                         double MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
+                         
+                         //Angle Analysis
+                         TLorentzVector PX2a;
+                         PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
+                         TLorentzVector PX2b;
+                         PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
+                         PX2a.Boost(Smeared_vBetaa);
+                         PX2b.Boost(Smeared_vBetab);
+                         
+                         //RECO Tree
+                         LAB_Reco.ClearEvent();
+                         L1a_Reco.SetLabFrameFourVector(L1a_RECO);
+                         L1b_Reco.SetLabFrameFourVector(L1b_RECO);
+                         L2a_Reco.SetLabFrameFourVector(L2a_RECO);
+                         L2b_Reco.SetLabFrameFourVector(L2b_RECO);
+                         X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
+                         X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
+                         
+                         LAB_Reco.AnalyzeEvent();
+                         
+                         double CosX2a = X2a_Reco.GetCosDecayAngle();
+                         double CosX2b = X2b_Reco.GetCosDecayAngle();
+                         
+                         if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9){ continue; }
+                         vect_met_acp.at(m).at(h)++;
+                     }
+                 }
+                 PUPPI_Detector.Set_Sigma_Par(sys, 1.);
+                 PUPPI_Detector.Set_Sigma_Perp(sys, 1.);
+                 
+                 //The smearing begins
+                 TVector3 I_Vect = I.Vect();
+                 TVector3 MET_RECO_PUPPI = PUPPI_Detector.Smear_MET(I_Vect);
+                 MET_RECO_PUPPI.SetZ(0.0);
+                 double MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+                 double MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
+                 
+                 //Angle Analysis
+                 TLorentzVector PX2a;
+                 PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
+                 TLorentzVector PX2b;
+                 PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
+                 PX2a.Boost(Smeared_vBetaa);
+                 PX2b.Boost(Smeared_vBetab);
+                 
+                 //RECO Tree
+                 LAB_Reco.ClearEvent();
+                 L1a_Reco.SetLabFrameFourVector(L1a_RECO);
+                 L1b_Reco.SetLabFrameFourVector(L1b_RECO);
+                 L2a_Reco.SetLabFrameFourVector(L2a_RECO);
+                 L2b_Reco.SetLabFrameFourVector(L2b_RECO);
+                 X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
+                 X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
+                 
+                 LAB_Reco.AnalyzeEvent();
+                 
+                 double CosX2a = X2a_Reco.GetCosDecayAngle();
+                 double CosX2b = X2b_Reco.GetCosDecayAngle();
+                 
+                 if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9){ continue; }
+                 vect_timing_acp.at(m).at(k)++;
+             }
         }
-        if(ToFb <= 0.0)
-        {
-            igen--;
-            continue;
-        }
-        
-        double Smeared_ToFa = PUPPI_Detector.Smear_ToF(ToFa);
-        double Smeared_ToFb = PUPPI_Detector.Smear_ToF(ToFb);
-        Vertex SVa = physics.Get_SV(ToFa,Pa);
-        Vertex SVb = physics.Get_SV(ToFb,Pb);
-        Vertex Smeared_PV = PUPPI_Detector.Smear_PV(PV);
-        Vertex Smeared_SVa = PUPPI_Detector.Smear_SV(SVa);
-        Vertex Smeared_SVb = PUPPI_Detector.Smear_SV(SVb);
-        TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
-        TVector3 Smeared_vBetab = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
-        TLorentzVector L1a_Gent = L1a_Gen.GetFourVector();
-        L1a_Gent.SetZ(0.0);
-        TLorentzVector L2a_Gent = L2a_Gen.GetFourVector();
-        L2a_Gent.SetZ(0.0);
-        TLorentzVector Ia_Gent = Ia;
-        Ia_Gent.SetZ(0.0);
-        TLorentzVector L1a_RECOt = PUPPI_Detector.Smear_Muon(L1a_Gent);
-        TLorentzVector L2a_RECOt = PUPPI_Detector.Smear_Muon(L2a_Gent);
-        TLorentzVector L1b_Gent = L1b_Gen.GetFourVector();
-        L1b_Gent.SetZ(0.0);
-        TLorentzVector L2b_Gent = L2b_Gen.GetFourVector();
-        L2b_Gent.SetZ(0.0);
-        TLorentzVector Ib_Gent = Ib;
-        Ib_Gent.SetZ(0.0);
-        TLorentzVector L1b_RECOt = PUPPI_Detector.Smear_Muon(L1b_Gent);
-        TLorentzVector L2b_RECOt = PUPPI_Detector.Smear_Muon(L2b_Gent);
-        
-        if(Smeared_vBetaa.Mag() >= 1.)
-        {
-            igen--;
-            continue;
-        }
-        if(Smeared_vBetab.Mag() >= 1.)
-        {
-            igen--;
-            continue;
-        }
-        
-        double Da = 30.*Smeared_ToFa*Smeared_vBetaa.Mag();
-        double Db = 30.*Smeared_ToFb*Smeared_vBetab.Mag();
-        
-        if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance) //require significant displacement in space and time
-        {
-            igen--;
-            continue;
-        }
-        
-        TLorentzVector Va = L1a_RECOt+L2a_RECOt;
-        TLorentzVector Vb = L1b_RECOt+L2b_RECOt;
-        
-       double MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
-       double MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
-        
-        //Angle Analysis
-        TLorentzVector PX2a;
-        PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
-        TLorentzVector PX2b;
-        PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
-        PX2a.Boost(Smeared_vBetaa);
-        PX2b.Boost(Smeared_vBetab);
-        
-        //RECO Tree
-        LAB_Reco.ClearEvent();
-        L1a_Reco.SetLabFrameFourVector(L1a_RECO);
-        L1b_Reco.SetLabFrameFourVector(L1b_RECO);
-        L2a_Reco.SetLabFrameFourVector(L2a_RECO);
-        L2b_Reco.SetLabFrameFourVector(L2b_RECO);
-        X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
-        X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
-        
-        LAB_Reco.AnalyzeEvent();
-        
-        double CosX2a = X2a_Reco.GetCosDecayAngle();
-        double CosX2b = X2b_Reco.GetCosDecayAngle();
-        
-        if(fabs(CosX2a) < 0.9 || fabs(CosX2b) < 0.9)
-        {
-            igen--;
-            continue;
-        }
-        
     }
-    vect_graph_Efficiency_SigmaT[m]->SetPoint(k,sigmaT[k],(100.0*Ngen)/gen_events);
-    }
-    //LAB_Gen.PrintGeneratorEfficiency();
-  }
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*Nctau*NsigmaT << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
+    for(int j = 0; j < Nctau; j++) { for(int l = 0; l < NsigmaT; l++){ vect_graph_Efficiency_SigmaT.at(j)->SetPoint(l,sigmaT[l],100.*(vect_timing_acp.at(j).at(l))/Ngen); }
+        for(int l = 0; l < NsigmaMET; l++){ vect_graph_Efficiency_SigmaMET.at(j)->SetPoint(l,sigmaMET[l],100.*(vect_met_acp.at(j).at(l))/Ngen); } }
     TFile fout(output_name.c_str(),"RECREATE");
     vector<string> leg_text_Efficiency_SigmaT;
     for(int j = 0; j < Nctau; j++){leg_text_Efficiency_SigmaT.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-    Draw_Graphs(fout, vect_graph_Efficiency_SigmaT, leg_text_Efficiency_SigmaT, "Generator Efficiency [%]", "#sigma_{t} [ps]", "Efficiency");
+    Draw_Graphs(fout, vect_graph_Efficiency_SigmaT, leg_text_Efficiency_SigmaT, "Generator Efficiency [%]", "#sigma_{t} [ps]", "Efficiency_Timing");
+    vector<string> leg_text_Efficiency_SigmaMET;
+    for(int j = 0; j < Nctau; j++){leg_text_Efficiency_SigmaMET.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
+    Draw_Graphs(fout, vect_graph_Efficiency_SigmaMET, leg_text_Efficiency_SigmaMET, "Generator Efficiency [%]", "#sigma_{MET} [%]", "Efficiency_MET");
   fout.Close();
   g_Log << LogInfo << "Finished" << LogEnd;
   g_Log << LogInfo << "Time to Process " << Ngen*Nctau << " Events: " << (Long64_t(gSystem->Now())-end)/1000.0 << " seconds" << LogEnd;
