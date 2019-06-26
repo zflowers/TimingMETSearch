@@ -180,6 +180,79 @@ void setMyStyle()
     CreatePalette();
     TStyle* myStyle = new TStyle("myStyle","myStyle");
     
+    // For the canvas:
+    myStyle->SetCanvasBorderMode(0);
+    myStyle->SetCanvasColor(kWhite);
+    myStyle->SetCanvasDefX(0);
+    myStyle->SetCanvasDefY(0);
+    
+    // For the Pad:
+    myStyle->SetPadBorderMode(0);
+    myStyle->SetPadColor(kWhite);
+    myStyle->SetGridColor(0);
+    myStyle->SetGridStyle(3);
+    myStyle->SetGridWidth(1);
+    
+    // For the frame:
+    myStyle->SetFrameBorderMode(0);
+    myStyle->SetFrameBorderSize(1);
+    myStyle->SetFrameFillColor(0);
+    myStyle->SetFrameFillStyle(0);
+    myStyle->SetFrameLineColor(1);
+    myStyle->SetFrameLineStyle(1);
+    myStyle->SetFrameLineWidth(1);
+    
+    // set the paper & margin sizes
+    myStyle->SetPaperSize(20,26);
+    myStyle->SetPadTopMargin(0.09);
+    myStyle->SetPadRightMargin(0.25);
+    myStyle->SetPadBottomMargin(0.18);
+    myStyle->SetPadLeftMargin(0.15);
+    
+    // use large Times-Roman fonts
+    myStyle->SetTitleFont(42,"xyz");  // set the all 3 axes title font
+    myStyle->SetTitleFont(42," ");    // set the pad title font
+    myStyle->SetTitleSize(0.06,"xyz"); // set the 3 axes title size
+    myStyle->SetTitleSize(0.06," ");   // set the pad title size
+    myStyle->SetLabelFont(42,"xyz");
+    myStyle->SetLabelSize(0.05,"xyz");
+    myStyle->SetLabelColor(1,"xyz");
+    myStyle->SetTextFont(42);
+    myStyle->SetTextSize(0.08);
+    myStyle->SetStatFont(42);
+    
+    // use bold lines and markers
+    myStyle->SetMarkerStyle(8);
+    myStyle->SetHistLineWidth(2);
+    myStyle->SetLineStyleString(2,"[12 12]"); // postscript dashes
+    
+    //..Get rid of X error bars
+    myStyle->SetErrorX(0.001);
+    
+    // do not display any of the standard histogram decorations
+    myStyle->SetOptTitle(0);
+    myStyle->SetOptStat(0);
+    myStyle->SetOptFit(11111111);
+    
+    // put tick marks on top and RHS of plots
+    myStyle->SetPadTickX(1);
+    myStyle->SetPadTickY(1);
+    
+    Int_t MyPalette[28];
+    Int_t alpha=1;
+    
+    Double_t Stops[5] = { 0.00, 0.50, 0.70, 0.82, 1.00 };
+    Double_t Red[5]   = { 0.00, 0.00, 0.74, 1.00, 1.00 };
+    Double_t Green[5] = { 0.00, 0.61, 0.82, 0.70, 1.00 };
+    Double_t Blue[5]  = { 0.31, 0.73, 0.08, 0.00, 1.00 };
+    
+    Int_t zpalette = TColor::CreateGradientColorTable(5, Stops, Red, Green, Blue, 28);
+    for(int i=0; i<28; i++)
+    {
+        MyPalette[i] = zpalette+i;
+    }
+    myStyle->SetPalette(28,MyPalette);
+    
     myStyle->cd();
 }
 

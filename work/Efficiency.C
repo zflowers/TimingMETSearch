@@ -42,7 +42,7 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
 
 void Efficiency(std::string output_name =
 			      "Efficiency.root"){
-
+    setMyStyle();
     Long64_t start = gSystem->Now();
     Long64_t end = 0.;
     
@@ -389,10 +389,10 @@ void Efficiency(std::string output_name =
     TFile fout(output_name.c_str(),"RECREATE");
     vector<string> leg_text_Efficiency_SigmaT;
     for(int j = 0; j < Nctau; j++){leg_text_Efficiency_SigmaT.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-    Draw_Graphs(fout, vect_graph_Efficiency_SigmaT, leg_text_Efficiency_SigmaT, "Generator Efficiency [%]", "#sigma_{t} [ps]", "Efficiency_Timing");
+    Draw_Graphs(fout, vect_graph_Efficiency_SigmaT, leg_text_Efficiency_SigmaT, "Reconstruction Efficiency [%]", "#sigma_{t} [ps]", "Efficiency_Timing");
     vector<string> leg_text_Efficiency_SigmaMET;
     for(int j = 0; j < Nctau; j++){leg_text_Efficiency_SigmaMET.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-    Draw_Graphs(fout, vect_graph_Efficiency_SigmaMET, leg_text_Efficiency_SigmaMET, "Generator Efficiency [%]", "#sigma_{MET} [%]", "Efficiency_MET");
+    Draw_Graphs(fout, vect_graph_Efficiency_SigmaMET, leg_text_Efficiency_SigmaMET, "Reconstruction Efficiency [%]", "#sigma_{MET} [%]", "Efficiency_MET");
   fout.Close();
   g_Log << LogInfo << "Finished" << LogEnd;
   g_Log << LogInfo << "Time to Process " << Ngen*Nctau << " Events: " << (Long64_t(gSystem->Now())-end)/1000.0 << " seconds" << LogEnd;

@@ -40,7 +40,7 @@ using namespace RestFrames;
 
 void LSP_testing(std::string output_name =
 			      "output_LSP_testing.root"){
-
+    setMyStyle();
     Long64_t start = gSystem->Now();
     Long64_t end = 0.;
     
@@ -177,66 +177,71 @@ void LSP_testing(std::string output_name =
   //treePlot->Draw("GenTree", "Generator Tree", true);
   
     // Declare observables for histogram booking
-    HistPlot* histPlot = new HistPlot("Plots",
+    HistPlot* histPlot_Cut = new HistPlot("Plots_Cut",
                                       std::string("#tilde{#chi}_{2}^{ 0} #tilde{#chi}_{2}^{ 0}") +
                                       "#rightarrow Za(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}"+
                                       "Zb(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}");
     
-    histPlot->SetRebin(1);
+    HistPlot* histPlot_NoCut = new HistPlot("Plots_NoCut",
+                                      std::string("#tilde{#chi}_{2}^{ 0} #tilde{#chi}_{2}^{ 0}") +
+                                      "#rightarrow Za(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}"+
+                                      "Zb(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}");
     
-    RFList<const HistPlotCategory> cat_list_ctau;
-    char smassX2[200];
-    string sctau = "c#tau = ";
+    histPlot_Cut->SetRebin(1);
+    histPlot_NoCut->SetRebin(1);
+    
+    RFList<const HistPlotCategory> cat_list_ctau_cut;
+    char smassX2_cut[200];
+    string sctau_cut = "c#tau = ";
     for(int m = 0; m < Nctau; m++){
         char snamectau[200], scatctau[50];
         sprintf(scatctau, "ctau_%d", m);
         sprintf(snamectau, "%.1f cm", ctau[m]);
-        cat_list_ctau += histPlot->GetNewCategory(scatctau, sctau+std::string(snamectau));
+        cat_list_ctau_cut += histPlot_Cut->GetNewCategory(scatctau, sctau_cut+std::string(snamectau));
     }
     
-    RFList<const HistPlotCategory> cat_list_timing;
-    string ssigmaT = "#sigma_{T} = ";
-    for(int m = 0; m < NsigmaT; m++){
-        char snametiming[200], scattiming[50];
-        sprintf(scattiming, "sigmaT_%d", m);
-        sprintf(snametiming, "%.1f ps", sigmaT[m]);
-        cat_list_timing += histPlot->GetNewCategory(scattiming, ssigmaT+std::string(snametiming));
-    }
-    
-    RFList<const HistPlotCategory> cat_list_MET;
-    string ssigmaMET = "#sigma_{MET} = ";
-    for(int m = 0; m < NsigmaMET; m++){
-        char snamemet[200], scatmet[50];
-        sprintf(scatmet, "sigmaMET_%d", m);
-        sprintf(snamemet, "%.1f", sigmaMET[m]);
-        cat_list_MET += histPlot->GetNewCategory(scatmet, ssigmaMET+std::string(snamemet));
+    RFList<const HistPlotCategory> cat_list_ctau_nocut;
+    char smassX2_nocut[200];
+    string sctau_nocut = "c#tau = ";
+    for(int m = 0; m < Nctau; m++){
+        char snamectau[200], scatctau[50];
+        sprintf(scatctau, "ctau_%d", m);
+        sprintf(snamectau, "%.1f cm", ctau[m]);
+        cat_list_ctau_nocut += histPlot_NoCut->GetNewCategory(scatctau, sctau_nocut+std::string(snamectau));
     }
     
     //setting up all the variables that could be potentially plotted
-    const HistPlotVar& MET = histPlot->GetNewVar("MET","MET",0.,1000.0,"");
-    const HistPlotVar& ToFa = histPlot->GetNewVar("ToFa","ToF(#tilde{#chi}_{2}^{0})",0.0,30.0,"[ns]");
-    const HistPlotVar& ToFb = histPlot->GetNewVar("ToFb","ToF(#tilde{#chi}_{2}^{0})",0.0,30.0,"[ns]");
-    const HistPlotVar& Da = histPlot->GetNewVar("Da", "D(#tilde{#chi}_{2}^{0})", 0.0, 0.05, "[cm]");
-    const HistPlotVar& Db = histPlot->GetNewVar("Db", "D(#tilde{#chi}_{2}^{0})", -15.0, 15.0, "[cm]");
-    const HistPlotVar& EZa = histPlot->GetNewVar("EZa", "E_{Za}^{#tilde{#chi}_{2a}^{0}}", 0., 800., "[GeV]");
-    const HistPlotVar& Pull_Mass_Invisible = histPlot->GetNewVar("Pull_Mass_Inv","Pull of M(#tilde{#chi}_{1a}^{0})",-5.0,5.0,"");
-    const HistPlotVar& MIa = histPlot->GetNewVar("MIa", "M(#tilde{#chi}_{1a}^{0})", 0., 1000., "[GeV]");
-    const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", -50., 300., "[GeV]");
-    const HistPlotVar& MIa3 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0}) miniRJR", -700., 600., "[GeV]");
-    const HistPlotVar& MX2X2 = histPlot->GetNewVar("MX2X2", "M(#tilde{#chi}_{2}^{0})(#tilde{#chi}_{2}^{0})", 0., 3000., "[GeV]");
-    const HistPlotVar& MV = histPlot->GetNewVar("MV", "M(#it{la})", 0., 150., "[GeV]");
-    const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", -1000., 2000., "[GeV]");
+    const HistPlotVar& MET = histPlot_Cut->GetNewVar("MET","MET",0.,1000.0,"");
+    const HistPlotVar& ToFa = histPlot_Cut->GetNewVar("ToFa","ToF(#tilde{#chi}_{2}^{0})",0.0,30.0,"[ns]");
+    const HistPlotVar& ToFb = histPlot_Cut->GetNewVar("ToFb","ToF(#tilde{#chi}_{2}^{0})",0.0,30.0,"[ns]");
+    const HistPlotVar& Da = histPlot_Cut->GetNewVar("Da", "D(#tilde{#chi}_{2}^{0})", 0.0, 0.05, "[cm]");
+    const HistPlotVar& Db = histPlot_Cut->GetNewVar("Db", "D(#tilde{#chi}_{2}^{0})", -15.0, 15.0, "[cm]");
+    const HistPlotVar& EZa_Cut = histPlot_Cut->GetNewVar("EZa", "E_{Za}^{#tilde{#chi}_{2a}^{0}}", 0., 800., "[GeV]");
+    const HistPlotVar& EZa_NoCut = histPlot_Cut->GetNewVar("EZa", "E_{Za}^{#tilde{#chi}_{2a}^{0}}", 0., 800., "[GeV]");
+    const HistPlotVar& Pull_Mass_Invisible = histPlot_Cut->GetNewVar("Pull_Mass_Inv","Pull of M(#tilde{#chi}_{1a}^{0})",-5.0,5.0,"");
+    const HistPlotVar& MIa = histPlot_Cut->GetNewVar("MIa", "M(#tilde{#chi}_{1a}^{0})", 0., 1000., "[GeV]");
+    const HistPlotVar& MIa2 = histPlot_Cut->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", -50., 300., "[GeV]");
+    const HistPlotVar& MIb2 = histPlot_Cut->GetNewVar("MIb2", "M(#tilde{#chi}_{1b}^{0})", -50., 300., "[GeV]");
+    const HistPlotVar& MIa3 = histPlot_Cut->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0}) miniRJR", -700., 600., "[GeV]");
+    const HistPlotVar& MX2X2 = histPlot_Cut->GetNewVar("MX2X2", "M(#tilde{#chi}_{2}^{0})(#tilde{#chi}_{2}^{0})", 0., 3000., "[GeV]");
+    const HistPlotVar& MV = histPlot_Cut->GetNewVar("MV", "M(#it{la})", 0., 150., "[GeV]");
+    const HistPlotVar& MXa2_Cut = histPlot_Cut->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 1200., "[GeV]");
+    const HistPlotVar& MXa2_NoCut = histPlot_NoCut->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 1200., "[GeV]");
     
     
-    histPlot->AddPlot(MIa2, cat_list_ctau);
-    histPlot->AddPlot(MIa3, cat_list_ctau);
-    
-    /*histPlot->AddPlot(MIa2, MV, cat_list_ctau);
-    histPlot->AddPlot(MIa2, MET, cat_list_ctau);
-    histPlot->AddPlot(MIa2, MXa2, cat_list_ctau);
-    histPlot->AddPlot(MIa2, EZa, cat_list_ctau);
+    //histPlot_Cut->AddPlot(MIa2, cat_list_ctau_cut);
+    //histPlot_Cut->AddPlot(MIa3, cat_list_ctau_cut);
+    histPlot_Cut->AddPlot(MXa2_Cut, cat_list_ctau_cut);
+    histPlot_Cut->AddPlot(EZa_Cut, cat_list_ctau_cut);
+    histPlot_NoCut->AddPlot(MXa2_NoCut, cat_list_ctau_nocut);
+    histPlot_NoCut->AddPlot(EZa_NoCut, cat_list_ctau_nocut);
+    /*
+    histPlot_Cut->AddPlot(MIa2, MV, cat_list_ctau_cut);
+    histPlot_Cut->AddPlot(MIa2, MET, cat_list_ctau_cut);
+    histPlot_Cut->AddPlot(MIa2, MXa2, cat_list_ctau_cut);
+    histPlot_Cut->AddPlot(MIa2, EZa, cat_list_ctau_cut);
+    histPlot_Cut->AddPlot(MIa2, MIb2, cat_list_ctau_cut);
     */
-    
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
     TFile* input = new TFile("PTEta.root");
@@ -402,19 +407,25 @@ void LSP_testing(std::string output_name =
         TLorentzVector vZb = L1b_RECO + L2b_RECO;
         vZb.Boost(-Smeared_vBetab);
         
-        EZa = vZa.E();
+        EZa_Cut = vZa.E();
+        EZa_NoCut = vZa.E();
         TLorentzVector vZaGen = L1a_Gen.GetFourVector() + L2a_Gen.GetFourVector();
         vZaGen.Boost(-vBetaaGen);
+        
+        double EZb = vZb.E();
         
         TLorentzVector Va = L1a_RECOt+L2a_RECOt;
         TLorentzVector Vb = L1b_RECOt+L2b_RECOt;
         
-        MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+        MXa2_Cut = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
+        MXa2_NoCut = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
         double MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
         
         //Two LLPs
         MV = (L1a_RECO+L2a_RECO).M();
-        MIa2 = test_Resolution.Mass_Invisible2(MXa2,EZa,MV);
+        double MVb = (L1b_RECO+L2b_RECO).M();
+        MIa2 = test_Resolution.Mass_Invisible2(MXa2_Cut,EZa_Cut,MV);
+        MIb2 = test_Resolution.Mass_Invisible2(MXb2,EZb,MVb);
         if(MIa2 <= 0. && LSP_flag)
         {
             igen--;
@@ -423,7 +434,7 @@ void LSP_testing(std::string output_name =
         
         //Angle Analysis
         TLorentzVector PX2a;
-        PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
+        PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2_Cut);
         TLorentzVector PX2b;
         PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
         PX2a.Boost(Smeared_vBetaa);
@@ -448,9 +459,10 @@ void LSP_testing(std::string output_name =
             igen--;
             continue;
         }
-        
-        histPlot->Fill(cat_list_ctau[m]);
-        acp_events++;
+        if(MIa2 < 1.e-6 && MIb2 < 1.e-6) {histPlot_Cut->Fill(cat_list_ctau_cut[m]); acp_events++;}
+        else {histPlot_NoCut->Fill(cat_list_ctau_nocut[m]);}
+        //histPlot_Cut->Fill(cat_list_ctau_cut[m]);
+        //acp_events++;
     }
     }
     //LAB_Gen.PrintGeneratorEfficiency();
@@ -461,11 +473,14 @@ void LSP_testing(std::string output_name =
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*Nctau << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*Nctau << " Events" << LogEnd;
-    histPlot->Draw();
+    histPlot_Cut->Draw();
+    histPlot_NoCut->Draw();
     TFile fout(output_name.c_str(),"RECREATE");
   fout.Close();
-  histPlot->WriteOutput(output_name);
-  histPlot->WriteHist(output_name);
+  histPlot_Cut->WriteOutput(output_name);
+  histPlot_Cut->WriteHist(output_name);
+  histPlot_NoCut->WriteOutput(output_name);
+  histPlot_NoCut->WriteHist(output_name);
   treePlot->WriteOutput(output_name);
   g_Log << LogInfo << "Finished" << LogEnd;
   g_Log << LogInfo << "Time to Process " << Ngen*Nctau << " Events: " << (Long64_t(gSystem->Now())-end)/1000.0 << " seconds" << LogEnd;
