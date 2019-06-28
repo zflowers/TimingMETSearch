@@ -14,7 +14,6 @@ vector<TH1D*> list_histos(string fname, vector<string> dir_names, string hist_na
     {
      TH1D* h = nullptr;
      f->GetObject(("Plots_"+dir_names[i]+"/"+"hist/"+hist_name+"_Plots_"+dir_names[i]).c_str(),h);
-     cout << h->GetName() << endl;
      vect_hist.push_back(h);
     }
     return vect_hist;
@@ -44,6 +43,8 @@ void Get_MultiHist(TCanvas*& canv, vector<TH1D*>& hists, vector<string> labels)
  if(hists.size() > 5) {hists[5]->SetLineColor(kOrange-2);}
  for(int k = 0; k < int(hists.size()); k++) 
  {
+  hists[k]->GetXaxis()->SetTitle("M_{#tilde{#chi}_{2a}^{0}} [GeV]");
+  hists[k]->GetYaxis()->SetTitle("Fraction of Events in Each Bin");
   hists[k]->SetFillStyle(0); 
   hists[k]->Draw("SAMES HIST"); 
  }
@@ -59,6 +60,9 @@ void Overlay()
 
  string inFile = "output_LSP_testing.root";
  vector<TH1D*> mLLP_25cm = list_histos(inFile, directories, "MXa2_ctau_0");
+ vector<TH1D*> mLLP_5cm = list_histos(inFile, directories, "MXa2_ctau_1");
+ vector<TH1D*> mLLP_1cm = list_histos(inFile, directories, "MXa2_ctau_2");
+ vector<TH1D*> EZa_25cm = list_histos(inFile, directories, "EZa_ctau_2");
 
  TFile* outFile = new TFile(("out_"+inFile).c_str(),"RECREATE");
 
@@ -66,4 +70,21 @@ void Overlay()
  TCanvas* canv_mLLP_25cm = new TCanvas(can_name_mLLP_25cm.c_str(),"",750,600);
  Get_MultiHist(canv_mLLP_25cm, mLLP_25cm, directories);
  canv_mLLP_25cm->Write();
+
+ string can_name_mLLP_5cm = "canv_mLLP_5cm";
+ TCanvas* canv_mLLP_5cm = new TCanvas(can_name_mLLP_5cm.c_str(),"",750,600);
+ Get_MultiHist(canv_mLLP_5cm, mLLP_5cm, directories);
+ canv_mLLP_5cm->Write();
+
+ string can_name_mLLP_1cm = "canv_mLLP_1cm";
+ TCanvas* canv_mLLP_1cm = new TCanvas(can_name_mLLP_1cm.c_str(),"",750,600);
+ Get_MultiHist(canv_mLLP_1cm, mLLP_1cm, directories);
+ canv_mLLP_1cm->Write();
+
+/*
+ string can_name_EZa_25cm = "canv_EZa_25cm";
+ TCanvas* canv_EZa_25cm = new TCanvas(can_name_EZa_25cm.c_str(),"",750,600);
+ Get_MultiHist(canv_EZa_25cm, EZa_25cm, directories);
+ canv_EZa_25cm->Write();
+*/
 }

@@ -21,6 +21,7 @@ public:
     TVector3 GetBeta(Vertex PV, Vertex SV);
     double Energy_Z_Parent(TVector3 Beta, TLorentzVector Lepton1, TLorentzVector Lepton2);
     double Energy_Z_Parent(Vertex PV, Vertex SV, TLorentzVector Lepton1, TLorentzVector Lepton2);
+    double Energy_Z_Parent(TVector3 Beta, TLorentzVector Leptons);
     double Energy_Z_Parent_Resolution(TVector3 Beta, TLorentzVector Lepton1, TLorentzVector Lepton2, double sigma_E_lepton1, double sigma_E_lepton2, double sigma_cos_theta1, double sigma_cos_theta2, double sigma_Beta_Mag);
     double Energy_Z_Parent_Resolution(TVector3 Beta, TLorentzVector Lepton1, TLorentzVector Lepton2, double sigma_E_lepton, double sigma_cos_theta, double sigma_Beta_Mag);
     double Cos_Resolution(TVector3 V1, TVector3 V2, double sigma_V1, double sigma_V2);
@@ -31,9 +32,11 @@ public:
     double Visible_Resolution(TVector3 L1a, TVector3 L2a, TVector3 L1b, TVector3 L2b, double sigma_L1a, double sigma_L2a, double sigma_L1b, double sigma_L2b);
     double Mass_Parents2(TVector3 Par, TVector3 Betaa, TVector3 Betab);
     double Mass_Parents2(TVector3 MET, TVector3 Vis, TVector3 Betaa, TVector3 Betab);
-    double Mass_Parents2_Resolution(TVector3 MET, TVector3 MET_Perp, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET, double sigma_MET_Perp, double sigma_Vis, double& f_MET, double& f_MET_Perp);
+    double Mass_Parents2_Resolution(TVector3 MET, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET, double sigma_MET_Perp, double sigma_Vis);
     double Mass_Invisible2(double Mass_P, double E_V_P, double Mass_V);
-    double Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET, double sigma_MET_Perp, double dM_dMET, double dM_dMET_Perp);
+    double Mass_Invisible2(TVector3 MET, TLorentzVector Va, TLorentzVector Vb, TVector3 Betaa, TVector3 Betab);
+    double Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET, double sigma_MET_Perp);
+    double Mass_Invisible_Resolution2(TVector3 MET, TLorentzVector Va, TLorentzVector Vb, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Mag, double sigma_MET, double sigma_MET_Perp);
 };
 #endif
 
@@ -105,6 +108,12 @@ inline double Resolution::Energy_Z_Parent(TVector3 Beta, TLorentzVector Lepton1,
     double gamma = 1.0/sqrt(1.0-Beta.Mag2());
     TLorentzVector Z = Lepton1 + Lepton2;
     return gamma*(Z.E() - Z.Vect().Dot(Beta));
+}
+
+inline double Resolution::Energy_Z_Parent(TVector3 Beta, TLorentzVector Leptons)
+{
+    double gamma = 1.0/sqrt(1.0-Beta.Mag2());
+    return gamma*(Leptons.E() - Leptons.Vect().Dot(Beta));
 }
 
 inline double Resolution::Energy_Z_Parent(Vertex PV, Vertex SV, TLorentzVector Lepton1, TLorentzVector Lepton2)
@@ -206,157 +215,34 @@ inline double Resolution::Mass_Parents2(TVector3 Par, TVector3 Betaa, TVector3 B
     return (Betab.Unit().Cross(Par)).Dot(Zhat)*Par.Mag2()/(gamma*Betaa.Pt()*((Betaa.Unit().Dot(Par)*Betab.Unit().Cross(Par))-Betab.Unit().Dot(Par)*Betaa.Unit().Cross(Par)).Dot(Zhat));
 }
 
-inline double Resolution::Mass_Parents2(TVector3 MET, TVector3 Vis, TVector3 Betaa, TVector3 Betab)
+inline double Resolution::Mass_Parents2(TVector3 MET, TVector3 Vis, TVector3 Betaa, TVector3 Betab) //need to fix this
 {
     TVector3 Zhat(0.0,0.0,1.0);
     double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
-    TVector3 BetaaT = Betaa;
-    TVector3 BetabT = Betab;
-    BetaaT.SetZ(0.);
-    BetabT.SetZ(0.);
-    //angles
-    //m: MET
-    //v: Vis
-    
-    double cmv = MET.Unit().Dot(Vis.Unit());
-    double sbm = MET.Unit().Cross(BetabT.Unit()).Dot(Zhat);
-    double sbv = Vis.Unit().Cross(BetabT.Unit()).Dot(Zhat);
-    double cam = MET.Unit().Dot(BetaaT.Unit());
-    double cav = Vis.Unit().Dot(BetaaT.Unit());
-    double cbm = MET.Unit().Dot(BetabT.Unit());
-    double cbv = Vis.Unit().Dot(BetabT.Unit());
-    double sam = MET.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
-    double sav = Vis.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
-
-    
-    double den1 = MET.Mag2()*(cam*sbm-cbm*sam);
-    double den3 = Vis.Mag2()*(cav*sbv-cbv*sav);
-    double den5 = MET.Mag()*Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    
-    double den = gamma*Betaa.Pt()*(den1+den3+den5);
-    
-    double num = MET.Mag2()*MET.Mag()*sbm+2.*MET.Mag2()*Vis.Mag()*cmv*sbm+2.*MET.Mag()*Vis.Mag2()*cmv*sbv+MET.Mag()*Vis.Mag2()*sbm+Vis.Mag2()*Vis.Mag()*sbv+MET.Mag2()*Vis.Mag()*sbv;
+    Betaa.SetZ(0.);
+    Betab.SetZ(0.);
+    Vis.SetZ(0.);
+    double sab = Betaa.Unit().Cross(Betab.Unit()).Dot(Zhat);
+    double num = (MET+Vis).Cross(Betab.Unit()).Dot(Zhat);
+    double den = gamma*Betaa.Mag()*sab;
     
     return num/den;
 }
-/*
-inline double Resolution::Mass_Parents2_Resolution(TVector3 MET, TVector3 MET_Perp, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET, double sigma_MET_Perp, double sigma_Vis, double& f_MET, double& f_MET_Perp)
-{
-    TVector3 Zhat(0.0,0.0,1.0);
-    double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
-    TVector3 BetaaT = Betaa;
-    TVector3 BetabT = Betab;
-    BetaaT.SetZ(0.);
-    BetabT.SetZ(0.);
-    //Angles
-    //m: MET
-    //d: MET_Perp
-    //v: Vis
-    
-    double cmv = MET.Unit().Dot(Vis.Unit());
-    double cdv = MET_Perp.Unit().Dot(Vis.Unit());
-    double sbm = MET.Unit().Cross(BetabT.Unit()).Dot(Zhat);
-    double sbd = MET_Perp.Unit().Cross(BetabT.Unit()).Dot(Zhat);
-    double sbv = Vis.Unit().Cross(BetabT.Unit()).Dot(Zhat);
-    double cam = MET.Unit().Dot(BetaaT.Unit());
-    double cad = MET_Perp.Unit().Dot(BetaaT.Unit());
-    double cav = Vis.Unit().Dot(BetaaT.Unit());
-    double cbm = MET.Unit().Dot(BetabT.Unit());
-    double cbd = MET_Perp.Unit().Dot(BetabT.Unit());
-    double cbv = Vis.Unit().Dot(BetabT.Unit());
-    double sam = MET.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
-    double sad = MET_Perp.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
-    double sav = Vis.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
-    
-    double num = MET.Mag2()*MET.Mag()*sbm+MET.Mag2()*MET_Perp.Mag()*sbd+2.*MET.Mag2()*Vis.Mag()*cmv*sbm+2.*MET.Mag()*MET_Perp.Mag()*Vis.Mag()*cdv*sbm+2.*MET.Mag()*Vis.Mag2()*cmv*sbv+MET.Mag()*Vis.Mag2()*sbm+MET_Perp.Mag2()*MET_Perp.Mag()*sbd+2.*MET_Perp.Mag2()*Vis.Mag()*cdv*sbd+MET_Perp.Mag2()*Vis.Mag()*sbv+2.*MET_Perp.Mag()*Vis.Mag2()*cdv*sbv+MET_Perp.Mag()*Vis.Mag2()*sbd+Vis.Mag2()*Vis.Mag()*sbv+MET.Mag2()*Vis.Mag()*sbv+MET.Mag()*MET_Perp.Mag2()*sbm+2.*MET.Mag()*MET_Perp.Mag()*Vis.Mag()*cmv*sbd;
-    double den1 = MET.Mag2()*(cam*sbm-cbm*sam);
-    double den2 = MET_Perp.Mag2()*(cad*sbd-cbd*sad);
-    double den3 = Vis.Mag2()*(cav*sbv-cbv*sav);
-    double den4 = MET.Mag()*MET_Perp.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam);
-    double den5 = MET.Mag()*Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    double den6 = MET_Perp.Mag()*Vis.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
-    double den = (den1+den2+den3+den4+den5+den6);
 
-    double dnum_dMag = (MET.Unit()*(3.*MET.Mag2()+MET_Perp.Mag2()+Vis.Mag2()+2.*Vis.Dot(2.*MET+MET_Perp))+2.*(MET_Perp+Vis)*(MET.Mag()+Vis.Dot(MET.Unit()))).Cross(BetabT.Unit()).Dot(Zhat);
-    double dden_dMag = 2.*MET.Mag()*(cam*sbm-cbm*sam)+MET_Perp.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam)+Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    double dnum_dDir = (MET_Perp.Unit()*(3.*MET_Perp.Mag2()+MET.Mag2()+Vis.Mag2()+2.*Vis.Dot(2.*MET_Perp+MET))+2.*(MET+Vis)*(MET_Perp.Mag()+Vis.Dot(MET_Perp.Unit()))).Cross(BetabT.Unit()).Dot(Zhat);
-    
-    double dden_dDir = 2.*MET_Perp.Mag()*(cad*sbd-cbd*sad)+MET.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam)+Vis.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
-    
-    
-    double dnum_dVis = 2.*MET.Mag2()*cmv*sbm+2.*MET.Mag()*MET_Perp.Mag()*cdv*sbm+4.*MET.Mag()*Vis.Mag()*cmv*sbv+2.*MET.Mag()*Vis.Mag()*sbm+2.*MET_Perp.Mag2()*cdv*sbd+MET_Perp.Mag2()*sbv+4.*MET_Perp.Mag()*Vis.Mag()*cdv*sbv+2.*MET_Perp.Mag()*Vis.Mag()*sbd+3.*Vis.Mag2()*sbv+MET.Mag2()*sbv+2.*MET.Mag()*MET_Perp.Mag()*cmv*sbd;
-    double dden_dVis = 2.*Vis.Mag()*(cav*sbv-cbv*sav)+MET.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam)+MET_Perp.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
-    
-    f_MET = (1./num)*(dnum_dMag)-(1./den)*(dden_dMag);
-    f_MET_Perp = (1./num)*(dnum_dDir)-(1./den)*(dden_dDir);
-    double f_Vis = (1./num)*(dnum_dVis)-(1./den)*(dden_dVis);
-    
-    double MET_RES = sigma_MET*Mass_Parents2(MET,MET_Perp,Vis,Betaa,Betab)*f_MET;
-    double MET_Perp_RES = sigma_MET_Perp*Mass_Parents2(MET,MET_Perp,Vis,Betaa,Betab)*f_MET_Perp;
-    double VIS_RES = sigma_Vis*Mass_Parents2(MET,MET_Perp,Vis,Betaa,Betab)*f_Vis;
-    double BETA_RES = sigma_Beta_Maga*Mass_Parents2(MET,MET_Perp,Vis,Betaa,Betab)*gamma*gamma/Betaa.Mag();
-    
-    
-    return sqrt(BETA_RES*BETA_RES + MET_RES*MET_RES + MET_Perp_RES*MET_Perp_RES + VIS_RES*VIS_RES);
-}
-*/
-inline double Resolution::Mass_Parents2_Resolution(TVector3 MET, TVector3 MET_Perp, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET, double sigma_MET_Perp, double sigma_Vis, double& f_MET, double& f_MET_Perp)
+inline double Resolution::Mass_Parents2_Resolution(TVector3 MET, TVector3 Vis, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Maga, double sigma_MET, double sigma_MET_Perp, double sigma_Vis)
 {
-    f_MET = 0.;
-    f_MET_Perp = 0.;
     TVector3 Zhat(0.0,0.0,1.0);
     double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
-    TVector3 BetaaT = Betaa;
-    TVector3 BetabT = Betab;
-    BetaaT.SetZ(0.);
-    BetabT.SetZ(0.);
-    //Angles
-    //m: MET
-    //d: MET_Perp
-    //v: Vis
-    double Mass_P = Mass_Parents2(MET,Vis,Betaa,Betab);
-    
-    double cmv = MET.Unit().Dot(Vis.Unit());
-    double sbm = MET.Unit().Cross(BetabT.Unit()).Dot(Zhat);
-    double sbd = MET_Perp.Unit().Cross(BetabT.Unit()).Dot(Zhat); //
-    double sbv = Vis.Unit().Cross(BetabT.Unit()).Dot(Zhat);
-    double cam = MET.Unit().Dot(BetaaT.Unit());
-    double cad = MET_Perp.Unit().Dot(BetaaT.Unit()); //
-    double cav = Vis.Unit().Dot(BetaaT.Unit());
-    double cbm = MET.Unit().Dot(BetabT.Unit());
-    double cbd = MET_Perp.Unit().Dot(BetabT.Unit()); //
-    double cbv = Vis.Unit().Dot(BetabT.Unit());
-    double sam = MET.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
-    double sad = MET_Perp.Unit().Cross(BetaaT.Unit()).Dot(Zhat); //
-    double sav = Vis.Unit().Cross(BetaaT.Unit()).Dot(Zhat);
-    
-    double num = MET.Mag2()*MET.Mag()*sbm+2.*MET.Mag2()*Vis.Mag()*cmv*sbm+2.*MET.Mag()*Vis.Mag2()*cmv*sbv+MET.Mag()*Vis.Mag2()*sbm+Vis.Mag2()*Vis.Mag()*sbv+MET.Mag2()*Vis.Mag()*sbv;
-    
-    double den1 = MET.Mag2()*(cam*sbm-cbm*sam);
-    double den3 = Vis.Mag2()*(cav*sbv-cbv*sav);
-    double den5 = MET.Mag()*Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    double den = (den1+den3+den5);
-    
-    double dnum_dMag = (MET.Unit()*(3.*MET.Mag2()+Vis.Mag2()+4.*Vis.Dot(MET))+2.*Vis*(MET.Mag()+Vis.Dot(MET.Unit()))).Cross(BetabT.Unit()).Dot(Zhat);
-    double dden_dMag = 2.*MET.Mag()*(cam*sbm-cbm*sam)+Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    //double dden_dMag = 2.*MET.Mag()*MET.Unit().Cross(BetabT.Unit()-BetaaT.Unit()).Dot(Zhat)+Vis.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    double dnum_dDir = (MET_Perp*(MET.Mag2()+Vis.Mag2()+2.*Vis.Dot(MET))+2.*(MET+Vis)*(Vis.Dot(MET_Perp))).Cross(BetabT.Unit()).Dot(Zhat); //
-    
-    double dden_dDir = MET.Mag()*(cam*sbd+cad*sbm-cbm*sad-cbd*sam)+Vis.Mag()*(cad*sbv+cav*sbd-cbd*sav-cbv*sad);
-    
-    double dnum_dVis = 2.*MET.Mag2()*cmv*sbm+4.*MET.Mag()*Vis.Mag()*cmv*sbv+2.*MET.Mag()*Vis.Mag()*sbm+3.*Vis.Mag2()*sbv+MET.Mag2()*sbv;
-    double dden_dVis = 2.*Vis.Mag()*(cav*sbv-cbv*sav)+MET.Mag()*(cam*sbv+cav*sbm-cbm*sav-cbv*sam);
-    
-    f_MET = (1./num)*(dnum_dMag)-(1./den)*(dden_dMag);
-    f_MET_Perp = (1./num)*(dnum_dDir)-(1./den)*(dden_dDir);
-    double f_Vis = (1./num)*(dnum_dVis)-(1./den)*(dden_dVis);
-    
-    double MET_RES = sigma_MET*Mass_P*f_MET;
-    double MET_Perp_RES = sigma_MET_Perp*Mass_P*f_MET_Perp;
-    double VIS_RES = sigma_Vis*Mass_P*f_Vis;
-    double BETA_RES = sigma_Beta_Maga*Mass_P*gamma*gamma/Betaa.Mag();
-    
-    return sqrt(BETA_RES*BETA_RES + MET_RES*MET_RES + MET_Perp_RES*MET_Perp_RES + VIS_RES*VIS_RES);
+    double Mass = Mass_Parents2(MET,Vis,Betaa,Betab);
+    double c = -sigma_Beta_Maga*(Mass*gamma*gamma/Betaa.Mag());
+    Betaa.SetZ(0.);
+    Betab.SetZ(0.);
+    Vis.SetZ(0.);
+    double den = gamma*Betaa.Mag()*Betaa.Unit().Cross(Betab.Unit()).Dot(Zhat);
+    double a = sigma_MET*MET.Unit().Cross(Betab.Unit()).Dot(Zhat)/den;
+    double d = sigma_Vis*Vis.Unit().Cross(Betab.Unit()).Dot(Zhat)/den;
+    double b = sigma_MET_Perp*MET.Unit().Dot(Betab.Unit())/den;
+    return sqrt(a*a+b*b+c*c+d*d);
 }
 
 inline double Resolution::Mass_Invisible2(double Mass_P, double E_V_P, double Mass_V)
@@ -370,13 +256,34 @@ inline double Resolution::Mass_Invisible2(double Mass_P, double E_V_P, double Ma
     //return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
 }
 
-inline double Resolution::Mass_Invisible_Resolution2(double Mass_I, double Mass_P, double E_V_P, TVector3 Beta, TLorentzVector L1a, TLorentzVector L2a, double sigma_Beta_Mag, double sigma_MET, double sigma_MET_Perp, double dM_dMET, double dM_dMET_Perp)
+inline double Resolution::Mass_Invisible2(TVector3 MET, TLorentzVector Va, TLorentzVector Vb, TVector3 Betaa, TVector3 Betab)
 {
-    double gamma = 1.0/sqrt(1.0-Beta.Mag2());
-    double dE_dB = gamma*gamma*gamma*(Beta.Mag()*(L1a.E()+L2a.E())-Beta.Unit().Dot((L1a+L2a).Vect()));
-    double dM_dB = -Mass_P*gamma*gamma/Beta.Mag();
-    double a = (sigma_Beta_Mag/Mass_I)*(Mass_P*dM_dB-E_V_P*dM_dB-Mass_P*dE_dB);
-    double b = (sigma_MET/Mass_I)*(dM_dMET*Mass_P*(Mass_P-E_V_P));
-    double c = (sigma_MET_Perp/Mass_I)*(dM_dMET_Perp*Mass_P*(Mass_P-E_V_P));
+    /*if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return -sqrt(fabs(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V));}
+     else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}*/
+    double Mass_P = Mass_Parents2(MET,(Va+Vb).Vect(),Betaa,Betab);
+    double E_V_P = Energy_Z_Parent(Betaa,Va);
+    double Mass_V = Va.M();
+    if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return 0.;}
+    else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}
+    
+    //return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
+}
+
+
+//only MET should be in the transverse plane for this function call!
+inline double Resolution::Mass_Invisible_Resolution2(TVector3 MET, TLorentzVector Va, TLorentzVector Vb, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Mag, double sigma_MET, double sigma_MET_Perp)
+{
+    TVector3 Zhat(0.0,0.0,1.0);
+    double gamma = 1.0/sqrt(1.0-Betaa.Mag2());
+    double MP = Mass_Parents2(MET,(Va+Vb).Vect(),Betaa,Betab);
+    double E_V_P = Energy_Z_Parent(Betaa,Va);
+    double MI = Mass_Invisible2(MP,E_V_P,Va.M());
+    double a = sigma_Beta_Mag*((MP*gamma*gamma)/(MI*Betaa.Mag()))*(-MP+E_V_P*(1.-Betaa.Mag()));
+    Betaa.SetZ(0.);
+    Betab.SetZ(0.);
+    double den = gamma*Betaa.Mag()*Betaa.Unit().Cross(Betab.Unit()).Dot(Zhat);
+    double b = sigma_MET*((MP-E_V_P)/MI)*(MET.Unit().Cross(Betab.Unit()).Dot(Zhat))/den;
+    double c = sigma_MET_Perp*((MP-E_V_P)/MI)*MET.Unit().Dot(Betab.Unit())/den;
     return sqrt(a*a+b*b+c*c);
 }
+

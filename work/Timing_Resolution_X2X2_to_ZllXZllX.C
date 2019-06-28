@@ -43,17 +43,17 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t start = gSystem->Now();
 
     //setting masses and widths
-    double mX2 = 1000.0;
+    double mX2 = 700.0;
     double mX1 = 500.0;
     double mZ = 91.19;
     double wZ = 2.50;
-    double ctau = 10.;
+    double ctau = 50.;
 
     vector<double> sigmaT;
 
     sigmaT.push_back(30.);
-    sigmaT.push_back(50.);
-    sigmaT.push_back(300.);
+    //sigmaT.push_back(50.);
+    //sigmaT.push_back(300.);
     
     //Number of events
     int Ngen = 100000;
@@ -233,7 +233,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(ToFb, cat_list);
     //histPlot->AddPlot(Db, cat_list);
     //histPlot->AddPlot(betaa, cat_list);
-    histPlot->AddPlot(EZa, cat_list);
+    //histPlot->AddPlot(EZa, cat_list);
     //histPlot->AddPlot(Pull_E_Z, cat_list);
     //histPlot->AddPlot(Pull_E_L, cat_list);
     //histPlot->AddPlot(Pull_D, cat_list);
@@ -245,15 +245,15 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     histPlot->AddPlot(MXa2, cat_list);
     histPlot->AddPlot(MIa2, cat_list);
     //histPlot->AddPlot(Delta_MIa2, cat_list);
-    //histPlot->AddPlot(Pull_MIa2, cat_list);
+    histPlot->AddPlot(Pull_MIa2, cat_list);
     //histPlot->AddPlot(MXa2, MXb2, cat_list);
-    //histPlot->AddPlot(Pull_MXa2, cat_list);
+    histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_MXa2, Pull_MXb2, cat_list);
     //histPlot->AddPlot(Pull_MXa2L, cat_list);
     //histPlot->AddPlot(Pull_MXa2B, cat_list);
     //histPlot->AddPlot(Pull_MXa2D, cat_list);
     //histPlot->AddPlot(Pull_Vis, cat_list);
-    histPlot->AddPlot(CosX2a, cat_list);
+    //histPlot->AddPlot(CosX2a, cat_list);
     //histPlot->AddPlot(CosX2b, cat_list);
     //histPlot->AddPlot(Pull_Beta_Mag, CosX2a, cat_list);
     //histPlot->AddPlot(Pull_MXa2, CosX2a, cat_list);
@@ -398,27 +398,18 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         Vertex Smeared_SVb = PUPPI_Detector.Smear_SV(SVb);
         TVector3 Smeared_vBetaa = PUPPI_Detector.Get_Beta(Smeared_PV,Smeared_SVa);
         TVector3 Smeared_vBetab = PUPPI_Detector.Get_Beta(Smeared_PV,Smeared_SVb);
-        TVector3 Smeared_vBetaaT = Smeared_vBetaa;
-        Smeared_vBetaaT.SetZ(0.0);
-        TVector3 Smeared_vBetabT = Smeared_vBetab;
-        Smeared_vBetabT.SetZ(0.0);
         TLorentzVector L1a_Gent = L1a_Gen.GetFourVector();
         L1a_Gent.SetZ(0.0);
         TLorentzVector L2a_Gent = L2a_Gen.GetFourVector();
         L2a_Gent.SetZ(0.0);
-        TLorentzVector Ia_Gent = Ia;
-        Ia_Gent.SetZ(0.0);
         TLorentzVector L1a_RECOt = PUPPI_Detector.Smear_Muon(L1a_Gent);
         TLorentzVector L2a_RECOt = PUPPI_Detector.Smear_Muon(L2a_Gent);
         TLorentzVector L1b_Gent = L1b_Gen.GetFourVector();
         L1b_Gent.SetZ(0.0);
         TLorentzVector L2b_Gent = L2b_Gen.GetFourVector();
         L2b_Gent.SetZ(0.0);
-        TLorentzVector Ib_Gent = Ib;
-        Ib_Gent.SetZ(0.0);
         TLorentzVector L1b_RECOt = PUPPI_Detector.Smear_Muon(L1b_Gent);
         TLorentzVector L2b_RECOt = PUPPI_Detector.Smear_Muon(L2b_Gent);
-
 
         if(Smeared_vBetaa.Mag() >= 1.)
         {
@@ -431,11 +422,8 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
             continue;
         }
 
-        betaa = vBetaaGen.Mag();
-        betab = vBetabGen.Mag();
-
-        Da = 30.*ToFa*betaa;
-        Db = 30.*ToFb*betab;
+        Da = 30.*ToFa*vBetaaGen.Mag();;
+        Db = 30.*ToFb*vBetabGen.Mag();;
 
         /*
          if(betaa < VelocityUncertainty || betab < VelocityUncertainty) //require significant displacement
@@ -493,7 +481,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         vZaGen.Boost(-vBetaaGen);
 
 
-        Pull_Beta_Mag = (betaa - Smeared_vBetaa.Mag())/Sigma_Beta_Mag;
+        Pull_Beta_Mag = (vBetaaGen.Mag() - Smeared_vBetaa.Mag())/Sigma_Beta_Mag;
 
         Pull_MET = (MET_RECO_PUPPI.Mag()-I.Vect().Mag())/MET_Mag_Resolution;
 
@@ -512,49 +500,40 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         MIa = sqrt(MXa*MXa-2.*MXa*EZa+((L1a_RECO+L2a_RECO).M2()));
         Pull_Mass_Invisible = (MI_Gen-MIa)/Mass_Invisible_Resolution;
 
-        TLorentzVector Va = L1a_RECOt+L2a_RECOt;
-        TLorentzVector Vb = L1b_RECOt+L2b_RECOt;
-
+        
+        
+        TLorentzVector Va = L1a_RECO+L2a_RECO;
+        TLorentzVector Vb = L1b_RECO+L2b_RECO;
+        
         double Sigma_Vis = test_Resolution.Visible_Resolution(L1a_RECOt.Vect(),L2a_RECOt.Vect(),L1b_RECOt.Vect(),L2b_RECOt.Vect(),L1a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1a_Gent),L2a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2a_Gent),L1b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1b_Gent),L2b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2b_Gent));
 
         Pull_Vis = ((L1a_RECOt.Vect()+L2a_RECOt.Vect()+L1b_RECOt.Vect()+L2b_RECOt.Vect()).Mag()-(L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect()).Mag())/Sigma_Vis;
-
-        double f_MET_MAG = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
-        double f_MET_DIR = 0.0; //Because the derivative of the LLP Mass wrt MET is messy, we use this to pass it to LSP Mass
 
         double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
         double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
         MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
         MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
 
-        double MXa2_ResolutionL = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
-        double MXa2_ResolutionB = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,MET_Dir_Resolution,0.,f_MET_MAG,f_MET_DIR);
-        double MXa2_ResolutionD = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,0.,0.,f_MET_MAG,f_MET_DIR);
+        double MXa2_ResolutionL = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,0.);
+        double MXa2_ResolutionB = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,MET_Dir_Resolution,0.);
+        double MXa2_ResolutionD = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,0.,0.);
 
         Pull_MXa2L = (MPa_Gen-MXa2)/MXa2_ResolutionL;
         Pull_MXa2B = (MPa_Gen-MXa2)/MXa2_ResolutionB;
         Pull_MXa2D = (MPa_Gen-MXa2)/MXa2_ResolutionD;
 
-        double MXb2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa,Sigma_Beta_Magb,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
-        double MXa2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,MET_RECO_PUPPI.Cross(Zhat).Unit(),Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis,f_MET_MAG,f_MET_DIR);
+        double MXb2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa,Sigma_Beta_Magb,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
+        double MXa2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
 
         Pull_MXa2 = (MPa_Gen-MXa2)/MXa2_Resolution;
         Pull_MXb2 = (MPb_Gen-MXb2)/MXb2_Resolution;
 
         //Two LLPs
-        MIa2 = test_Resolution.Mass_Invisible2(MXa2,EZa,(L1a_RECO+L2a_RECO).M());
         double MIa2_Gen = test_Resolution.Mass_Invisible2(MPa_Gen,vZaGen.E(),(L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M());
-        double MIa2_Res = test_Resolution.Mass_Invisible_Resolution2(MIa2,MXa2,EZa,Smeared_vBetaa,L1a_RECO,L2a_RECO,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,f_MET_MAG,f_MET_DIR);
+        MIa2 = test_Resolution.Mass_Invisible2(MXa2,EZa,(L1a_RECO+L2a_RECO).M());
+        double MIa2_Res = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution);
         Delta_MIa2 = MIa2-MIa2_Gen;
         Pull_MIa2 = Delta_MIa2/MIa2_Gen;
-
-        /*
-         double Mass_Invisible_Resolution = test_Resolution.Mass_Invisible_Resolution(Smeared_vBetaa,Ia_RECO,L1a_RECO,L2a_RECO,MET_Mag_Resolution,Sigma_Beta_Mag);
-
-         double MI_Gen = sqrt(MXa_Gen*MXa_Gen-2.*MXa_Gen*vZaGen.E()+((L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M2()));
-         MIa = sqrt(MXa*MXa-2.*MXa*EZa+((L1a_RECO+L2a_RECO).M2()));
-         Pull_Mass_Invisible = (MI_Gen-MIa)/Mass_Invisible_Resolution;
-         */
 
         //Angle Analysis
         TLorentzVector PX2a;
@@ -587,9 +566,11 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         X2X2_Frame_X2a_Gen = X2X2_Gen.GetDeltaPhiDecayPlanes(X2a_Gen);
         X2X2_Frame_X2b_Gen = X2X2_Gen.GetDeltaPhiDecayPlanes(X2b_Gen);
         X2a_Frame_X2b_Gen = X2a_Gen.GetDeltaPhiDecayPlanes(X2b_Gen);
-
-        histPlot->Fill(cat_list[m]);
-        acp_events++;
+        if(MIa2 > 0.)
+        {
+           histPlot->Fill(cat_list[m]);
+           acp_events++;
+        }
     }
     LAB_Gen.PrintGeneratorEfficiency();
   }

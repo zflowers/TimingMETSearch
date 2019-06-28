@@ -19,6 +19,27 @@
 #include <numeric>
 #include <algorithm>
 
+double Hist_Mode(const TH1D& hist)
+{
+    return hist.GetXaxis()->GetBinCenter(hist.GetMaximumBin()); //placeholder to be changed
+}
+
+double Hist_FWHM(const TH1D& hist)
+{
+    int left_bin = 0;
+    int right_bin = 0;
+    for(int i = 0; i < hist.GetNbinsX(); i++)
+    {
+        if(hist.GetBinContent(i) > hist.GetMaximum()/2.) left_bin = i;
+    }
+    for(int j = hist.GetNbinsX()-1; j >=0; j--)
+    {
+        if(hist.GetBinContent(j) > hist.GetMaximum()/2.) right_bin = j;
+    }
+    //cout << hist.GetXaxis()->GetBinUpEdge(right_bin)-hist.GetXaxis()->GetBinLowEdge(left_bin) << endl;
+    return hist.GetXaxis()->GetBinUpEdge(right_bin)-hist.GetXaxis()->GetBinLowEdge(left_bin);
+}
+
 double Hist_68_Interval(const TH1F& hist_user)
 {
     TH1F hist = hist_user;
@@ -813,6 +834,21 @@ void Draw_Two_Hists(TH1* hist1, TH1* hist2, TCanvas* canvas)
 }
 
 void Draw_Hists(vector<TH1F*> hists, TCanvas* canvas)
+{
+    canvas->cd();
+    for(int i=0; i<int(hists.size()); i++)
+    {
+        TRandom3 rndm_color;
+        rndm_color.SetSeed(0);
+        Double_t dbl_color_index = rndm_color.Uniform(300.0,1000.0);
+        int color_index = (int)dbl_color_index;
+        hists.at(i)->Draw("SAMES");
+        canvas->Update();
+        hists.at(i)->SetLineColor(color_index);
+    }
+}
+
+void Draw_Hists(vector<TH1D*> hists, TCanvas* canvas)
 {
     canvas->cd();
     for(int i=0; i<int(hists.size()); i++)

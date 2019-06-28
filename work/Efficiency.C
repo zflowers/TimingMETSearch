@@ -54,9 +54,9 @@ void Efficiency(std::string output_name =
     
     vector<double> ctau;
     
-    ctau.push_back(25.);
+    //ctau.push_back(25.);
     ctau.push_back(10.);
-    ctau.push_back(5.);
+    //ctau.push_back(5.);
     
     int Nctau = ctau.size();
     vector<double> sigmaT;
@@ -76,15 +76,20 @@ void Efficiency(std::string output_name =
     int Ngen = 10000;
     
     vector<vector<int>> vect_timing_acp(Nctau, vector<int>(NsigmaT,0));
+    vector<vector<int>> vect_timing_decayangle_acp(Nctau, vector<int>(NsigmaT,0));
     vector<vector<int>> vect_met_acp(Nctau, vector<int>(NsigmaMET,0));
     
     vector<TGraph*> vect_graph_Efficiency_SigmaT;
+    vector<TGraph*> vect_graph_Efficiency_SigmaT_DecayAngle;
     vector<TGraph*> vect_graph_Efficiency_SigmaMET;
     for(int j = 0; j < Nctau; j++)
     {
         TGraph* graph_Efficiency_SigmaT = new TGraph(NsigmaT);
         graph_Efficiency_SigmaT->SetName(("graph_sigmaT"+std::to_string(j)).c_str());
         vect_graph_Efficiency_SigmaT.push_back(graph_Efficiency_SigmaT);
+        TGraph* graph_Efficiency_SigmaT_DecayAngle = new TGraph(NsigmaT);
+        graph_Efficiency_SigmaT_DecayAngle->SetName(("graph_sigmaT_DecayAngle"+std::to_string(j)).c_str());
+        vect_graph_Efficiency_SigmaT_DecayAngle.push_back(graph_Efficiency_SigmaT_DecayAngle);
         TGraph* graph_Efficiency_SigmaMET = new TGraph(NsigmaMET);
         graph_Efficiency_SigmaMET->SetName(("graph_sigmaMET"+std::to_string(j)).c_str());
         vect_graph_Efficiency_SigmaMET.push_back(graph_Efficiency_SigmaMET);
