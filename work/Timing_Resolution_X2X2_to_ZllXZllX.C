@@ -216,11 +216,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& X2X2_Frame_X2b_Gen = histPlot->GetNewVar("X2X2_Frame_X2b_Gen","X2X2_Frame_X2b_Gen",-0.1,6.5,"");
     const HistPlotVar& X2a_Frame_X2b_Gen = histPlot->GetNewVar("X2a_Frame_X2b_Gen","X2a_Frame_X2b_Gen",-0.1,6.5,"");
     const HistPlotVar& tReco_tTrue = histPlot->GetNewVar("tReco_tTrue","#theta^{R}_{X^{0}_{2a}} - #theta^{G}_{X^{0}_{2a}}",-1.,1.,"");
-    //Various Pulls of mass
-    const HistPlotVar& Pull_MXa2L = histPlot->GetNewVar("Pull_MXa2L", "Pull of M(#tilde{#chi}_{2a}^{0})L", -5.0, 5.0, ""); //turn off lepton
-    const HistPlotVar& Pull_MXa2B = histPlot->GetNewVar("Pull_MXa2B", "Pull of M(#tilde{#chi}_{2a}^{0})B", -5.0, 5.0, ""); //turn off beta
-    const HistPlotVar& Pull_MXa2D = histPlot->GetNewVar("Pull_MXa2D", "Pull of M(#tilde{#chi}_{2a}^{0})D", -5.0, 5.0, ""); //turn off MET Direction
-
+    
     //comment in/out whatever plots are interesting
     //histPlot->AddPlot(Pull_Mass_Parent, cat_list); //need ~1 TeV MX2 & ~300 MX1, to look good
     //histPlot->AddPlot(Pull_MET, cat_list);
@@ -249,9 +245,6 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(MXa2, MXb2, cat_list);
     histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_MXa2, Pull_MXb2, cat_list);
-    //histPlot->AddPlot(Pull_MXa2L, cat_list);
-    //histPlot->AddPlot(Pull_MXa2B, cat_list);
-    //histPlot->AddPlot(Pull_MXa2D, cat_list);
     //histPlot->AddPlot(Pull_Vis, cat_list);
     //histPlot->AddPlot(CosX2a, cat_list);
     //histPlot->AddPlot(CosX2b, cat_list);
@@ -422,18 +415,15 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
             continue;
         }
 
-        Da = 30.*ToFa*vBetaaGen.Mag();;
-        Db = 30.*ToFb*vBetabGen.Mag();;
-
-        /*
-         if(betaa < VelocityUncertainty || betab < VelocityUncertainty) //require significant displacement
-         {
-         igen--;
-         continue;
-         }
-         */
-
-
+        Da = 30.*ToFa*vBetaaGen.Mag();
+        Db = 30.*ToFb*vBetabGen.Mag();
+        
+        //require significant displacement in space and time
+        if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance)
+        {
+            igen--;
+            continue;
+        }
 
         TVector3 vPta = (L1a_RECO+L2a_RECO).Vect()+Ia_RECO;
         TVector3 vPtaGen = (L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()+Ia).Vect();
@@ -514,26 +504,11 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
         MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
 
-        double MXa2_ResolutionL = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,0.);
-        double MXa2_ResolutionB = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,MET_Dir_Resolution,0.);
-        double MXa2_ResolutionD = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,0.,MET_Mag_Resolution,0.,0.);
-
-        Pull_MXa2L = (MPa_Gen-MXa2)/MXa2_ResolutionL;
-        Pull_MXa2B = (MPa_Gen-MXa2)/MXa2_ResolutionB;
-        Pull_MXa2D = (MPa_Gen-MXa2)/MXa2_ResolutionD;
-
         double MXb2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa,Sigma_Beta_Magb,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
         double MXa2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
 
         Pull_MXa2 = (MPa_Gen-MXa2)/MXa2_Resolution;
         Pull_MXb2 = (MPb_Gen-MXb2)/MXb2_Resolution;
-
-        //Two LLPs
-        double MIa2_Gen = test_Resolution.Mass_Invisible2(MPa_Gen,vZaGen.E(),(L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M());
-        MIa2 = test_Resolution.Mass_Invisible2(MXa2,EZa,(L1a_RECO+L2a_RECO).M());
-        double MIa2_Res = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution);
-        Delta_MIa2 = MIa2-MIa2_Gen;
-        Pull_MIa2 = Delta_MIa2/MIa2_Gen;
 
         //Angle Analysis
         TLorentzVector PX2a;
@@ -542,7 +517,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
         PX2a.Boost(Smeared_vBetaa);
         PX2b.Boost(Smeared_vBetab);
-
+        
         //RECO Tree
         LAB_Reco.ClearEvent();
         L1a_Reco.SetLabFrameFourVector(L1a_RECO);
@@ -551,9 +526,8 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         L2b_Reco.SetLabFrameFourVector(L2b_RECO);
         X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
         X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
-
         LAB_Reco.AnalyzeEvent();
-
+        
         CosX2a = X2a_Reco.GetCosDecayAngle();
         CosX2b = X2b_Reco.GetCosDecayAngle();
         CosX2a_Gen = X2a_Gen.GetCosDecayAngle();
@@ -562,15 +536,30 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         X2X2_Frame_X2b = X2X2_Reco.GetDeltaPhiDecayPlanes(X2b_Reco);
         X2a_Frame_X2b = X2a_Reco.GetDeltaPhiDecayPlanes(X2b_Reco);
         tReco_tTrue = TMath::ACos(CosX2a) - TMath::ACos(CosX2a_Gen);
-
+        
         X2X2_Frame_X2a_Gen = X2X2_Gen.GetDeltaPhiDecayPlanes(X2a_Gen);
         X2X2_Frame_X2b_Gen = X2X2_Gen.GetDeltaPhiDecayPlanes(X2b_Gen);
         X2a_Frame_X2b_Gen = X2a_Gen.GetDeltaPhiDecayPlanes(X2b_Gen);
-        if(MIa2 > 0.)
+        
+        if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9)
         {
+            igen--;
+            continue;
+        }
+        
+        //Two LLPs
+        double MIa2_Gen = test_Resolution.Mass_Invisible2(MPa_Gen,vZaGen.E(),(L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M());
+        MIa2 = test_Resolution.Mass_Invisible2(MXa2,EZa,(L1a_RECO+L2a_RECO).M());
+        double MIa2_Res = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution);
+        Delta_MIa2 = MIa2-MIa2_Gen;
+        Pull_MIa2 = Delta_MIa2/MIa2_Gen;
+
+
+        //if(MIa2 > 0.)
+        //{
            histPlot->Fill(cat_list[m]);
            acp_events++;
-        }
+        //}
     }
     LAB_Gen.PrintGeneratorEfficiency();
   }

@@ -54,9 +54,9 @@ void Efficiency(std::string output_name =
     
     vector<double> ctau;
     
-    //ctau.push_back(25.);
+    ctau.push_back(25.);
     ctau.push_back(10.);
-    //ctau.push_back(5.);
+    ctau.push_back(5.);
     
     int Nctau = ctau.size();
     vector<double> sigmaT;
@@ -73,15 +73,22 @@ void Efficiency(std::string output_name =
     int NsigmaMET = sigmaMET.size();
     
     //Number of events
-    int Ngen = 10000;
+    int Ngen = 50000;
     
     vector<vector<int>> vect_timing_acp(Nctau, vector<int>(NsigmaT,0));
     vector<vector<int>> vect_timing_decayangle_acp(Nctau, vector<int>(NsigmaT,0));
+    vector<vector<int>> vect_timing_displacement_acp(Nctau, vector<int>(NsigmaT,0));
     vector<vector<int>> vect_met_acp(Nctau, vector<int>(NsigmaMET,0));
+    vector<vector<int>> vect_met_decayangle_acp(Nctau, vector<int>(NsigmaMET,0));
+    vector<vector<int>> vect_met_displacement_acp(Nctau, vector<int>(NsigmaMET,0));
     
     vector<TGraph*> vect_graph_Efficiency_SigmaT;
     vector<TGraph*> vect_graph_Efficiency_SigmaT_DecayAngle;
+    vector<TGraph*> vect_graph_Efficiency_SigmaT_Displacement;
     vector<TGraph*> vect_graph_Efficiency_SigmaMET;
+    vector<TGraph*> vect_graph_Efficiency_SigmaMET_DecayAngle;
+    vector<TGraph*> vect_graph_Efficiency_SigmaMET_Displacement;
+    
     for(int j = 0; j < Nctau; j++)
     {
         TGraph* graph_Efficiency_SigmaT = new TGraph(NsigmaT);
@@ -90,9 +97,18 @@ void Efficiency(std::string output_name =
         TGraph* graph_Efficiency_SigmaT_DecayAngle = new TGraph(NsigmaT);
         graph_Efficiency_SigmaT_DecayAngle->SetName(("graph_sigmaT_DecayAngle"+std::to_string(j)).c_str());
         vect_graph_Efficiency_SigmaT_DecayAngle.push_back(graph_Efficiency_SigmaT_DecayAngle);
+        TGraph* graph_Efficiency_SigmaT_Displacement = new TGraph(NsigmaT);
+        graph_Efficiency_SigmaT_Displacement->SetName(("graph_sigmaT_Displacement"+std::to_string(j)).c_str());
+        vect_graph_Efficiency_SigmaT_Displacement.push_back(graph_Efficiency_SigmaT_Displacement);
         TGraph* graph_Efficiency_SigmaMET = new TGraph(NsigmaMET);
         graph_Efficiency_SigmaMET->SetName(("graph_sigmaMET"+std::to_string(j)).c_str());
         vect_graph_Efficiency_SigmaMET.push_back(graph_Efficiency_SigmaMET);
+        TGraph* graph_Efficiency_SigmaMET_DecayAngle = new TGraph(NsigmaMET);
+        graph_Efficiency_SigmaMET_DecayAngle->SetName(("graph_sigmaMET_DecayAngle"+std::to_string(j)).c_str());
+        vect_graph_Efficiency_SigmaMET_DecayAngle.push_back(graph_Efficiency_SigmaMET_DecayAngle);
+        TGraph* graph_Efficiency_SigmaMET_Displacement = new TGraph(NsigmaT);
+        graph_Efficiency_SigmaMET_Displacement->SetName(("graph_sigmaMET_Displacement"+std::to_string(j)).c_str());
+        vect_graph_Efficiency_SigmaMET_Displacement.push_back(graph_Efficiency_SigmaMET_Displacement);
     }
     
     g_Log << LogInfo << "Initializing generator frames and tree..." << LogEnd;
@@ -345,7 +361,7 @@ void Efficiency(std::string output_name =
                          
                          double CosX2a = X2a_Reco.GetCosDecayAngle();
                          double CosX2b = X2b_Reco.GetCosDecayAngle();
-                         
+                         vect_met_decayangle_acp.at(m).at(h)++;
                          if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9){ continue; }
                          vect_met_acp.at(m).at(h)++;
                      }
@@ -381,7 +397,7 @@ void Efficiency(std::string output_name =
                  
                  double CosX2a = X2a_Reco.GetCosDecayAngle();
                  double CosX2b = X2b_Reco.GetCosDecayAngle();
-                 
+                 vect_timing_decayangle_acp.at(m).at(k)++;
                  if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9){ continue; }
                  vect_timing_acp.at(m).at(k)++;
              }
@@ -389,15 +405,27 @@ void Efficiency(std::string output_name =
     }
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*Nctau*NsigmaT << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
-    for(int j = 0; j < Nctau; j++) { for(int l = 0; l < NsigmaT; l++){ vect_graph_Efficiency_SigmaT.at(j)->SetPoint(l,sigmaT[l],100.*(vect_timing_acp.at(j).at(l))/Ngen); }
-        for(int l = 0; l < NsigmaMET; l++){ vect_graph_Efficiency_SigmaMET.at(j)->SetPoint(l,sigmaMET[l],100.*(vect_met_acp.at(j).at(l))/Ngen); } }
+    for(int j = 0; j < Nctau; j++) {
+    for(int l = 0; l < NsigmaT; l++){
+        vect_graph_Efficiency_SigmaT.at(j)->SetPoint(l,sigmaT[l],100.*(vect_timing_acp.at(j).at(l))/Ngen);
+        vect_graph_Efficiency_SigmaT_DecayAngle.at(j)->SetPoint(l,sigmaT[l],100.*(vect_timing_decayangle_acp.at(j).at(l))/Ngen);
+        vect_graph_Efficiency_SigmaT_Displacement.at(j)->SetPoint(l,sigmaT[l],100.*(vect_timing_displacement_acp.at(j).at(l))/Ngen);
+    }
+    for(int l = 0; l < NsigmaMET; l++){
+        vect_graph_Efficiency_SigmaMET.at(j)->SetPoint(l,sigmaMET[l],100.*(vect_met_acp.at(j).at(l))/Ngen);
+        vect_graph_Efficiency_SigmaMET_DecayAngle.at(j)->SetPoint(l,sigmaMET[l],100.*(vect_met_decayangle_acp.at(j).at(l))/Ngen);
+        vect_graph_Efficiency_SigmaMET_Displacement.at(j)->SetPoint(l,sigmaMET[l],100.*(vect_met_displacement_acp.at(j).at(l))/Ngen);
+    }
+    }
     TFile fout(output_name.c_str(),"RECREATE");
     vector<string> leg_text_Efficiency_SigmaT;
     for(int j = 0; j < Nctau; j++){leg_text_Efficiency_SigmaT.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
     Draw_Graphs(fout, vect_graph_Efficiency_SigmaT, leg_text_Efficiency_SigmaT, "Reconstruction Efficiency [%]", "#sigma_{t} [ps]", "Efficiency_Timing");
+    Draw_Graphs(fout, vect_graph_Efficiency_SigmaT_DecayAngle, leg_text_Efficiency_SigmaT, "Reconstruction Efficiency (Decay Angle) [%]", "#sigma_{t} [ps]", "Efficiency_Timing_DecayAngle");
     vector<string> leg_text_Efficiency_SigmaMET;
     for(int j = 0; j < Nctau; j++){leg_text_Efficiency_SigmaMET.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
     Draw_Graphs(fout, vect_graph_Efficiency_SigmaMET, leg_text_Efficiency_SigmaMET, "Reconstruction Efficiency [%]", "#sigma_{MET} [%]", "Efficiency_MET");
+    Draw_Graphs(fout, vect_graph_Efficiency_SigmaMET_DecayAngle, leg_text_Efficiency_SigmaMET, "Reconstruction Efficiency (Decay Angle) [%]", "#sigma_{MET} [%]", "Efficiency_MET_DecayAngle");
   fout.Close();
   g_Log << LogInfo << "Finished" << LogEnd;
   g_Log << LogInfo << "Time to Process " << Ngen*Nctau << " Events: " << (Long64_t(gSystem->Now())-end)/1000.0 << " seconds" << LogEnd;

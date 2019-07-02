@@ -247,26 +247,28 @@ inline double Resolution::Mass_Parents2_Resolution(TVector3 MET, TVector3 Vis, T
 
 inline double Resolution::Mass_Invisible2(double Mass_P, double E_V_P, double Mass_V)
 {
-    /*if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return -sqrt(fabs(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V));}
-    else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}*/
-    
+    //return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
+    /*
+    if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return -sqrt(fabs(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V));}
+    else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}
+    */
     if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return 0.;}
     else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}
-    
-    //return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
 }
 
 inline double Resolution::Mass_Invisible2(TVector3 MET, TLorentzVector Va, TLorentzVector Vb, TVector3 Betaa, TVector3 Betab)
 {
-    /*if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return -sqrt(fabs(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V));}
-     else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}*/
     double Mass_P = Mass_Parents2(MET,(Va+Vb).Vect(),Betaa,Betab);
     double E_V_P = Energy_Z_Parent(Betaa,Va);
     double Mass_V = Va.M();
+    /*
+    if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return -sqrt(fabs(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V));}
+     else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}
+    */
+    //return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
+    
     if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return 0.;}
     else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}
-    
-    //return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);
 }
 
 
@@ -286,4 +288,3 @@ inline double Resolution::Mass_Invisible_Resolution2(TVector3 MET, TLorentzVecto
     double c = sigma_MET_Perp*((MP-E_V_P)/MI)*MET.Unit().Dot(Betab.Unit())/den;
     return sqrt(a*a+b*b+c*c);
 }
-
