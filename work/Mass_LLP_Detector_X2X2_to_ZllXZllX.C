@@ -43,20 +43,15 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
 
     Long64_t start = gSystem->Now();
     double ctau = 50.0;
-    double mX1 = 300.0;
+    double mX1 = 100.0;
     double mZ = 91.19;
     double wZ = 2.50;
 
-
     vector<double> mX2;
-    //mX2.push_back(100.);
-    //mX2.push_back(200.);
-    mX2.push_back(300.);
-    mX2.push_back(500.);
-		mX2.push_back(700.);
-		mX2.push_back(1000.);
-
-
+    mX2.push_back(200.);
+    mX2.push_back(400.);
+    mX2.push_back(600.);
+    
     int NmX2 = mX2.size();
 
     //Number of events
@@ -78,18 +73,18 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     InvisibleGenFrame X1a_Gen("X1a_Gen","#tilde{#chi}^{ 0}_{1 a}");
     InvisibleGenFrame X1b_Gen("X1b_Gen","#tilde{#chi}^{ 0}_{1 b}");
 
-		LabRecoFrame LAB_Reco("LAB_Reco","LAB");
-		DecayRecoFrame     X2X2_Reco("X2X2_Reco","#tilde{#chi}^{ 0}_{2} #tilde{#chi}^{ 0}_{2}");
-		DecayRecoFrame     X2a_Reco("X2a_Reco","#tilde{#chi}^{ 0}_{2 a}");
-		DecayRecoFrame     X2b_Reco("X2b_Reco","#tilde{#chi}^{ 0}_{2 b}");
-		DecayRecoFrame Za_Reco("Za_Reco","Z_{a}");
-		DecayRecoFrame Zb_Reco("Zb_Reco","Z_{b}");
-		VisibleRecoFrame   L1a_Reco("L1a_Reco","#it{l}_{1a}");
-		VisibleRecoFrame   L2a_Reco("L2a_Reco","#it{l}_{2a}");
-		VisibleRecoFrame   L1b_Reco("L1b_Reco","#it{l}_{1b}");
-		VisibleRecoFrame   L2b_Reco("L2b_Reco","#it{l}_{2b}");
-		VisibleRecoFrame X1a_Reco("X1a_Reco","#tilde{#chi}^{ 0}_{1 a}");
-		VisibleRecoFrame X1b_Reco("X1b_Reco","#tilde{#chi}^{ 0}_{1 b}");
+    LabRecoFrame LAB_Reco("LAB_Reco","LAB");
+    DecayRecoFrame     X2X2_Reco("X2X2_Reco","#tilde{#chi}^{ 0}_{2} #tilde{#chi}^{ 0}_{2}");
+    DecayRecoFrame     X2a_Reco("X2a_Reco","#tilde{#chi}^{ 0}_{2 a}");
+    DecayRecoFrame     X2b_Reco("X2b_Reco","#tilde{#chi}^{ 0}_{2 b}");
+    DecayRecoFrame Za_Reco("Za_Reco","Z_{a}");
+    DecayRecoFrame Zb_Reco("Zb_Reco","Z_{b}");
+    VisibleRecoFrame   L1a_Reco("L1a_Reco","#it{l}_{1a}");
+    VisibleRecoFrame   L2a_Reco("L2a_Reco","#it{l}_{2a}");
+    VisibleRecoFrame   L1b_Reco("L1b_Reco","#it{l}_{1b}");
+    VisibleRecoFrame   L2b_Reco("L2b_Reco","#it{l}_{2b}");
+    VisibleRecoFrame X1a_Reco("X1a_Reco","#tilde{#chi}^{ 0}_{1 a}");
+    VisibleRecoFrame X1b_Reco("X1b_Reco","#tilde{#chi}^{ 0}_{1 b}");
 
     //
     LAB_Gen.SetChildFrame(X2X2_Gen);
@@ -121,12 +116,10 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         g_Log << LogInfo << "...Successfully initialized generator tree" << LogEnd;
     else
         g_Log << LogError << "...Failed initializing generator tree" << LogEnd;
-
-
-		if(LAB_Reco.InitializeTree())
-				g_Log << LogInfo << "...Successfully initialized reconstructed tree" << LogEnd;
-		else
-				g_Log << LogError << "...Failed initializing reconstructed tree" << LogEnd;
+    if(LAB_Reco.InitializeTree())
+        g_Log << LogInfo << "...Successfully initialized reconstructed tree" << LogEnd;
+    else
+        g_Log << LogError << "...Failed initializing reconstructed tree" << LogEnd;
 
   //-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//-//
 
@@ -139,12 +132,11 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
   Zb_Gen.SetMass(mZ);
   Zb_Gen.SetWidth(wZ);
 
-  /*
   L1a_Gen.SetPtCut(10.);        L1a_Gen.SetEtaCut(2.5);
   L2a_Gen.SetPtCut(10.);        L2a_Gen.SetEtaCut(2.5);
   L1b_Gen.SetPtCut(10.);        L1b_Gen.SetEtaCut(2.5);
   L2b_Gen.SetPtCut(10.);        L2b_Gen.SetEtaCut(2.5);
-  */
+  
   if(LAB_Gen.InitializeAnalysis())
     g_Log << LogInfo << "...Successfully initialized generator analysis" << LogEnd;
   else
@@ -173,107 +165,14 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
 
         cat_list += histPlot->GetNewCategory(scat, std::string(smX2));
     }
-    //setting up all the variables that could be potentially plotted
-    const HistPlotVar& Pull_Mass_Parent = histPlot->GetNewVar("Pull_Mass_Parent","Pull of M(#tilde{#chi}_{2a}^{0})",-5.0,5.0,"");
-    //const HistPlotVar& Mass_Parent_Resolution = histPlot->GetNewVar("Resolution_of_Parent_Mass","M(#tilde{#chi}_{2a}^{0})",-200.0,200.0,"[GeV]");
-    const HistPlotVar& MassReco_MassGen = histPlot->GetNewVar("RecoMass_GenMass","#Delta M(#tilde{#chi}_{2a}^{0})",-100.0,100.0,"[GeV]");
-    const HistPlotVar& Pull_E_Z = histPlot->GetNewVar("Pull_E_Z","Pull of #delta E_{Za}^{#tilde{#chi}_{2a}^{0}}",-5.0,5.0,"");
-    const HistPlotVar& Pull_E_L = histPlot->GetNewVar("Pull_E_L","Pull of #delta E_{L1a}",-5.0,5.0,"");
-    const HistPlotVar& Pull_D = histPlot->GetNewVar("Pull_D","Pull of Distance",-5.0,5.0,"");
-    const HistPlotVar& Pull_T = histPlot->GetNewVar("Pull_T","Pull of Time",-5.0,5.0,"");
-    const HistPlotVar& Pull_Beta_Mag = histPlot->GetNewVar("Pull_Beta_Mag","Pull of |#vec{#Beta}|",-5.0,5.0,"");
-    const HistPlotVar& MuonResolution = histPlot->GetNewVar("MuonResolution","MuonResolutions",-1.0,1.0,"");
-    const HistPlotVar& Ereco_Egen = histPlot->GetNewVar("Ereco_Egen","#Delta E",-50.0,50.0,"[GeV]");
-    const HistPlotVar& E_Z_Parent_Resolution = histPlot->GetNewVar("E_Z_Parent_Resolution","E_{Za}^{#tilde{#chi}_{2a}^{0}}",-200.0,200.0,"[GeV]");
-    const HistPlotVar& CosA = histPlot->GetNewVar("CosA","Cos(#theta)",-1.0,1.1,"[Radians]");
-    const HistPlotVar& ThetaA = histPlot->GetNewVar("ThetaA","#theta",-5.0,5.0,"[Radians]"); //some angle, see below
-    const HistPlotVar& Pull_MET = histPlot->GetNewVar("Pull MET","Pull of MET",-5.0,5.0,"[GeV]");
-    const HistPlotVar& DCosA = histPlot->GetNewVar("DCosA","#Delta Cos(#theta)",-0.002,0.002,"[Radians]");
-    const HistPlotVar& Pull_Cos = histPlot->GetNewVar("Pull_Cos","Pull of Cos(#theta)",-5.0,5.0,"");
-    const HistPlotVar& DElA = histPlot->GetNewVar("DElA","#Delta E_{Lepton}",-25.0,25.0,"[GeV]");
-    const HistPlotVar& DBetaA = histPlot->GetNewVar("DBetaA","#Delta #Beta",-0.5,0.5,"[#mu m/pico s]");
-
-    const HistPlotVar& ToFaL = histPlot->GetNewVar("ToFaL", "log_{10} ToF(#tilde{#chi}_{2}^{0})", -3.5, 2.5, "[ns]");
-    const HistPlotVar& ToFbL = histPlot->GetNewVar("ToFbL", "log_{10} ToF(#tilde{#chi}_{2}^{0})", -3.5, 2.5, "[ns]");
-    const HistPlotVar& DaL = histPlot->GetNewVar("DaL", "log_{10} D(#tilde{#chi}_{2}^{0})", -2.5, 4.5, "[cm]");
-    const HistPlotVar& DbL = histPlot->GetNewVar("DbL", "log_{10} D(#tilde{#chi}_{2}^{0})", -2.5, 4.5, "[cm]");
-    const HistPlotVar& ToFa = histPlot->GetNewVar("ToFa","ToF(#tilde{#chi}_{2}^{0})",0.0,30.0,"[ns]");
-    const HistPlotVar& ToFb = histPlot->GetNewVar("ToFb","ToF(#tilde{#chi}_{2}^{0})",0.0,30.0,"[ns]");
-    const HistPlotVar& Da = histPlot->GetNewVar("Da", "D(#tilde{#chi}_{2}^{0})", 0.0, 0.05, "[cm]");
-    const HistPlotVar& Db = histPlot->GetNewVar("Db", "D(#tilde{#chi}_{2}^{0})", -15.0, 15.0, "[cm]");
-    const HistPlotVar& betaa = histPlot->GetNewVar("betaa", "#beta(#tilde{#chi}_{2}^{0})", 0., 1.);
-    const HistPlotVar& betab = histPlot->GetNewVar("betab", "#beta(#tilde{#chi}_{2}^{0})", 0., 1.);
-    const HistPlotVar& dbeta = histPlot->GetNewVar("dbeta", "(#vec{#beta}^{reco} - #vec{#beta}^{gen}) #bullet #hat{#beta}^{gen}/[1 - #vec{#beta}^{reco}#bullet#vec{#beta}^{gen}]", -1., 1.);
-    const HistPlotVar& EZa = histPlot->GetNewVar("EZa", "E_{Za}^{#tilde{#chi}_{2a}^{0}}", 0., 800., "[GeV]");
-    const HistPlotVar& Pull_vPta = histPlot->GetNewVar("Pull_vPta","Pull of #delta vPta",-5.0,5.0,"");
-    const HistPlotVar& Pull_Mass_Invisible = histPlot->GetNewVar("Pull_Mass_Inv","Pull of M(#tilde{#chi}_{1a}^{0})",-5.0,5.0,"");
-    const HistPlotVar& Mreco_Mgen = histPlot->GetNewVar("Mreco_Mgen","#Delta M(#tilde{#chi}_{1a}^{0})",-300.0,300.0,"[GeV]");
-    const HistPlotVar& Mass_Invisible_Resolution = histPlot->GetNewVar("Mass_Invisible_Resolution","Invisible Mass Resolution",290.0,310.0,"[GeV]");
-    const HistPlotVar& MIa = histPlot->GetNewVar("MIa", "M(#tilde{#chi}_{1a}^{0})", 0., 500., "[GeV]");
+    
     const HistPlotVar& Pull_MXa2 = histPlot->GetNewVar("Pull_MXa2", "Pull of M(#tilde{#chi}_{2a}^{0})", -5.0, 5.0, "");
-    const HistPlotVar& Pull_Par = histPlot->GetNewVar("Pull_Par", "Pull of n_{||}", -5.0, 5.0, "");
-    const HistPlotVar& Par = histPlot->GetNewVar("Par","n_{||}",0.0,500.0);
-
-    const HistPlotVar& EZb = histPlot->GetNewVar("EZb", "E_{Zb}^{#tilde{#chi}_{2b}^{0}}", 0., 800., "[GeV]");
-    const HistPlotVar& MXa = histPlot->GetNewVar("MXa", "M(#tilde{#chi}_{2a}^{0})", 0., 1800., "[GeV]");
+    const HistPlotVar& EZa = histPlot->GetNewVar("EZa", "E_{Za}^{#tilde{#chi}_{2a}^{0}}", 0., 800., "[GeV]");
     const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 1800., "[GeV]");
     const HistPlotVar& MXb2 = histPlot->GetNewVar("MXb2", "M(#tilde{#chi}_{2b}^{0})", 0., 1800., "[GeV]");
     const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", 0., 1000., "[GeV]");
-    const HistPlotVar& RMIXa2 = histPlot->GetNewVar("RMIXa2", "M(#tilde{#chi}_{1a}^{0})/M(#tilde{#chi}_{2a}^{0})", 0., 1.2);
-    const HistPlotVar& MXa3 = histPlot->GetNewVar("MXa3", "M(#tilde{#chi}_{2a}^{0})", 0., 2000., "[GeV]");
-    const HistPlotVar& MIa3 = histPlot->GetNewVar("MIa3", "M(#tilde{#chi}_{1a}^{0})", 0., 1800., "[GeV]");
-    const HistPlotVar& MXb3 = histPlot->GetNewVar("MXb3", "M(#tilde{#chi}_{2b}^{0})", 0., 2000., "[GeV]");
-    const HistPlotVar& MIb3 = histPlot->GetNewVar("MIb3", "M(#tilde{#chi}_{1b}^{0})", 0., 1800., "[GeV]");
-
-    //comment in/out whatever plots are interesting
-    //histPlot->AddPlot(MassReco_MassGen, cat_list);
-    //histPlot->AddPlot(Pull_Mass_Parent, cat_list);
-    //histPlot->AddPlot(Ereco_Egen, cat_list);
-    //histPlot->AddPlot(E_Z_Parent_Resolution, cat_list);
-    //histPlot->AddPlot(DElA, cat_list);
-    //histPlot->AddPlot(CosA, cat_list);
-    //histPlot->AddPlot(DCosA, cat_list);
-    //histPlot->AddPlot(Pull_Cos, cat_list);
-    //histPlot->AddPlot(ThetaA, cat_list);
-    //histPlot->AddPlot(Pull_MET, cat_list);
-    //histPlot->AddPlot(DBetaA, cat_list);
-    //histPlot->AddPlot(ToFaL, cat_list);
-    //histPlot->AddPlot(DaL, cat_list);
-    //histPlot->AddPlot(ToFbL, cat_list);
-    //histPlot->AddPlot(DbL, cat_list);
-    //histPlot->AddPlot(ToFa, cat_list);
-    //histPlot->AddPlot(Da, cat_list);
-    //histPlot->AddPlot(ToFb, cat_list);
-    //histPlot->AddPlot(Db, cat_list);
-    //histPlot->AddPlot(betaa, cat_list);
-    //histPlot->AddPlot(dbeta, cat_list);
-    //histPlot->AddPlot(EZa, cat_list);
-    //histPlot->AddPlot(EZb, cat_list);
-    //histPlot->AddPlot(MXa, cat_list);
-    //histPlot->AddPlot(EZa, EZb, cat_list);
-    //histPlot->AddPlot(MXa2, cat_list);
-    //histPlot->AddPlot(MIa2, cat_list);
-    //histPlot->AddPlot(RMIXa2, cat_list);
-    //histPlot->AddPlot(MXa3, cat_list);
-    //histPlot->AddPlot(MIa3, cat_list);
-    //histPlot->AddPlot(MXa3, MIa3, cat_list);
-    //histPlot->AddPlot(MXa3, MXb3, cat_list);
-    //histPlot->AddPlot(MIa3, MIb3, cat_list);
-    //histPlot->AddPlot(Pull_E_Z, cat_list);
-    //histPlot->AddPlot(MuonResolution, cat_list);
-    //histPlot->AddPlot(Pull_E_L, cat_list);
-    //histPlot->AddPlot(Pull_D, cat_list);
-    //histPlot->AddPlot(Pull_T, cat_list);
-    //histPlot->AddPlot(Pull_Beta_Mag, cat_list);
-    //histPlot->AddPlot(Pull_vPta, cat_list);
-    //histPlot->AddPlot(Pull_Mass_Invisible, cat_list);
-    //histPlot->AddPlot(Mreco_Mgen, cat_list);
-    //histPlot->AddPlot(Mass_Invisible_Resolution, cat_list);
-    //histPlot->AddPlot(MIa, cat_list);
-    //histPlot->AddPlot(MXa2, cat_list);
+    
     histPlot->AddPlot(Pull_MXa2, cat_list);
-    //histPlot->AddPlot(Pull_Par, cat_list);
-    //histPlot->AddPlot(Par, cat_list);
 
     //build the detector
     Detector PUPPI_Detector;
@@ -291,7 +190,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     Resolution test_Resolution(PUPPI_Detector); //seting up the Resolution "calculator"
     double LAB_Pt;
     double LAB_eta;
-		double LAB_M;
+    double LAB_M;
 
     //relative uncertainty on the distance between PV and SV
     double sigmaDistance = sqrt((PUPPI_Detector.Get_sigmaPV()*PUPPI_Detector.Get_sigmaPV()+PUPPI_Detector.Get_sigmaSV()*PUPPI_Detector.Get_sigmaSV()));
@@ -301,18 +200,15 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     int acp_events = 0;
 
   for(int m = 0; m < NmX2; m++){
-		TFile* file = new TFile("PTEta.root","READ");
-
-		string PTEta_histname = "hist_PTvsEtavsMass_";
-		int hist_mX2 = mX2[m];
-		PTEta_histname += std::to_string(hist_mX2);
-
-		//TH2* hist = (TH2*)file->Get("hist_PTvsEta_1000");
-		TH3* hist = (TH3*)file->Get(PTEta_histname.c_str());
-		Physics physics;
-		physics.SetEtaPtMCM(*hist);
-		file->Close();
-		delete file;
+    TFile* file = new TFile("PTEta.root","READ");
+    string PTEta_histname = "hist_PTvsEtavsMass_";
+    int hist_mX2 = mX2[m];
+    PTEta_histname += std::to_string(hist_mX2);
+    TH3* hist = (TH3*)file->Get(PTEta_histname.c_str());
+    Physics physics;
+    physics.SetEtaPtMCM(*hist);
+    file->Close();
+    delete file;
 
     g_Log << LogInfo << "Generating events for ";
     g_Log << "mX2 = " << mX2[m] << " , ";
@@ -344,12 +240,11 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         TLorentzVector I   = Ia+Ib;
         I.SetZ(0.0);
 
-
-				double MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
-				double MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
+        double MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
+        double MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
 
         //The smearing begins
-				TVector3 I_Vect = I.Vect();
+        TVector3 I_Vect = I.Vect();
         TVector3 MET_RECO_PUPPI = PUPPI_Detector.Smear_MET(I.Vect());
         MET_RECO_PUPPI.SetZ(0.0);
         TVector3 Ia_RECO = PUPPI_Detector.Smear_MET(Ia.Vect());
@@ -366,8 +261,8 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
 
         ToFa = physics.Get_ToF(ctau, Pa);
         ToFb = physics.Get_ToF(ctau, Pb);
-				double Smeared_ToFa = PUPPI_Detector.Smear_ToF(ToFa);
-				double Smeared_ToFb = PUPPI_Detector.Smear_ToF(ToFb);
+        double Smeared_ToFa = PUPPI_Detector.Smear_ToF(ToFa);
+        double Smeared_ToFb = PUPPI_Detector.Smear_ToF(ToFb);
         Vertex SVa = physics.Get_SV(ToFa,Pa);
         Vertex SVb = physics.Get_SV(ToFb,Pb);
         Vertex Smeared_PV = PUPPI_Detector.Smear_PV(PV);
@@ -392,8 +287,6 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         Ib_Gent.SetZ(0.0);
         TLorentzVector L1b_RECOt = PUPPI_Detector.Smear_Muon(L1b_Gent);
         TLorentzVector L2b_RECOt = PUPPI_Detector.Smear_Muon(L2b_Gent);
-
-
         if(Smeared_vBetaa.Mag() >= 1.)
         {
             igen--;
@@ -404,46 +297,29 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
             igen--;
             continue;
         }
-
-
-				double Da = 30.*Smeared_ToFa*Smeared_vBetaa.Mag();
-				double Db = 30.*Smeared_ToFb*Smeared_vBetab.Mag();
-
-				if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance) //require significant displacement in space and time
-				{
-						igen--;
-						continue;
-				}
-
+        double Da = 30.*Smeared_ToFa*Smeared_vBetaa.Mag();
+        double Db = 30.*Smeared_ToFb*Smeared_vBetab.Mag();
+        if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance) //require significant displacement in space and time
+        {
+            igen--;
+            continue;
+        }
         double Sigma_Beta_Mag = sqrt((1.0/(Smeared_ToFa*Smeared_ToFa))*(sigmaDistance*sigmaDistance+2.*Smeared_vBetaa.Mag()*Smeared_vBetaa.Mag()*PUPPI_Detector.Get_sigmaT()*PUPPI_Detector.Get_sigmaT()));
-
         TLorentzVector vZa = L1a_RECO + L2a_RECO;
         vZa.Boost(-Smeared_vBetaa);
-        TLorentzVector vZb = L1b_RECO + L2b_RECO;
-        vZb.Boost(-Smeared_vBetab);
-
         EZa = vZa.E();
         TLorentzVector vZaGen = L1a_Gen.GetFourVector() + L2a_Gen.GetFourVector();
         vZaGen.Boost(-vBetaaGen);
-
-
-
         TLorentzVector Va = L1a_RECO+L2a_RECO;
         TLorentzVector Vb = L1b_RECO+L2b_RECO;
-
-
-				double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
+        double MPa_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetaaGen,vBetabGen);
         double MPb_Gen = test_Resolution.Mass_Parents2(I_Vect,L1a_Gent.Vect()+L2a_Gent.Vect()+L1b_Gent.Vect()+L2b_Gent.Vect(),vBetabGen,vBetaaGen);
         MXa2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab);
         MXb2 = test_Resolution.Mass_Parents2(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetab,Smeared_vBetaa);
-
-
-				double Sigma_Vis = test_Resolution.Visible_Resolution(L1a_RECOt.Vect(),L2a_RECOt.Vect(),L1b_RECOt.Vect(),L2b_RECOt.Vect(),L1a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1a_Gent),L2a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2a_Gent),L1b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1b_Gent),L2b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2b_Gent));
-
-
-
+        double Sigma_Vis = test_Resolution.Visible_Resolution(L1a_RECOt.Vect(),L2a_RECOt.Vect(),L1b_RECOt.Vect(),L2b_RECOt.Vect(),L1a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1a_Gent),L2a_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2a_Gent),L1b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L1b_Gent),L2b_RECOt.Pt()*PUPPI_Detector.GetMuonResolution(L2b_Gent));
         Pull_MXa2 = (MPa_Gen-MXa2)/test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect() + Vb.Vect(), Smeared_vBetaa,
 				Smeared_vBetab, Sigma_Beta_Mag, MET_Mag_Resolution, MET_Dir_Resolution, Sigma_Vis);
+        
         histPlot->Fill(cat_list[m]);
         acp_events++;
     }
