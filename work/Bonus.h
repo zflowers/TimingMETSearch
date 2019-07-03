@@ -30,14 +30,14 @@ double Hist_FWHM(const TH1D& hist)
     int right_bin = 0;
     for(int i = 0; i < hist.GetNbinsX(); i++)
     {
-        if(hist.GetBinContent(i) > hist.GetMaximum()/2.) left_bin = i;
+        if(hist.GetBinContent(i) > hist.GetBinContent(hist.GetMaximumBin())/2.) left_bin = i;
     }
     for(int j = hist.GetNbinsX()-1; j >=0; j--)
     {
-        if(hist.GetBinContent(j) > hist.GetMaximum()/2.) right_bin = j;
+        if(hist.GetBinContent(j) > hist.GetBinContent(hist.GetMaximumBin())/2.) right_bin = j;
     }
-    //cout << hist.GetXaxis()->GetBinUpEdge(right_bin)-hist.GetXaxis()->GetBinLowEdge(left_bin) << endl;
-    return hist.GetXaxis()->GetBinUpEdge(right_bin)-hist.GetXaxis()->GetBinLowEdge(left_bin);
+    //cout << fabs(hist.GetXaxis()->GetBinUpEdge(right_bin)-hist.GetXaxis()->GetBinLowEdge(left_bin)) << endl;
+    return fabs(hist.GetXaxis()->GetBinUpEdge(right_bin)-hist.GetXaxis()->GetBinLowEdge(left_bin));
 }
 
 double Hist_68_Interval(const TH1F& hist_user)
