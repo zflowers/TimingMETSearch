@@ -259,8 +259,8 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         TVector3 vBetaaGen = Pa.BoostVector();
         TVector3 vBetabGen = Pb.BoostVector();
 
-        ToFa = physics.Get_ToF(ctau, Pa);
-        ToFb = physics.Get_ToF(ctau, Pb);
+        double ToFa = physics.Get_ToF(ctau, Pa);
+        double ToFb = physics.Get_ToF(ctau, Pb);
         double Smeared_ToFa = PUPPI_Detector.Smear_ToF(ToFa);
         double Smeared_ToFb = PUPPI_Detector.Smear_ToF(ToFb);
         Vertex SVa = physics.Get_SV(ToFa,Pa);
