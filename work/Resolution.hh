@@ -271,7 +271,6 @@ inline double Resolution::Mass_Invisible2(TVector3 MET, TLorentzVector Va, TLore
     else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}
 }
 
-
 //only MET should be in the transverse plane for this function call!
 inline double Resolution::Mass_Invisible_Resolution2(TVector3 MET, TLorentzVector Va, TLorentzVector Vb, TVector3 Betaa, TVector3 Betab, double sigma_Beta_Mag, double sigma_MET, double sigma_MET_Perp)
 {

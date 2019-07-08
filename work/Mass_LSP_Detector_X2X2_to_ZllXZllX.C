@@ -56,7 +56,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     vector<double> sigmaT;
     vector<double> sigmaMET;
     
-    for(double i = 10.; i <= 350.; i+=10.)
+    for(double i = 10.; i <= 350.; i+=1.)
     {
         sigmaMET.push_back(i);
         sigmaT.push_back(i);
@@ -723,7 +723,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     if(timing_flag){
     for(int i = 0; i<NmX1; i++)
     {
-        g_Log << LogInfo << "Computing Points For timing and MLSP = " << mX1[i] << LogEnd;
+    g_Log << LogInfo << "Computing Points For timing and MLSP = " << mX1[i] << LogEnd;
     for(int j = 0; j<NsigmaT; j++)
     {
         vect_graph_Sigma_MX2_SigmaT.at(i)->SetPoint(j,sigmaT[j],Hist_Mode(*vect_hist_Sigma_MX2_SigmaT.at(i).at(j)));
@@ -757,7 +757,6 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     }
     vector<string> leg_text_Sigma_MX2_SigmaT;
     for(int j = 0; j < NmX1; j++){leg_text_Sigma_MX2_SigmaT.push_back("#tilde{#chi}^{ 0}_{1} "+std::to_string(int(mX1.at(j))));}
-    Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_timing_mX1");
     Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "MLSP_timing_mX1");
     }
     if(MET_flag){
@@ -795,9 +794,9 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
             delete vect_hist_Sigma_MX1_Timing_Measured_SigmaMET.at(i).at(j);
         }
         }
-        vector<string> leg_text_Sigma_MX2_SigmaMET;
-        for(int j = 0; j < NmX1; j++){leg_text_Sigma_MX2_SigmaMET.push_back("#tilde{#chi}^{0}_{1} "+std::to_string(int(mX1.at(j))));}
-        Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_met_mX1");
+        vector<string> leg_text_Sigma_MX1_SigmaMET;
+        for(int j = 0; j < NmX1; j++){leg_text_Sigma_MX1_SigmaMET.push_back("#tilde{#chi}^{0}_{1} "+std::to_string(int(mX1.at(j))));}
+        Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaMET_Measured, leg_text_Sigma_MX1_SigmaMET, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{MET} [%]", "MLSP_met_mX1");
     }
   fout.Close();
   histPlot->WriteOutput(output_name);
