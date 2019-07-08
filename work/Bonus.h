@@ -196,6 +196,61 @@ void CreatePalette()
     gStyle->SetPalette(28,MyPalette);
 }
 
+void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>& leg_text, const string& YaxisText, const string& XaxisText, const string& plotName)
+{
+    bool opt_title = false;
+    if(!(fout.IsOpen())) {cout << "Output File Not Open..." << endl;}
+    TLegend* leg = new TLegend(0.15,0.6,0.403,0.91);
+    vector<TLegendEntry*> vect_leg_entry;
+    {for(int i = 0; i<int(leg_text.size()); i++) { TLegendEntry* leg_entry = leg->AddEntry(vect_graph.at(i),leg_text.at(i).c_str(),"P"); }}
+    
+    TCanvas* canvas_graph = new TCanvas(("canvas_graph"+plotName).c_str(),"canvas_graph",750,500);
+    canvas_graph->SetGridx();
+    canvas_graph->SetGridy();
+    canvas_graph->cd();
+    
+    TMultiGraph* mg = new TMultiGraph();
+    string title = vect_graph.at(0)->GetTitle();
+    title += (";"+XaxisText+";"+YaxisText);
+    if((strcmp((vect_graph.at(0)->GetTitle()),"Graph")))
+    {
+        //mg->Get
+        gStyle->SetOptTitle(1);
+        opt_title = true;
+    }
+    mg->SetTitle(title.c_str());
+    for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph.at(i)); }
+    vect_graph[0]->SetMarkerStyle(22);
+    vect_graph[0]->SetMarkerColor(kBlue);
+    if(vect_graph.size() > 1){
+        vect_graph[1]->SetMarkerStyle(22);
+        vect_graph[1]->SetMarkerColor(kRed);}
+    if(vect_graph.size() > 2){
+        vect_graph[2]->SetMarkerStyle(22);
+        vect_graph[2]->SetMarkerColor(kGreen+2);}
+    if(vect_graph.size() == 4){
+        vect_graph[3]->SetMarkerStyle(22);
+        vect_graph[3]->SetMarkerColor(kMagenta);}
+    if(vect_graph.size() == 6){
+        vect_graph[3]->SetMarkerStyle(32);
+        vect_graph[3]->SetMarkerColor(kBlue);
+        vect_graph[4]->SetMarkerStyle(32);
+        vect_graph[4]->SetMarkerColor(kRed);
+        vect_graph[5]->SetMarkerStyle(32);
+        vect_graph[5]->SetMarkerColor(kGreen+2);}
+    mg->Draw("AP");
+    mg->GetYaxis()->SetTitleOffset(1.05);
+    mg->GetXaxis()->SetTitleOffset(1.05);
+    mg->GetYaxis()->SetTitleSize(.04);
+    mg->GetXaxis()->SetTitleSize(.04);
+    mg->GetYaxis()->SetLabelSize(.04);
+    mg->GetXaxis()->SetLabelSize(.04);
+    leg->Draw("SAMES");
+    canvas_graph->SaveAs((plotName+".pdf").c_str());
+    canvas_graph->Write();
+    //if(opt_title) { gStyle->SetOptTitle(0); }
+}
+
 void setMyStyle()
 {
     CreatePalette();

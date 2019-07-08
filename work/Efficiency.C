@@ -47,8 +47,8 @@ void Efficiency(std::string output_name =
     Long64_t end = 0.;
     
     //setting masses and widths
-    double mX2 = 1000.0;
-    double mX1 = 500.0;
+    double mX2 = 500.0;
+    double mX1 = 200.0;
     double mZ = 91.19;
     double wZ = 2.50;
     
@@ -73,44 +73,34 @@ void Efficiency(std::string output_name =
     int NsigmaMET = sigmaMET.size();
     
     //Number of events
-    int Ngen = 1000;
+    int Ngen = 5000;
     
-    bool met_flag = true;
+    bool met_flag = false;
     
-    vector<vector<int>> vect_all(Nctau, vector<int>(NsigmaT,0));
-    vector<vector<int>> vect_beta(Nctau, vector<int>(NsigmaT,0));
-    vector<vector<int>> vect_distance_displacement(Nctau, vector<int>(NsigmaT,0));
-    vector<vector<int>> vect_timing_displacement(Nctau, vector<int>(NsigmaT,0));
-    vector<vector<int>> vect_timing_decayangle(Nctau, vector<int>(NsigmaT,0));
-    vector<vector<int>> vect_met_decayangle(Nctau, vector<int>(NsigmaMET,0));
+    vector<vector<int>> vect_timing_2displacement(Nctau, vector<int>(NsigmaT,0));
+    vector<vector<int>> vect_timing_3displacement(Nctau, vector<int>(NsigmaT,0));
+    vector<vector<int>> vect_timing_2displacement_decayangle(Nctau, vector<int>(NsigmaT,0));
+    vector<vector<int>> vect_timing_3displacement_decayangle(Nctau, vector<int>(NsigmaT,0));
     
-    vector<TGraph*> vect_graph_Efficiency_All;
-    vector<TGraph*> vect_graph_Efficiency_Beta;
-    vector<TGraph*> vect_graph_Efficiency_Distance_Displacement;
-    vector<TGraph*> vect_graph_Efficiency_Timing_Displacement;
-    vector<TGraph*> vect_graph_Efficiency_Timing_DecayAngle;
-    vector<TGraph*> vect_graph_Efficiency_MET_DecayAngle;
+    vector<TGraph*> vect_graph_timing_2displacement;
+    vector<TGraph*> vect_graph_timing_3displacement;
+    vector<TGraph*> vect_graph_timing_2displacement_decayangle;
+    vector<TGraph*> vect_graph_timing_3displacement_decayangle;
     
     for(int j = 0; j < Nctau; j++)
     {
-        TGraph* graph_Efficiency_All = new TGraph(NsigmaT);
-        graph_Efficiency_All->SetName(("graph_All"+std::to_string(j)).c_str());
-        vect_graph_Efficiency_All.push_back(graph_Efficiency_All);
-        TGraph* graph_Efficiency_Beta = new TGraph(NsigmaT);
-        graph_Efficiency_Beta->SetName(("graph_Beta"+std::to_string(j)).c_str());
-        vect_graph_Efficiency_Beta.push_back(graph_Efficiency_Beta);
-        TGraph* graph_Efficiency_Distance_Displacement = new TGraph(NsigmaT);
-        graph_Efficiency_Distance_Displacement->SetName(("graph_Distance_Displacement"+std::to_string(j)).c_str());
-        vect_graph_Efficiency_Distance_Displacement.push_back(graph_Efficiency_Distance_Displacement);
-        TGraph* graph_Efficiency_Timing_Displacement = new TGraph(NsigmaT);
-        graph_Efficiency_Timing_Displacement->SetName(("graph_Timing_Displacement"+std::to_string(j)).c_str());
-        vect_graph_Efficiency_Timing_Displacement.push_back(graph_Efficiency_Timing_Displacement);
-        TGraph* graph_Efficiency_Timing_DecayAngle = new TGraph(NsigmaT);
-        graph_Efficiency_Timing_DecayAngle->SetName(("graph_Timing_DecayAngle"+std::to_string(j)).c_str());
-        vect_graph_Efficiency_Timing_DecayAngle.push_back(graph_Efficiency_Timing_DecayAngle);
-        TGraph* graph_Efficiency_MET_DecayAngle = new TGraph(NsigmaT);
-        graph_Efficiency_MET_DecayAngle->SetName(("graph_MET_DecayAngle"+std::to_string(j)).c_str());
-        vect_graph_Efficiency_MET_DecayAngle.push_back(graph_Efficiency_MET_DecayAngle);
+        TGraph* graph_Efficiency_2displacement = new TGraph(NsigmaT);
+        graph_Efficiency_2displacement->SetName(("graph_2displacement"+std::to_string(j)).c_str());
+        vect_graph_timing_2displacement.push_back(graph_Efficiency_2displacement);
+        TGraph* graph_Efficiency_3displacement = new TGraph(NsigmaT);
+        graph_Efficiency_3displacement->SetName(("graph_3displacement"+std::to_string(j)).c_str());
+        vect_graph_timing_3displacement.push_back(graph_Efficiency_3displacement);
+        TGraph* graph_Efficiency_2displacement_decayangle = new TGraph(NsigmaT);
+        graph_Efficiency_2displacement_decayangle->SetName(("graph_2displacement_decayangle"+std::to_string(j)).c_str());
+        vect_graph_timing_2displacement_decayangle.push_back(graph_Efficiency_2displacement_decayangle);
+        TGraph* graph_Efficiency_3displacement_decayangle = new TGraph(NsigmaT);
+        graph_Efficiency_3displacement_decayangle->SetName(("graph_3displacement_decayangle"+std::to_string(j)).c_str());
+        vect_graph_timing_3displacement_decayangle.push_back(graph_Efficiency_3displacement_decayangle);
     }
     
     g_Log << LogInfo << "Initializing generator frames and tree..." << LogEnd;
@@ -133,14 +123,14 @@ void Efficiency(std::string output_name =
     DecayRecoFrame     X2X2_Reco("X2X2_Reco","#tilde{#chi}^{ 0}_{2} #tilde{#chi}^{ 0}_{2}");
     DecayRecoFrame     X2a_Reco("X2a_Reco","#tilde{#chi}^{ 0}_{2 a}");
     DecayRecoFrame     X2b_Reco("X2b_Reco","#tilde{#chi}^{ 0}_{2 b}");
-    DecayRecoFrame Za_Reco("Za_Reco","Z_{a}");
-    DecayRecoFrame Zb_Reco("Zb_Reco","Z_{b}");
+    DecayRecoFrame     Za_Reco("Za_Reco","Z_{a}");
+    DecayRecoFrame     Zb_Reco("Zb_Reco","Z_{b}");
     VisibleRecoFrame   L1a_Reco("L1a_Reco","#it{l}_{1a}");
     VisibleRecoFrame   L2a_Reco("L2a_Reco","#it{l}_{2a}");
     VisibleRecoFrame   L1b_Reco("L1b_Reco","#it{l}_{1b}");
     VisibleRecoFrame   L2b_Reco("L2b_Reco","#it{l}_{2b}");
-    VisibleRecoFrame X1a_Reco("X1a_Reco","#tilde{#chi}^{ 0}_{1 a}");
-    VisibleRecoFrame X1b_Reco("X1b_Reco","#tilde{#chi}^{ 0}_{1 b}");
+    VisibleRecoFrame   X1a_Reco("X1a_Reco","#tilde{#chi}^{ 0}_{1 a}");
+    VisibleRecoFrame   X1b_Reco("X1b_Reco","#tilde{#chi}^{ 0}_{1 b}");
     
     //
     LAB_Gen.SetChildFrame(X2X2_Gen);
@@ -260,8 +250,8 @@ void Efficiency(std::string output_name =
         //LAB_Gen.InitializeAnalysis(); //Uncomment for "Official" Plots
         
         LAB_Gen.AnalyzeEvent();                         // generate a new event
-        TLorentzVector Pa = X2a_Gen.GetFourVector();
-        TLorentzVector Pb = X2b_Gen.GetFourVector();
+        TLorentzVector Pa  = X2a_Gen.GetFourVector();
+        TLorentzVector Pb  = X2b_Gen.GetFourVector();
         TLorentzVector sys = Pa+Pb;
         TLorentzVector Ia  = X1a_Gen.GetFourVector();
         TLorentzVector Ib  = X1b_Gen.GetFourVector();
@@ -303,21 +293,22 @@ void Efficiency(std::string output_name =
             TLorentzVector Vb = L1b_RECOt+L2b_RECOt;
             
              for(int k = 0; k < NsigmaT; k++){
+                 bool displacement2 = false;
+                 bool displacement3 = false;
                  PUPPI_Detector.Set_sigmaT((sigmaT[k]/1000.)/sqrt(2.));
                  
                  double Smeared_ToFa = PUPPI_Detector.Smear_ToF(ToFa);
                  double Smeared_ToFb = PUPPI_Detector.Smear_ToF(ToFb);
                  TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
                  TVector3 Smeared_vBetab = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
-                 if(Smeared_vBetaa.Mag() >= 1.) { vect_beta.at(m).at(k)++; vect_all.at(m).at(k)++; }
-                 if(Smeared_vBetab.Mag() >= 1.) { vect_beta.at(m).at(k)++; vect_all.at(m).at(k)++; }
+                 //if(Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.) { continue; }//vect_timing_2displacement.at(m).at(k)++; vect_timing_3displacement.at(m).at(k)++; vect_timing_2displacement_decayangle.at(m).at(k)++; vect_timing_3displacement_decayangle.at(m).at(k)++; continue;}
                  
                  double Da = 30.*Smeared_ToFa*Smeared_vBetaa.Mag();
                  double Db = 30.*Smeared_ToFb*Smeared_vBetab.Mag();
                  
                  //require significant displacement in space and time
-                 if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT()) { vect_timing_displacement.at(m).at(k)++; vect_all.at(m).at(k)++; }
-                 if(fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance) { vect_distance_displacement.at(m).at(k)++; vect_all.at(m).at(k)++; }
+                 if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance || Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.) { vect_timing_2displacement.at(m).at(k)++; displacement2 = true;}
+                 if(fabs(Smeared_ToFa) < 3.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 3.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 3.*sigmaDistance || fabs(Db) < 3.*sigmaDistance || Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.) { vect_timing_3displacement.at(m).at(k)++; displacement3 = true;}
                  
                  PUPPI_Detector.Set_Sigma_Par(sys, 1.);
                  PUPPI_Detector.Set_Sigma_Perp(sys, 1.);
@@ -350,7 +341,8 @@ void Efficiency(std::string output_name =
                  
                  double CosX2a = X2a_Reco.GetCosDecayAngle();
                  double CosX2b = X2b_Reco.GetCosDecayAngle();
-                 if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9){ vect_timing_decayangle.at(m).at(k)++; vect_all.at(m).at(k)++; }
+                 if((fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9) || displacement2){ vect_timing_2displacement_decayangle.at(m).at(k)++; }
+                 if((fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9) || displacement3){ vect_timing_3displacement_decayangle.at(m).at(k)++; }
                  if((sigmaT[k] < 31. && sigmaT[k] > 29.) && met_flag)
                  {
                      for(int h = 0; h < NsigmaMET; h++)
@@ -386,7 +378,7 @@ void Efficiency(std::string output_name =
                          
                          double CosX2a = X2a_Reco.GetCosDecayAngle();
                          double CosX2b = X2b_Reco.GetCosDecayAngle();
-                         if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9){ vect_met_decayangle.at(m).at(h)++; vect_all.at(m).at(h)++; }
+                         //if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9){ vect_met_decayangle.at(m).at(h)++; vect_all.at(m).at(h)++; }
                      }
                  }
              }
@@ -395,70 +387,26 @@ void Efficiency(std::string output_name =
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     for(int j = 0; j < Nctau; j++) {
-    for(int l = 0; l < NsigmaT; l++){
-        vect_graph_Efficiency_All.at(j)->SetPoint(l,sigmaT[l],100.*(vect_all.at(j).at(l))/Ngen);
-        vect_graph_Efficiency_Beta.at(j)->SetPoint(l,sigmaT[l],100.*(vect_beta.at(j).at(l))/Ngen);
-        vect_graph_Efficiency_Distance_Displacement.at(j)->SetPoint(l,sigmaT[l],100.*(vect_distance_displacement.at(j).at(l))/Ngen);
-        vect_graph_Efficiency_Timing_Displacement.at(j)->SetPoint(l,sigmaT[l],100.*(vect_timing_displacement.at(j).at(l))/Ngen);
-        vect_graph_Efficiency_Timing_DecayAngle.at(j)->SetPoint(l,sigmaT[l],100.*(vect_timing_decayangle.at(j).at(l))/Ngen);
+    for(int l = 0; l < NsigmaT; l++) {
+        vect_graph_timing_2displacement.at(j)->SetPoint(l,sigmaT[l],100.*(Ngen-vect_timing_2displacement.at(j).at(l))/Ngen);
+        vect_graph_timing_3displacement.at(j)->SetPoint(l,sigmaT[l],100.*(Ngen-vect_timing_3displacement.at(j).at(l))/Ngen);
+        vect_graph_timing_2displacement_decayangle.at(j)->SetPoint(l,sigmaT[l],100.*(Ngen-vect_timing_2displacement_decayangle.at(j).at(l))/Ngen);
+        vect_graph_timing_3displacement_decayangle.at(j)->SetPoint(l,sigmaT[l],100.*(Ngen-vect_timing_3displacement_decayangle.at(j).at(l))/Ngen);
     }
-    for(int l = 0; l < NsigmaMET; l++){ vect_graph_Efficiency_MET_DecayAngle.at(j)->SetPoint(l,sigmaMET[l],100.*(vect_met_decayangle.at(j).at(l))/Ngen); }
+    //for(int l = 0; l < NsigmaMET; l++){ vect_graph_Efficiency_MET_DecayAngle.at(j)->SetPoint(l,sigmaMET[l],100.*(vect_met_decayangle.at(j).at(l))/Ngen); }
     }
     TFile fout(output_name.c_str(),"RECREATE");
     vector<string> leg_text_Ctau;
     for(int j = 0; j < Nctau; j++){leg_text_Ctau.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-    Draw_Graphs(fout, vect_graph_Efficiency_All, leg_text_Ctau, "Reconstruction Efficiency [%]", "#sigma_{t} [ps]", "Efficiency_All");
-    Draw_Graphs(fout, vect_graph_Efficiency_Beta, leg_text_Ctau, "Reconstruction Efficiency (#beta) [%]", "#sigma_{t} [ps]", "Efficiency_Beta");
-    Draw_Graphs(fout, vect_graph_Efficiency_Distance_Displacement, leg_text_Ctau, "Reconstruction Efficiency (Distance Displacement) [%]", "#sigma_{t} [ps]", "Efficiency_Distance_Displacement");
-    Draw_Graphs(fout, vect_graph_Efficiency_Timing_Displacement, leg_text_Ctau, "Reconstruction Efficiency (Timing Displacement) [%]", "#sigma_{t} [ps]", "Efficiency_Timing_Displacement");
-    Draw_Graphs(fout, vect_graph_Efficiency_Timing_DecayAngle, leg_text_Ctau, "Reconstruction Efficiency (Decay Angle) [%]", "#sigma_{t} [ps]", "Efficiency_Timing_DecayAngle");
-    Draw_Graphs(fout, vect_graph_Efficiency_MET_DecayAngle, leg_text_Ctau, "Reconstruction Efficiency (Decay Angle) [%]", "#sigma_{MET} [%]", "Efficiency_MET_DecayAngle");
+    Draw_Graphs(fout, vect_graph_timing_2displacement, leg_text_Ctau, "Reconstruction Efficiency 2#sigma [%]", "#sigma_{t} [ps]", "Efficiency_2Sigma");
+    Draw_Graphs(fout, vect_graph_timing_3displacement, leg_text_Ctau, "Reconstruction Efficiency 3#sigma [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma");
+    Draw_Graphs(fout, vect_graph_timing_2displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 2#sigma & |Cos(#theta)| < 0.9 [%]", "#sigma_{t} [ps]", "Efficiency_2Sigma_DecayAngle");
+    Draw_Graphs(fout, vect_graph_timing_3displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 3#sigma & |Cos(#theta)| < 0.9 [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma_DecayAngle");
+    vector<TGraph*> vect_graph_ctau { vect_graph_timing_2displacement.at(1), vect_graph_timing_3displacement.at(1), vect_graph_timing_2displacement_decayangle.at(1), vect_graph_timing_3displacement_decayangle.at(1) };
+    vector<string> leg_text { "2#sigma Displacement", "3#sigma Displacement", "2#sigma & |Cos(#theta)| < 0.9", "3#sigma & |Cos(#theta)| < 0.9" };
+    vect_graph_ctau.at(0)->SetTitle(("c#tau = " + std::to_string(int(ctau.at(1))) + " cm, M_{#tilde{#chi}^{ 0}_{2}} = " + std::to_string(int(mX2)) + " GeV, M_{#tilde{#chi}^{ 0}_{1}} = " + std::to_string(int(mX1)) + " GeV").c_str());
+    Draw_Graphs(fout, vect_graph_ctau, leg_text, "Reconstruction Efficiency [%]", "#sigma_{t} [ps]", "Efficiency");
   fout.Close();
   g_Log << LogInfo << "Finished" << LogEnd;
   g_Log << LogInfo << "Time to Process " << Ngen*Nctau << " Events: " << (Long64_t(gSystem->Now())-end)/1000.0 << " seconds" << LogEnd;
-}
-
-void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>& leg_text, const string& YaxisText, const string& XaxisText, const string& plotName)
-{
-    if(!(fout.IsOpen())) {cout << "Output File Not Open..." << endl;}
-    TLegend* leg = new TLegend(0.15,0.6,0.403,0.91);
-    vector<TLegendEntry*> vect_leg_entry;
-    {for(int i = 0; i<int(leg_text.size()); i++) { TLegendEntry* leg_entry = leg->AddEntry(vect_graph.at(i),leg_text.at(i).c_str(),"P"); }}
-    
-    TCanvas* canvas_graph = new TCanvas(("canvas_graph"+plotName).c_str(),"canvas_graph",750,500);
-    canvas_graph->SetGridx();
-    canvas_graph->SetGridy();
-    canvas_graph->cd();
-    
-    TMultiGraph* mg = new TMultiGraph();
-    for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph.at(i)); }
-    vect_graph[0]->SetMarkerStyle(22);
-    vect_graph[0]->SetMarkerColor(kBlue);
-    if(vect_graph.size() > 1){
-    vect_graph[1]->SetMarkerStyle(22);
-    vect_graph[1]->SetMarkerColor(kRed);}
-    if(vect_graph.size() > 2){
-    vect_graph[2]->SetMarkerStyle(22);
-    vect_graph[2]->SetMarkerColor(kGreen+2);}
-    if(vect_graph.size() == 4){
-        vect_graph[3]->SetMarkerStyle(22);
-        vect_graph[3]->SetMarkerColor(kMagenta);}
-    if(vect_graph.size() == 6){
-        vect_graph[3]->SetMarkerStyle(32);
-        vect_graph[3]->SetMarkerColor(kBlue);
-        vect_graph[4]->SetMarkerStyle(32);
-        vect_graph[4]->SetMarkerColor(kRed);
-        vect_graph[5]->SetMarkerStyle(32);
-        vect_graph[5]->SetMarkerColor(kGreen+2);}
-    mg->Draw("AP");
-    mg->GetYaxis()->SetTitleOffset(1.05);
-    mg->GetYaxis()->SetTitleSize(.04);
-    mg->GetXaxis()->SetTitleSize(.04);
-    mg->GetYaxis()->SetLabelSize(.04);
-    mg->GetXaxis()->SetLabelSize(.04);
-    mg->GetYaxis()->SetTitle(YaxisText.c_str());
-    mg->GetXaxis()->SetTitle(XaxisText.c_str());
-    leg->Draw("SAMES");
-    canvas_graph->SaveAs((plotName+".pdf").c_str());
-    canvas_graph->Write();
 }
