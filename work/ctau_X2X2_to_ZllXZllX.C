@@ -45,16 +45,16 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t end = 0.;
     
     //setting masses and widths
-    double mX2 = 1000.0;
-    double mX1 = 500.0;
+    double mX2 = 700.0;
+    double mX1 = 200.0;
     double mZ = 91.19;
     double wZ = 2.50;
     
     vector<double> ctau;
     
-    ctau.push_back(25.);
+    //ctau.push_back(25.);
     ctau.push_back(10.);
-    ctau.push_back(5.);
+    //ctau.push_back(5.);
     //ctau.push_back(1.);
     
     int Nctau = ctau.size();
@@ -1080,6 +1080,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         leg_text_ctau_SigmaMET.push_back("Measured");
         Draw_Graphs(fout, vect_graph_ctau_SigmaMET, leg_text_ctau_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET_ctau");
     }
+    TCanvas* canv = new TCanvas("canv","",750,500);
+    Draw_Hists(vect_hist_Sigma_MX1_Measured_SigmaT.at(0),canv);
   fout.Close();
   histPlot->WriteOutput(output_name);
   histPlot->WriteHist(output_name);
