@@ -967,8 +967,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     }
     //LAB_Gen.PrintGeneratorEfficiency();
   }
-    //TCanvas* canv = new TCanvas("test","",750,500);
-    //Draw_Hists(vect_hist_Sigma_MX2_SigmaMET.at(0),canv);
     g_Log << LogInfo << "Generated a Total of " << gen_events << " Events " << LogEnd;
     g_Log << LogInfo << acp_events << " passed selection requirements " << LogEnd;
     g_Log << LogInfo << "Efficiency: " << 100.0*acp_events/gen_events << "%" << LogEnd;
@@ -1004,10 +1002,10 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         delete vect_hist_Sigma_MX2_MET_Measured_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_Timing_Measured_SigmaT.at(i).at(j);
         
-        delete vect_hist_Sigma_MX1_SigmaT.at(i).at(j);
+        //delete vect_hist_Sigma_MX1_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_MET_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_Timing_SigmaT.at(i).at(j);
-        delete vect_hist_Sigma_MX1_Measured_SigmaT.at(i).at(j);
+        //delete vect_hist_Sigma_MX1_Measured_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_MET_Measured_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_Timing_Measured_SigmaT.at(i).at(j);
     }
@@ -1015,6 +1013,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     vector<string> leg_text_Sigma_MX2_SigmaT;
     for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaT.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
     Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_timing_ctau");
+    Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "MLSP_timing_ctau");
     vector<TGraph*> vect_graph_ctau_SigmaT;
     vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_SigmaT[0]);
     vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_MET_SigmaT[0]);
@@ -1027,7 +1026,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     leg_text_ctau_SigmaT.push_back("#sigma_{MET} Off");
     leg_text_ctau_SigmaT.push_back("#sigma_{t} Off");
     leg_text_ctau_SigmaT.push_back("Measured");
-    Draw_Graphs(fout, vect_graph_ctau_SigmaT, leg_text_ctau_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_Timing");
+    Draw_Graphs(fout, vect_graph_ctau_SigmaT, leg_text_ctau_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_Timing_ctau");
     }
     if(MET_flag){
     for(int i = 0; i<Nctau; i++)
@@ -1079,7 +1078,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         leg_text_ctau_SigmaMET.push_back("#sigma_{MET} Off");
         leg_text_ctau_SigmaMET.push_back("#sigma_{t} Off");
         leg_text_ctau_SigmaMET.push_back("Measured");
-        Draw_Graphs(fout, vect_graph_ctau_SigmaMET, leg_text_ctau_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET");
+        Draw_Graphs(fout, vect_graph_ctau_SigmaMET, leg_text_ctau_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET_ctau");
     }
   fout.Close();
   histPlot->WriteOutput(output_name);

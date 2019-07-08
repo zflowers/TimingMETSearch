@@ -19,13 +19,15 @@
 #include <numeric>
 #include <algorithm>
 
-double Hist_Mode(const TH1D& hist)
+double Hist_Mode(TH1D& hist)
 {
+    if( hist.GetMaximumBin() == 1 ) { hist.SetBinContent(1,0.); }
     return hist.GetXaxis()->GetBinCenter(hist.GetMaximumBin()); //placeholder to be changed
 }
 
-double Hist_FWHM(const TH1D& hist)
+double Hist_FWHM(TH1D& hist)
 {
+    if( hist.GetMaximumBin() == 1 ) { hist.SetBinContent(1,0.); }
     int left_bin = 0;
     int right_bin = 0;
     for(int i = 0; i < hist.GetNbinsX(); i++)
