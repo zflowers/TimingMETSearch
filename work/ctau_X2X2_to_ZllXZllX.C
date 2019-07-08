@@ -37,7 +37,6 @@
 #include "Bonus.h"
 
 using namespace RestFrames;
-void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>& leg_text, const string& YaxisText, const string& XaxisText, const string& plotName);
 
 void ctau_X2X2_to_ZllXZllX(std::string output_name =
 			      "output_ctau_X2X2_to_ZallXZbllX.root"){
@@ -73,11 +72,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     int NsigmaMET = sigmaMET.size();
     bool timing_flag = true; //set to false to turn off anything related to looping over sigmat
     bool MET_flag = true;
-    bool LSP_flag = false; //set to false to turn off regenerating the event for non-real LSP reco masses
-    bool LSP_Calc_flag = false; //leave this alone
     
     //Number of events
-    int Ngen = 100000;
+    int Ngen = 1000;
     
     int bins_MX2 = 25.;
     double xmin_MX2 = 0.;
@@ -781,11 +778,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         //Two LLPs
         MV = (L1a_RECO+L2a_RECO).M();
         MIa2 = test_Resolution.Mass_Invisible2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa,Smeared_vBetab);
-        if(MIa2 < 0. && LSP_flag)
-        {
-            igen--;
-            continue;
-        }
         double MIa2_Gen = test_Resolution.Mass_Invisible2(MPa_Gen,vZaGen.E(),(L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()).M());
         double MIa2_Res = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution);
         Delta_MIa2 = MIa2-MIa2_Gen;
@@ -842,11 +834,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 MXa1_MET_Calc[i] = test_Resolution.Mass_Invisible2(MXa2_MET_Calc, EZa_Calc, Mass_Vis);
                 MXa1_Timing_Calc[i] = test_Resolution.Mass_Invisible2(MXa2_Timing_Calc, EZa_Timing_Calc, Mass_Vis);
                 
-                if(MXa1_Calc[i] < 0. || MXa1_MET_Calc[i] < 0. || MXa1_Timing_Calc[i] < 0.)
-                {
-                    LSP_Calc_flag = true;
-                }
-                
                 double MXa2_Res = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time,Sigma_Beta_Mag_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
                 MXa1_Res[i] = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa_Time,Smeared_vBetab_Time,Sigma_Beta_Mag_Time,MET_Mag_Resolution,MET_Dir_Resolution);
                 double MXa2_Res_MET = test_Resolution.Mass_Parents2_Resolution(I_Vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa_Time,Smeared_vBetab_Time,Sigma_Beta_Mag_Time,0.,0.,Sigma_Vis);
@@ -860,15 +847,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 vect_hist_Sigma_MX2_Measured_SigmaT.at(m).at(i)->Fill(MXa2_Calc);
                 vect_hist_Sigma_MX2_MET_Measured_SigmaT.at(m).at(i)->Fill(MXa2_MET_Calc);
                 vect_hist_Sigma_MX2_Timing_Measured_SigmaT.at(m).at(i)->Fill(MXa2_Timing_Calc);
-            }
-            if(LSP_Calc_flag && LSP_flag)
-            {
-                igen--;
-                LSP_Calc_flag = false;
-                continue;
-            }
-            for(int i = 0; i < NsigmaT; i++)
-            {
                 vect_hist_Sigma_MX1_SigmaT.at(m).at(i)->Fill(MXa1_Res[i]/MXa1_Calc[i]);
                 vect_hist_Sigma_MX1_MET_SigmaT.at(m).at(i)->Fill(MXa1_Res_MET[i]/MXa1_MET_Calc[i]);
                 vect_hist_Sigma_MX1_Timing_SigmaT.at(m).at(i)->Fill(MXa1_Res_Timing[i]/MXa1_Timing_Calc[i]);
@@ -927,11 +905,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 MXa1_MET_Calc[i] = test_Resolution.Mass_Invisible2(MXa2_MET_Calc, EZa_Calc, Mass_Vis);
                 MXa1_Timing_Calc[i] = test_Resolution.Mass_Invisible2(MXa2_Timing_Calc, EZa_Timing_Calc, Mass_Vis);
                 
-                if(MXa1_Calc[i] < 0. || MXa1_MET_Calc[i] < 0. || MXa1_Timing_Calc[i] < 0.)
-                {
-                    LSP_Calc_flag = true;
-                }
-                
                 double MXa2_Res = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI_LOOP,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
                 MXa1_Res[i] = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI_LOOP,Va,Vb,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution);
                 double MXa2_Res_MET = test_Resolution.Mass_Parents2_Resolution(I_Vect,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,0.,0.,Sigma_Vis);
@@ -946,15 +919,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 vect_hist_Sigma_MX2_Measured_SigmaMET.at(m).at(i)->Fill(MXa2_Calc);
                 vect_hist_Sigma_MX2_MET_Measured_SigmaMET.at(m).at(i)->Fill(MXa2_MET_Calc);
                 vect_hist_Sigma_MX2_Timing_Measured_SigmaMET.at(m).at(i)->Fill(MXa2_Timing_Calc);
-            }
-            if(LSP_Calc_flag && LSP_flag)
-            {
-                igen--;
-                LSP_Calc_flag = false;
-                continue;
-            }
-            for(int i = 0; i < NsigmaMET; i++)
-            {
                 vect_hist_Sigma_MX1_SigmaMET.at(m).at(i)->Fill(MXa1_Res[i]/MXa1_Calc[i]);
                 vect_hist_Sigma_MX1_MET_SigmaMET.at(m).at(i)->Fill(MXa1_Res_MET[i]/MXa1_MET_Calc[i]);
                 vect_hist_Sigma_MX1_Timing_SigmaMET.at(m).at(i)->Fill(MXa1_Res_Timing[i]/MXa1_Timing_Calc[i]);
@@ -1003,9 +967,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     }
     //LAB_Gen.PrintGeneratorEfficiency();
   }
-    TCanvas* canv = new TCanvas("test","",750,500);
-    //Draw_Hists(vect_hist_Sigma_MX2_SigmaT.at(0),canv);
-    Draw_Hists(vect_hist_Sigma_MX2_SigmaMET.at(0),canv);
+    //TCanvas* canv = new TCanvas("test","",750,500);
+    //Draw_Hists(vect_hist_Sigma_MX2_SigmaMET.at(0),canv);
     g_Log << LogInfo << "Generated a Total of " << gen_events << " Events " << LogEnd;
     g_Log << LogInfo << acp_events << " passed selection requirements " << LogEnd;
     g_Log << LogInfo << "Efficiency: " << 100.0*acp_events/gen_events << "%" << LogEnd;
@@ -1033,7 +996,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         vect_graph_Sigma_MX1_SigmaT_Measured.at(i)->SetPoint(j,sigmaT[j],Hist_FWHM(*vect_hist_Sigma_MX1_Measured_SigmaT.at(i).at(j))/Hist_Mode(*vect_hist_Sigma_MX1_Measured_SigmaT.at(i).at(j)));
         vect_graph_Sigma_MX1_MET_SigmaT_Measured.at(i)->SetPoint(j,sigmaT[j],Hist_FWHM(*vect_hist_Sigma_MX1_MET_Measured_SigmaT.at(i).at(j))/Hist_Mode(*vect_hist_Sigma_MX1_MET_Measured_SigmaT.at(i).at(j)));
         vect_graph_Sigma_MX1_Timing_SigmaT_Measured.at(i)->SetPoint(j,sigmaT[j],Hist_FWHM(*vect_hist_Sigma_MX1_Timing_Measured_SigmaT.at(i).at(j))/Hist_Mode(*vect_hist_Sigma_MX1_Timing_Measured_SigmaT.at(i).at(j)));
-        /*
+        
         delete vect_hist_Sigma_MX2_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_MET_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_Timing_SigmaT.at(i).at(j);
@@ -1046,25 +1009,25 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         delete vect_hist_Sigma_MX1_Timing_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_Measured_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_MET_Measured_SigmaT.at(i).at(j);
-        delete vect_hist_Sigma_MX1_Timing_Measured_SigmaT.at(i).at(j);*/
+        delete vect_hist_Sigma_MX1_Timing_Measured_SigmaT.at(i).at(j);
     }
     }
     vector<string> leg_text_Sigma_MX2_SigmaT;
     for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaT.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
     Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_timing_ctau");
-    vector<TGraph*> vect_graph_ctau_10_SigmaT;
-    vect_graph_ctau_10_SigmaT.push_back(vect_graph_Sigma_MX2_SigmaT[0]);
-    vect_graph_ctau_10_SigmaT.push_back(vect_graph_Sigma_MX2_MET_SigmaT[0]);
-    vect_graph_ctau_10_SigmaT.push_back(vect_graph_Sigma_MX2_Timing_SigmaT[0]);
-    vect_graph_ctau_10_SigmaT.push_back(vect_graph_Sigma_MX2_SigmaT_Measured[0]);
-    vect_graph_ctau_10_SigmaT.push_back(vect_graph_Sigma_MX2_MET_SigmaT_Measured[0]);
-    vect_graph_ctau_10_SigmaT.push_back(vect_graph_Sigma_MX2_Timing_SigmaT_Measured[0]);
-    vector<string> leg_text_ctau_10_SigmaT;
-    leg_text_ctau_10_SigmaT.push_back("Analytical");
-    leg_text_ctau_10_SigmaT.push_back("#sigma_{MET} Off");
-    leg_text_ctau_10_SigmaT.push_back("#sigma_{t} Off");
-    leg_text_ctau_10_SigmaT.push_back("Measured");
-    Draw_Graphs(fout, vect_graph_ctau_10_SigmaT, leg_text_ctau_10_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_Timing");
+    vector<TGraph*> vect_graph_ctau_SigmaT;
+    vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_SigmaT[0]);
+    vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_MET_SigmaT[0]);
+    vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_Timing_SigmaT[0]);
+    vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_SigmaT_Measured[0]);
+    vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_MET_SigmaT_Measured[0]);
+    vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_Timing_SigmaT_Measured[0]);
+    vector<string> leg_text_ctau_SigmaT;
+    leg_text_ctau_SigmaT.push_back("Analytical");
+    leg_text_ctau_SigmaT.push_back("#sigma_{MET} Off");
+    leg_text_ctau_SigmaT.push_back("#sigma_{t} Off");
+    leg_text_ctau_SigmaT.push_back("Measured");
+    Draw_Graphs(fout, vect_graph_ctau_SigmaT, leg_text_ctau_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_Timing");
     }
     if(MET_flag){
     for(int i = 0; i<Nctau; i++)
@@ -1085,7 +1048,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             vect_graph_Sigma_MX1_SigmaMET_Measured.at(i)->SetPoint(j,sigmaMET[j],Hist_FWHM(*vect_hist_Sigma_MX1_Measured_SigmaMET.at(i).at(j))/Hist_Mode(*vect_hist_Sigma_MX1_Measured_SigmaMET.at(i).at(j)));
             vect_graph_Sigma_MX1_MET_SigmaMET_Measured.at(i)->SetPoint(j,sigmaMET[j],Hist_FWHM(*vect_hist_Sigma_MX1_MET_Measured_SigmaMET.at(i).at(j))/Hist_Mode(*vect_hist_Sigma_MX1_MET_Measured_SigmaMET.at(i).at(j)));
             vect_graph_Sigma_MX1_Timing_SigmaMET_Measured.at(i)->SetPoint(j,sigmaMET[j],Hist_FWHM(*vect_hist_Sigma_MX1_Timing_Measured_SigmaMET.at(i).at(j))/Hist_Mode(*vect_hist_Sigma_MX1_Timing_Measured_SigmaMET.at(i).at(j)));
-            /*
+            
             delete vect_hist_Sigma_MX2_SigmaMET.at(i).at(j);
             delete vect_hist_Sigma_MX2_MET_SigmaMET.at(i).at(j);
             delete vect_hist_Sigma_MX2_Timing_SigmaMET.at(i).at(j);
@@ -1098,25 +1061,25 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             delete vect_hist_Sigma_MX1_Timing_SigmaMET.at(i).at(j);
             delete vect_hist_Sigma_MX1_Measured_SigmaMET.at(i).at(j);
             delete vect_hist_Sigma_MX1_MET_Measured_SigmaMET.at(i).at(j);
-            delete vect_hist_Sigma_MX1_Timing_Measured_SigmaMET.at(i).at(j);*/
+            delete vect_hist_Sigma_MX1_Timing_Measured_SigmaMET.at(i).at(j);
         }
         }
         vector<string> leg_text_Sigma_MX2_SigmaMET;
         for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaMET.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
         Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_met_ctau");
-        vector<TGraph*> vect_graph_ctau_10_SigmaMET;
-        vect_graph_ctau_10_SigmaMET.push_back(vect_graph_Sigma_MX2_SigmaMET[0]);
-        vect_graph_ctau_10_SigmaMET.push_back(vect_graph_Sigma_MX2_MET_SigmaMET[0]);
-        vect_graph_ctau_10_SigmaMET.push_back(vect_graph_Sigma_MX2_Timing_SigmaMET[0]);
-        vect_graph_ctau_10_SigmaMET.push_back(vect_graph_Sigma_MX2_SigmaMET_Measured[0]);
-        vect_graph_ctau_10_SigmaMET.push_back(vect_graph_Sigma_MX2_MET_SigmaMET_Measured[0]);
-        vect_graph_ctau_10_SigmaMET.push_back(vect_graph_Sigma_MX2_Timing_SigmaMET_Measured[0]);
-        vector<string> leg_text_ctau_10_SigmaMET;
-        leg_text_ctau_10_SigmaMET.push_back("Analytical");
-        leg_text_ctau_10_SigmaMET.push_back("#sigma_{MET} Off");
-        leg_text_ctau_10_SigmaMET.push_back("#sigma_{t} Off");
-        leg_text_ctau_10_SigmaMET.push_back("Measured");
-        Draw_Graphs(fout, vect_graph_ctau_10_SigmaMET, leg_text_ctau_10_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET");
+        vector<TGraph*> vect_graph_ctau_SigmaMET;
+        vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_SigmaMET[0]);
+        vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_MET_SigmaMET[0]);
+        vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_Timing_SigmaMET[0]);
+        vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_SigmaMET_Measured[0]);
+        vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_MET_SigmaMET_Measured[0]);
+        vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_Timing_SigmaMET_Measured[0]);
+        vector<string> leg_text_ctau_SigmaMET;
+        leg_text_ctau_SigmaMET.push_back("Analytical");
+        leg_text_ctau_SigmaMET.push_back("#sigma_{MET} Off");
+        leg_text_ctau_SigmaMET.push_back("#sigma_{t} Off");
+        leg_text_ctau_SigmaMET.push_back("Measured");
+        Draw_Graphs(fout, vect_graph_ctau_SigmaMET, leg_text_ctau_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET");
     }
   fout.Close();
   histPlot->WriteOutput(output_name);

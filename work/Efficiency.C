@@ -38,8 +38,6 @@
 
 using namespace RestFrames;
 
-void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>& leg_text, const string& YaxisText, const string& XaxisText, const string& plotName);
-
 void Efficiency(std::string output_name =
 			      "Efficiency.root"){
     setMyStyle();
