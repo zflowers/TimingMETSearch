@@ -566,7 +566,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 TVector3 Smeared_vBetaa_Time = PUPPI_Detector.Smear_Beta(PV,SVa);
                 TVector3 Smeared_vBetab_Time = PUPPI_Detector.Smear_Beta(PV,SVb);
                 
-                if(Smeared_vBetaa_Time.Mag() >= 1. || Smeared_vBetab_Time.Mag() >= 1.)
+                if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance || Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.)
                 {
                     i--;
                     continue;
@@ -597,6 +597,30 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 MXa1_Res_MET[i] = test_Resolution.Mass_Invisible_Resolution2(I_Vect,Va,Vb,Smeared_vBetaa_Time,Smeared_vBetab_Time,Sigma_Beta_Mag_Time,0.,0.);
                 double MXa2_Res_Timing = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
                 MXa1_Res_Timing[i] = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution);
+                
+                //Angle Analysis
+                TLorentzVector PX2a;
+                PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
+                TLorentzVector PX2b;
+                PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
+                PX2a.Boost(Smeared_vBetaa);
+                PX2b.Boost(Smeared_vBetab);
+                
+                //RECO Tree
+                LAB_Reco.ClearEvent();
+                L1a_Reco.SetLabFrameFourVector(L1a_RECO);
+                L1b_Reco.SetLabFrameFourVector(L1b_RECO);
+                L2a_Reco.SetLabFrameFourVector(L2a_RECO);
+                L2b_Reco.SetLabFrameFourVector(L2b_RECO);
+                X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
+                X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
+                
+                LAB_Reco.AnalyzeEvent();
+                
+                double CosX2a = X2a_Reco.GetCosDecayAngle();
+                double CosX2b = X2b_Reco.GetCosDecayAngle();
+                if((fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9)){ i--; continue; }
+                
                 //Fill Vectors
                 vect_hist_Sigma_MX2_SigmaT.at(m).at(i)->Fill(MXa2_Res/MXa2_Calc);
                 vect_hist_Sigma_MX2_MET_SigmaT.at(m).at(i)->Fill(MXa2_Res_MET/MXa2_MET_Calc);
@@ -604,14 +628,26 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 vect_hist_Sigma_MX2_Measured_SigmaT.at(m).at(i)->Fill(MXa2_Calc);
                 vect_hist_Sigma_MX2_MET_Measured_SigmaT.at(m).at(i)->Fill(MXa2_MET_Calc);
                 vect_hist_Sigma_MX2_Timing_Measured_SigmaT.at(m).at(i)->Fill(MXa2_Timing_Calc);
-                vect_hist_Sigma_MX1_SigmaT.at(m).at(i)->Fill(MXa1_Res[i]/MXa1_Calc[i]);
-                vect_hist_Sigma_MX1_MET_SigmaT.at(m).at(i)->Fill(MXa1_Res_MET[i]/MXa1_MET_Calc[i]);
-                vect_hist_Sigma_MX1_Timing_SigmaT.at(m).at(i)->Fill(MXa1_Res_Timing[i]/MXa1_Timing_Calc[i]);
-                vect_hist_Sigma_MX1_Measured_SigmaT.at(m).at(i)->Fill(MXa1_Calc[i]);
-                vect_hist_Sigma_MX1_MET_Measured_SigmaT.at(m).at(i)->Fill(MXa1_MET_Calc[i]);
-                vect_hist_Sigma_MX1_Timing_Measured_SigmaT.at(m).at(i)->Fill(MXa1_Timing_Calc[i]);
             }
             PUPPI_Detector.Set_sigmaT((sigmaT[0]/1000.)/sqrt(2.));
+            for(int k = 0; k < NsigmaT; k++)
+            {
+                if(MXa1_Calc[i] > 0.0001)
+                {
+                    vect_hist_Sigma_MX1_SigmaT.at(m).at(i)->Fill(MXa1_Res[i]/MXa1_Calc[i]);
+                    vect_hist_Sigma_MX1_Measured_SigmaT.at(m).at(i)->Fill(MXa1_Calc[i]);
+                }
+                if(MXa1_MET_Calc[i] > 0.0001)
+                {
+                    vect_hist_Sigma_MX1_MET_SigmaT.at(m).at(i)->Fill(MXa1_Res_MET[i]/MXa1_MET_Calc[i]);
+                    vect_hist_Sigma_MX1_MET_Measured_SigmaT.at(m).at(i)->Fill(MXa1_MET_Calc[i]);
+                }
+                if(MXa1_Timing_Calc[i] > 0.0001)
+                {
+                    vect_hist_Sigma_MX1_Timing_SigmaT.at(m).at(i)->Fill(MXa1_Res_Timing[i]/MXa1_Timing_Calc[i]);
+                    vect_hist_Sigma_MX1_Timing_Measured_SigmaT.at(m).at(i)->Fill(MXa1_Timing_Calc[i]);
+                }
+            }
         }
         
         if(MET_flag){
@@ -619,7 +655,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             TVector3 Smeared_vBetaa_No_Time = PUPPI_Detector.Smear_Beta(PV,SVa);
             TVector3 Smeared_vBetab_No_Time = PUPPI_Detector.Smear_Beta(PV,SVb);
             
-            if(Smeared_vBetaa_No_Time.Mag() >= 1. || Smeared_vBetab_No_Time.Mag() >= 1.)
+            if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance || Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.)
             {
                 igen--;
                 continue;
@@ -669,6 +705,29 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 double MXa2_Res_Timing = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI_LOOP,Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
                 MXa1_Res_Timing[i] = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI_LOOP,Va,Vb,Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution);
                 
+                //Angle Analysis
+                TLorentzVector PX2a;
+                PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
+                TLorentzVector PX2b;
+                PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
+                PX2a.Boost(Smeared_vBetaa);
+                PX2b.Boost(Smeared_vBetab);
+                
+                //RECO Tree
+                LAB_Reco.ClearEvent();
+                L1a_Reco.SetLabFrameFourVector(L1a_RECO);
+                L1b_Reco.SetLabFrameFourVector(L1b_RECO);
+                L2a_Reco.SetLabFrameFourVector(L2a_RECO);
+                L2b_Reco.SetLabFrameFourVector(L2b_RECO);
+                X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
+                X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
+                
+                LAB_Reco.AnalyzeEvent();
+                
+                double CosX2a = X2a_Reco.GetCosDecayAngle();
+                double CosX2b = X2b_Reco.GetCosDecayAngle();
+                if((fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9)){ i--; continue; }
+                
                 //Fill Vectors
                 vect_hist_Sigma_MX2_SigmaMET.at(m).at(i)->Fill(MXa2_Res/MXa2_Calc);
                 vect_hist_Sigma_MX2_MET_SigmaMET.at(m).at(i)->Fill(MXa2_Res_MET/MXa2_MET_Calc);
@@ -676,40 +735,29 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 vect_hist_Sigma_MX2_Measured_SigmaMET.at(m).at(i)->Fill(MXa2_Calc);
                 vect_hist_Sigma_MX2_MET_Measured_SigmaMET.at(m).at(i)->Fill(MXa2_MET_Calc);
                 vect_hist_Sigma_MX2_Timing_Measured_SigmaMET.at(m).at(i)->Fill(MXa2_Timing_Calc);
-                vect_hist_Sigma_MX1_SigmaMET.at(m).at(i)->Fill(MXa1_Res[i]/MXa1_Calc[i]);
-                vect_hist_Sigma_MX1_MET_SigmaMET.at(m).at(i)->Fill(MXa1_Res_MET[i]/MXa1_MET_Calc[i]);
-                vect_hist_Sigma_MX1_Timing_SigmaMET.at(m).at(i)->Fill(MXa1_Res_Timing[i]/MXa1_Timing_Calc[i]);
-                vect_hist_Sigma_MX1_Measured_SigmaMET.at(m).at(i)->Fill(MXa1_Calc[i]);
-                vect_hist_Sigma_MX1_MET_Measured_SigmaMET.at(m).at(i)->Fill(MXa1_MET_Calc[i]);
-                vect_hist_Sigma_MX1_Timing_Measured_SigmaMET.at(m).at(i)->Fill(MXa1_Timing_Calc[i]);
             }
             MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
             MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
+            for(int k = 0; k < NsigmaMET; k++)
+            {
+                if(MXa1_Calc[i] > 0.0001)
+                {
+                    vect_hist_Sigma_MX1_SigmaT.at(m).at(i)->Fill(MXa1_Res[i]/MXa1_Calc[i]);
+                    vect_hist_Sigma_MX1_Measured_SigmaT.at(m).at(i)->Fill(MXa1_Calc[i]);
+                }
+                if(MXa1_MET_Calc[i] > 0.0001)
+                {
+                    vect_hist_Sigma_MX1_MET_SigmaT.at(m).at(i)->Fill(MXa1_Res_MET[i]/MXa1_MET_Calc[i]);
+                    vect_hist_Sigma_MX1_MET_Measured_SigmaT.at(m).at(i)->Fill(MXa1_MET_Calc[i]);
+                }
+                if(MXa1_Timing_Calc[i] > 0.0001)
+                {
+                    vect_hist_Sigma_MX1_Timing_SigmaT.at(m).at(i)->Fill(MXa1_Res_Timing[i]/MXa1_Timing_Calc[i]);
+                    vect_hist_Sigma_MX1_Timing_Measured_SigmaT.at(m).at(i)->Fill(MXa1_Timing_Calc[i]);
+                }
+            }
         }
-        
-        //Angle Analysis
-        TLorentzVector PX2a;
-        PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
-        TLorentzVector PX2b;
-        PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
-        PX2a.Boost(Smeared_vBetaa);
-        PX2b.Boost(Smeared_vBetab);
-        
-        //RECO Tree
-        LAB_Reco.ClearEvent();
-        L1a_Reco.SetLabFrameFourVector(L1a_RECO);
-        L1b_Reco.SetLabFrameFourVector(L1b_RECO);
-        L2a_Reco.SetLabFrameFourVector(L2a_RECO);
-        L2b_Reco.SetLabFrameFourVector(L2b_RECO);
-        X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
-        X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
-        
-        LAB_Reco.AnalyzeEvent();
-        
-        double CosX2a = X2a_Reco.GetCosDecayAngle();
-        double CosX2b = X2b_Reco.GetCosDecayAngle();
-        
-        histPlot->Fill(cat_list_ctau[m]);
+        histPlot->Fill(cat_list_mX1[m]);
         acp_events++;
     }
     //LAB_Gen.PrintGeneratorEfficiency();
