@@ -56,7 +56,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     vector<double> sigmaT;
     vector<double> sigmaMET;
     
-    for(double i = 10.; i <= 350.; i+=1.)
+    for(double i = 10.; i <= 350.; i+=10.)
     {
         sigmaMET.push_back(i);
         sigmaT.push_back(i);
@@ -69,7 +69,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     bool MET_flag = true;
     
     //Number of events
-    int Ngen = 10000;
+    int Ngen = 100000;
     
     int bins_MX2 = 25.;
     double xmin_MX2 = 0.;
@@ -564,7 +564,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
                 TVector3 Smeared_vBetaa_Time = PUPPI_Detector.Smear_Beta(PV,SVa);
                 TVector3 Smeared_vBetab_Time = PUPPI_Detector.Smear_Beta(PV,SVb);
                 
-                if(Smeared_vBetaa_Time.Mag() >= 1. || Smeared_vBetab_Time.Mag() >= 1.)
+                if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance || Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.)
                 {
                     i--;
                     continue;
@@ -595,6 +595,30 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
                 MXa1_Res_MET[i] = test_Resolution.Mass_Invisible_Resolution2(I_Vect,Va,Vb,Smeared_vBetaa_Time,Smeared_vBetab_Time,Sigma_Beta_Mag_Time,0.,0.);
                 double MXa2_Res_Timing = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
                 MXa1_Res_Timing[i] = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution);
+                
+                //Angle Analysis
+                TLorentzVector PX2a;
+                PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
+                TLorentzVector PX2b;
+                PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
+                PX2a.Boost(Smeared_vBetaa);
+                PX2b.Boost(Smeared_vBetab);
+                
+                //RECO Tree
+                LAB_Reco.ClearEvent();
+                L1a_Reco.SetLabFrameFourVector(L1a_RECO);
+                L1b_Reco.SetLabFrameFourVector(L1b_RECO);
+                L2a_Reco.SetLabFrameFourVector(L2a_RECO);
+                L2b_Reco.SetLabFrameFourVector(L2b_RECO);
+                X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
+                X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
+                
+                LAB_Reco.AnalyzeEvent();
+                
+                double CosX2a = X2a_Reco.GetCosDecayAngle();
+                double CosX2b = X2b_Reco.GetCosDecayAngle();
+                if((fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9)){ i--; continue; }
+                
                 //Fill Vectors
                 vect_hist_Sigma_MX2_SigmaT.at(m).at(i)->Fill(MXa2_Res/MXa2_Calc);
                 vect_hist_Sigma_MX2_MET_SigmaT.at(m).at(i)->Fill(MXa2_Res_MET/MXa2_MET_Calc);
@@ -617,7 +641,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
             TVector3 Smeared_vBetaa_No_Time = PUPPI_Detector.Smear_Beta(PV,SVa);
             TVector3 Smeared_vBetab_No_Time = PUPPI_Detector.Smear_Beta(PV,SVb);
             
-            if(Smeared_vBetaa_No_Time.Mag() >= 1. || Smeared_vBetab_No_Time.Mag() >= 1.)
+            if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance || Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.)
             {
                 igen--;
                 continue;
@@ -667,6 +691,29 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
                 double MXa2_Res_Timing = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI_LOOP,Va.Vect()+Vb.Vect(),Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
                 MXa1_Res_Timing[i] = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI_LOOP,Va,Vb,Smeared_vBetaa_No_Time,Smeared_vBetab_No_Time,Sigma_Beta_Mag_No_Time,MET_Mag_Resolution,MET_Dir_Resolution);
                 
+                //Angle Analysis
+                TLorentzVector PX2a;
+                PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
+                TLorentzVector PX2b;
+                PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
+                PX2a.Boost(Smeared_vBetaa);
+                PX2b.Boost(Smeared_vBetab);
+                
+                //RECO Tree
+                LAB_Reco.ClearEvent();
+                L1a_Reco.SetLabFrameFourVector(L1a_RECO);
+                L1b_Reco.SetLabFrameFourVector(L1b_RECO);
+                L2a_Reco.SetLabFrameFourVector(L2a_RECO);
+                L2b_Reco.SetLabFrameFourVector(L2b_RECO);
+                X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
+                X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
+                
+                LAB_Reco.AnalyzeEvent();
+                
+                double CosX2a = X2a_Reco.GetCosDecayAngle();
+                double CosX2b = X2b_Reco.GetCosDecayAngle();
+                if((fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9)){ i--; continue; }
+                
                 //Fill Vectors
                 vect_hist_Sigma_MX2_SigmaMET.at(m).at(i)->Fill(MXa2_Res/MXa2_Calc);
                 vect_hist_Sigma_MX2_MET_SigmaMET.at(m).at(i)->Fill(MXa2_Res_MET/MXa2_MET_Calc);
@@ -684,28 +731,6 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
             MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
             MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
         }
-        
-        //Angle Analysis
-        TLorentzVector PX2a;
-        PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
-        TLorentzVector PX2b;
-        PX2b.SetPxPyPzE(0.0,0.0,0.0,MXb2);
-        PX2a.Boost(Smeared_vBetaa);
-        PX2b.Boost(Smeared_vBetab);
-        
-        //RECO Tree
-        LAB_Reco.ClearEvent();
-        L1a_Reco.SetLabFrameFourVector(L1a_RECO);
-        L1b_Reco.SetLabFrameFourVector(L1b_RECO);
-        L2a_Reco.SetLabFrameFourVector(L2a_RECO);
-        L2b_Reco.SetLabFrameFourVector(L2b_RECO);
-        X1a_Reco.SetLabFrameFourVector(PX2a-L1a_RECO-L2a_RECO);
-        X1b_Reco.SetLabFrameFourVector(PX2b-L1b_RECO-L2b_RECO);
-        
-        LAB_Reco.AnalyzeEvent();
-        
-        double CosX2a = X2a_Reco.GetCosDecayAngle();
-        double CosX2b = X2b_Reco.GetCosDecayAngle();
         
         histPlot->Fill(cat_list_mX1[m]);
         acp_events++;

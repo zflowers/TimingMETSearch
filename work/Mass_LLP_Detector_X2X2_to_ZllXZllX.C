@@ -60,7 +60,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     vector<double> sigmaT;
     vector<double> sigmaMET;
     
-    for(double i = 10.; i <= 350.; i+=1.)
+    for(double i = 10.; i <= 350.; i+=10.)
     {
         sigmaMET.push_back(i);
         sigmaT.push_back(i);
@@ -70,8 +70,6 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     int NsigmaMET = sigmaMET.size();
     bool timing_flag = true; //set to false to turn off anything related to looping over sigmat
     bool MET_flag = true;
-    bool LSP_flag = true; //set to false to turn off regenerating the event for non-real LSP reco masses
-    bool LSP_Calc_flag = false; //leave this alone
     
     //Number of events
     int Ngen = 100000;
@@ -681,11 +679,6 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
                     MXa1_Calc[i] = test_Resolution.Mass_Invisible2(MXa2_Calc, EZa_Calc, Mass_Vis);
                     MXa1_MET_Calc[i] = test_Resolution.Mass_Invisible2(MXa2_MET_Calc, EZa_Calc, Mass_Vis);
                     MXa1_Timing_Calc[i] = test_Resolution.Mass_Invisible2(MXa2_Timing_Calc, EZa_Timing_Calc, Mass_Vis);
-                    
-                    if(MXa1_Calc[i] < 0. || MXa1_MET_Calc[i] < 0. || MXa1_Timing_Calc[i] < 0.)
-                    {
-                        LSP_Calc_flag = true;
-                    }
                     
                     double MXa2_Res = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI_LOOP,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
                     MXa1_Res[i] = test_Resolution.Mass_Invisible_Resolution2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution);

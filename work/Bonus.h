@@ -22,14 +22,14 @@
 double Hist_Mode(TH1D& hist)
 {
     //if( hist.GetMaximumBin() == 1 ) { hist.SetBinContent(1,0.); }
-    if(hist.GetBinContent(1) > hist.GetBinContent(2)) { hist.SetBinContent(1,0.); }
+    //if(hist.GetBinContent(1) > hist.GetBinContent(2)) { hist.SetBinContent(1,0.); }
     return hist.GetXaxis()->GetBinCenter(hist.GetMaximumBin());
 }
 
 double Hist_FWHM(TH1D& hist)
 {
     //if( hist.GetMaximumBin() == 1 ) { hist.SetBinContent(1,0.); }
-    if(hist.GetBinContent(1) > hist.GetBinContent(2)) { hist.SetBinContent(1,0.); }
+    //if(hist.GetBinContent(1) > hist.GetBinContent(2)) { hist.SetBinContent(1,0.); }
     int left_bin = 0;
     int right_bin = 0;
     for(int i = 0; i < hist.GetNbinsX(); i++)
@@ -356,7 +356,7 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
         vect_graph[5]->SetMarkerStyle(32);
         vect_graph[5]->SetLineColor(kGreen+2);
         vect_graph[5]->SetMarkerColor(kGreen+2);}
-    mg->Draw("AC");
+    mg->Draw("AP"); //mg->Draw("AC");
     mg->GetYaxis()->SetTitleOffset(1.05);
     mg->GetXaxis()->SetTitleOffset(1.05);
     mg->GetYaxis()->SetTitleSize(.04);
