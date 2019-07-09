@@ -834,6 +834,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         }
         vector<string> leg_text_Sigma_MX2_SigmaT;
         for(int j = 0; j < NmX2; j++){leg_text_Sigma_MX2_SigmaT.push_back("M(#tilde{#chi}_{2}^{0})"+std::to_string(int(mX2.at(j))));}
+        setMyStyle();
         vect_graph_Sigma_MX2_SigmaT.at(0)->SetTitle("Analytical: Everything On");
         Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_timing_LLP_Both", points);
         vect_graph_Sigma_MX2_MET_SigmaT.at(0)->SetTitle("Analytical: MET Off");
@@ -896,6 +897,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         }
         vector<string> leg_text_Sigma_MX2_SigmaMET;
         for(int j = 0; j < NmX2; j++){leg_text_Sigma_MX2_SigmaMET.push_back("M(#tilde{#chi}_{2}^{0})"+std::to_string(int(mX2.at(j))));}
+        setMyStyle();
         vect_graph_Sigma_MX2_SigmaMET.at(0)->SetTitle("Analytical: Everything On");
         Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_met_LLP_Both", points);
         vect_graph_Sigma_MX2_MET_SigmaMET.at(0)->SetTitle("Analytical: MET Off");

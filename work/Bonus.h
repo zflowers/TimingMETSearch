@@ -215,7 +215,7 @@ void setMyStyle()
     myStyle->SetLegendBorderSize(1);
     myStyle->SetLegendFillColor(0);
     myStyle->SetLegendFont(42);
-    myStyle->SetLegendTextSize(0.08);
+    myStyle->SetLegendTextSize(0.05);
     
     // For the Pad:
     myStyle->SetPadBorderMode(0);
@@ -240,6 +240,16 @@ void setMyStyle()
     myStyle->SetPadBottomMargin(0.18);
     myStyle->SetPadLeftMargin(0.15);
     
+    myStyle->SetTitleX(0.5);
+    myStyle->SetTitleAlign(23);
+    myStyle->SetTitleY(0.985);
+    myStyle->SetTitleFont(42);
+    myStyle->SetTitleColor(1);
+    myStyle->SetTitleTextColor(1);
+    myStyle->SetTitleFillColor(0);
+    myStyle->SetTitleFontSize(0.05);
+    myStyle->SetTitleBorderSize(0);
+    
     // use large Times-Roman fonts
     myStyle->SetTitleFont(42,"xyz");  // set the all 3 axes title font
     myStyle->SetTitleFont(42," ");    // set the pad title font
@@ -261,7 +271,7 @@ void setMyStyle()
     myStyle->SetErrorX(0.001);
     
     // do not display any of the standard histogram decorations
-    myStyle->SetOptTitle(0);
+    myStyle->SetOptTitle(1);
     myStyle->SetOptStat(0);
     myStyle->SetOptFit(11111111);
     
@@ -290,12 +300,12 @@ void setMyStyle()
 void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>& leg_text, const string& YaxisText, const string& XaxisText, const string& plotName, bool type)
 {
     setMyStyle();
-    bool opt_title = false;
+    gStyle->SetOptTitle(1);
     if(!(fout.IsOpen())) {cout << "Output File Not Open..." << endl;}
-    TLegend* leg = new TLegend(0.15,0.6,0.403,0.91);
+    TLegend* leg = new TLegend(0.15,0.7,0.3,0.91);
     vector<TLegendEntry*> vect_leg_entry;
     {for(int i = 0; i<int(leg_text.size()); i++) { TLegendEntry* leg_entry = leg->AddEntry(vect_graph.at(i),leg_text.at(i).c_str(),"P"); }}
-    
+    leg->SetTextSize(0.05);
     TCanvas* canvas_graph = new TCanvas(("canvas_graph"+plotName).c_str(),"canvas_graph",750,500);
     canvas_graph->SetGridx();
     canvas_graph->SetGridy();
@@ -304,12 +314,6 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     TMultiGraph* mg = new TMultiGraph();
     string title = vect_graph.at(0)->GetTitle();
     title += (";"+XaxisText+";"+YaxisText);
-    if((strcmp((vect_graph.at(0)->GetTitle()),"Graph")))
-    {
-        //mg->Get
-        gStyle->SetOptTitle(1);
-        opt_title = true;
-    }
     mg->SetTitle(title.c_str());
     for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph.at(i)); }
     vect_graph[0]->SetLineStyle(1);
@@ -369,7 +373,6 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     leg->Draw("SAMES");
     canvas_graph->SaveAs((plotName+".pdf").c_str());
     canvas_graph->Write();
-    //if(opt_title) { gStyle->SetOptTitle(0); }
 }
 
 Double_t Expo_sqrt(Double_t *x,Double_t *par)

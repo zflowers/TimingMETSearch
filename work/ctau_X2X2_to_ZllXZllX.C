@@ -834,16 +834,17 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         delete vect_hist_Sigma_MX2_MET_Measured_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_Timing_Measured_SigmaT.at(i).at(j);
         
-        //delete vect_hist_Sigma_MX1_SigmaT.at(i).at(j);
+        delete vect_hist_Sigma_MX1_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_MET_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_Timing_SigmaT.at(i).at(j);
-        //delete vect_hist_Sigma_MX1_Measured_SigmaT.at(i).at(j);
+        delete vect_hist_Sigma_MX1_Measured_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_MET_Measured_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX1_Timing_Measured_SigmaT.at(i).at(j);
     }
     }
     vector<string> leg_text_Sigma_MX2_SigmaT;
     for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaT.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
+    gStyle->SetOptTitle(1);
     vect_graph_Sigma_MX2_SigmaT.at(0)->SetTitle("Analytical: Everything On");
     Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_ctau_LLP_Both", points);
     vect_graph_Sigma_MX2_MET_SigmaT.at(0)->SetTitle("Analytical: MET Off");
@@ -919,6 +920,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         }
         vector<string> leg_text_Sigma_MX2_SigmaMET;
         for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaMET.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
+        gStyle->SetOptTitle(1);
         vect_graph_Sigma_MX2_SigmaMET.at(0)->SetTitle("Analytical: Everything On");
         Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_met_ctau_Both", points);
         vect_graph_Sigma_MX2_MET_SigmaMET.at(0)->SetTitle("Analytical: MET Off");
