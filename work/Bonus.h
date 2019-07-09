@@ -312,25 +312,51 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     }
     mg->SetTitle(title.c_str());
     for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph.at(i)); }
+    vect_graph[0]->SetLineStyle(1);
     vect_graph[0]->SetMarkerStyle(22);
+    vect_graph[0]->SetLineColor(kBlue);
     vect_graph[0]->SetMarkerColor(kBlue);
     if(vect_graph.size() > 1){
+        vect_graph[1]->SetLineStyle(1);
         vect_graph[1]->SetMarkerStyle(22);
+        vect_graph[1]->SetLineColor(kRed);
         vect_graph[1]->SetMarkerColor(kRed);}
     if(vect_graph.size() > 2){
+        vect_graph[2]->SetLineStyle(1);
         vect_graph[2]->SetMarkerStyle(22);
+        vect_graph[2]->SetLineColor(kGreen+2);
         vect_graph[2]->SetMarkerColor(kGreen+2);}
     if(vect_graph.size() == 4){
+        vect_graph[3]->SetLineStyle(1);
         vect_graph[3]->SetMarkerStyle(22);
+        vect_graph[3]->SetLineColor(kMagenta);
         vect_graph[3]->SetMarkerColor(kMagenta);}
     if(vect_graph.size() == 6){
+        vect_graph[0]->SetLineStyle(1);
+        vect_graph[0]->SetMarkerStyle(22);
+        vect_graph[0]->SetLineColor(kBlue);
+        vect_graph[0]->SetMarkerColor(kBlue);
+        vect_graph[1]->SetLineStyle(1);
+        vect_graph[1]->SetMarkerStyle(22);
+        vect_graph[1]->SetLineColor(kRed);
+        vect_graph[1]->SetMarkerColor(kRed);
+        vect_graph[2]->SetLineStyle(1);
+        vect_graph[2]->SetMarkerStyle(22);
+        vect_graph[2]->SetLineColor(kGreen+2);
+        vect_graph[2]->SetMarkerColor(kGreen+2);
+        vect_graph[3]->SetLineStyle(9);
         vect_graph[3]->SetMarkerStyle(32);
+        vect_graph[3]->SetLineColor(kBlue);
         vect_graph[3]->SetMarkerColor(kBlue);
+        vect_graph[4]->SetLineStyle(9);
         vect_graph[4]->SetMarkerStyle(32);
+        vect_graph[4]->SetLineColor(kRed);
         vect_graph[4]->SetMarkerColor(kRed);
+        vect_graph[5]->SetLineStyle(9);
         vect_graph[5]->SetMarkerStyle(32);
+        vect_graph[5]->SetLineColor(kGreen+2);
         vect_graph[5]->SetMarkerColor(kGreen+2);}
-    mg->Draw("AP");
+    mg->Draw("AC");
     mg->GetYaxis()->SetTitleOffset(1.05);
     mg->GetXaxis()->SetTitleOffset(1.05);
     mg->GetYaxis()->SetTitleSize(.04);

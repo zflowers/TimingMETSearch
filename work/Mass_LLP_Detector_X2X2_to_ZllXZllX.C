@@ -60,7 +60,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     vector<double> sigmaT;
     vector<double> sigmaMET;
     
-    for(double i = 10.; i <= 350.; i+=10.)
+    for(double i = 10.; i <= 350.; i+=1.)
     {
         sigmaMET.push_back(i);
         sigmaT.push_back(i);

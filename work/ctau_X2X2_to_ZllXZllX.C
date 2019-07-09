@@ -60,7 +60,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     vector<double> sigmaT;
     vector<double> sigmaMET;
     
-    for(double i = 10.; i <= 350.; i+=10.)
+    for(double i = 10.; i <= 350.; i+=1.)
     {
         sigmaMET.push_back(i);
         sigmaT.push_back(i);
@@ -760,7 +760,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     vector<string> leg_text_Sigma_MX2_SigmaT;
     for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaT.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
     Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_timing_ctau");
-    Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "MLSP_timing_ctau");
+    //Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "MLSP_timing_ctau");
     vector<TGraph*> vect_graph_ctau_SigmaT;
     vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_SigmaT[0]);
     vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_MET_SigmaT[0]);
@@ -773,7 +773,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     leg_text_ctau_SigmaT.push_back("#sigma_{MET} Off");
     leg_text_ctau_SigmaT.push_back("#sigma_{t} Off");
     leg_text_ctau_SigmaT.push_back("Measured");
-    Draw_Graphs(fout, vect_graph_ctau_SigmaT, leg_text_ctau_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_Timing_ctau");
+    //Draw_Graphs(fout, vect_graph_ctau_SigmaT, leg_text_ctau_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_Timing_ctau");
     }
     if(MET_flag){
     for(int i = 0; i<Nctau; i++)
@@ -812,7 +812,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         }
         vector<string> leg_text_Sigma_MX2_SigmaMET;
         for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaMET.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-        Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_met_ctau");
+        //Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_met_ctau");
         vector<TGraph*> vect_graph_ctau_SigmaMET;
         vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_SigmaMET[0]);
         vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_MET_SigmaMET[0]);
@@ -825,7 +825,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         leg_text_ctau_SigmaMET.push_back("#sigma_{MET} Off");
         leg_text_ctau_SigmaMET.push_back("#sigma_{t} Off");
         leg_text_ctau_SigmaMET.push_back("Measured");
-        Draw_Graphs(fout, vect_graph_ctau_SigmaMET, leg_text_ctau_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET_ctau");
+        //Draw_Graphs(fout, vect_graph_ctau_SigmaMET, leg_text_ctau_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET_ctau");
     }
   fout.Close();
   histPlot->WriteOutput(output_name);
