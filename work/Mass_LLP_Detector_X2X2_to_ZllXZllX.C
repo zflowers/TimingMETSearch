@@ -73,7 +73,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     bool points = true;
     
     //Number of events
-    int Ngen = 10000;
+    int Ngen = 100000;
     
     int bins_MX2 = 50.; int bins_MX1 = 50.;
     double xmin_MX2 = 0.; double xmin_MX1 = 0.;
