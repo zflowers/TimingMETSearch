@@ -543,8 +543,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         
         if(timing_flag){
             PUPPI_Detector.Set_sigmaT(0.);
-            double ToFa_No_Time = physics.Get_ToF(ctau, Pa);
-            double ToFb_No_Time = physics.Get_ToF(ctau, Pb);
+            double ToFa_No_Time = physics.Get_ToF(ctau[m], Pa);
+            double ToFb_No_Time = physics.Get_ToF(ctau[m], Pb);
             double Smeared_ToFa_No_Time = PUPPI_Detector.Smear_ToF(ToFa_No_Time);
             double Smeared_ToFb_No_Time = PUPPI_Detector.Smear_ToF(ToFb_No_Time);
             Vertex SVa_No_Time = physics.Get_SV(ToFa_No_Time,Pa);
@@ -575,8 +575,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             for(int i = 0; i < NsigmaT; i++)
             {
                 PUPPI_Detector.Set_sigmaT((sigmaT[i]/1000.0)/sqrt(2.));
-                double ToFa_Time = physics.Get_ToF(ctau, Pa);
-                double ToFb_Time = physics.Get_ToF(ctau, Pb);
+                double ToFa_Time = physics.Get_ToF(ctau[m], Pa);
+                double ToFb_Time = physics.Get_ToF(ctau[m], Pb);
                 double Smeared_ToFa_Time = PUPPI_Detector.Smear_ToF(ToFa_Time);
                 double Smeared_ToFb_Time = PUPPI_Detector.Smear_ToF(ToFb_Time);
                 Vertex SVa_Time = physics.Get_SV(ToFa_Time,Pa);
@@ -677,8 +677,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         
         if(MET_flag){
             PUPPI_Detector.Set_sigmaT(0.);
-            double ToFa_No_Time = physics.Get_ToF(ctau, Pa);
-            double ToFb_No_Time = physics.Get_ToF(ctau, Pb);
+            double ToFa_No_Time = physics.Get_ToF(ctau[m], Pa);
+            double ToFb_No_Time = physics.Get_ToF(ctau[m], Pb);
             double Smeared_ToFa_No_Time = PUPPI_Detector.Smear_ToF(ToFa_No_Time);
             double Smeared_ToFb_No_Time = PUPPI_Detector.Smear_ToF(ToFb_No_Time);
             Vertex SVa_No_Time = physics.Get_SV(ToFa_No_Time,Pa);
@@ -844,8 +844,30 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     }
     vector<string> leg_text_Sigma_MX2_SigmaT;
     for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaT.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-    Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_timing_ctau", points);
-    //Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "MLSP_timing_ctau", points);
+    vect_graph_Sigma_MX2_SigmaT.at(0)->SetTitle("Analytical: Everything On");
+    Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_ctau_LLP_Both", points);
+    vect_graph_Sigma_MX2_MET_SigmaT.at(0)->SetTitle("Analytical: MET Off");
+    Draw_Graphs(fout, vect_graph_Sigma_MX2_MET_SigmaT, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_ctau_LLP_MET_Off", points);
+    vect_graph_Sigma_MX2_Timing_SigmaT.at(0)->SetTitle("Analytical: Timing Off");
+    Draw_Graphs(fout, vect_graph_Sigma_MX2_Timing_SigmaT, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_ctau_LLP_Timing_Off", points);
+    vect_graph_Sigma_MX2_SigmaT_Measured.at(0)->SetTitle("Measured: Everything On");
+    Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Measured_ctau_LLP_Both", points);
+    vect_graph_Sigma_MX2_MET_SigmaT_Measured.at(0)->SetTitle("Measured: MET Off");
+    Draw_Graphs(fout, vect_graph_Sigma_MX2_MET_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Measured_ctau_LLP_MET_Off", points);
+    vect_graph_Sigma_MX2_Timing_SigmaT_Measured.at(0)->SetTitle("Measured: Timing Off");
+    Draw_Graphs(fout, vect_graph_Sigma_MX2_Timing_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Measured_ctau_LLP_Timing_Off", points);
+    vect_graph_Sigma_MX1_SigmaT.at(0)->SetTitle("Analytical: Everything On");
+    Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Analytical_ctau_LSP_Both", points);
+    vect_graph_Sigma_MX1_MET_SigmaT.at(0)->SetTitle("Analytical: MET Off");
+    Draw_Graphs(fout, vect_graph_Sigma_MX1_MET_SigmaT, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Analytical_ctau_LSP_MET_Off", points);
+    vect_graph_Sigma_MX1_Timing_SigmaT.at(0)->SetTitle("Analytical: Timing Off");
+    Draw_Graphs(fout, vect_graph_Sigma_MX1_Timing_SigmaT, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Analytical_ctau_LSP_Timing_Off", points);
+    vect_graph_Sigma_MX1_SigmaT_Measured.at(0)->SetTitle("Measured: Everything On");
+    Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Measured_ctau_LSP_Both", points);
+    vect_graph_Sigma_MX1_MET_SigmaT_Measured.at(0)->SetTitle("Measured: MET Off");
+    Draw_Graphs(fout, vect_graph_Sigma_MX1_MET_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Measured_ctau_LSP_MET_Off", points);
+    vect_graph_Sigma_MX1_Timing_SigmaT_Measured.at(0)->SetTitle("Measured: Timing Off");
+    Draw_Graphs(fout, vect_graph_Sigma_MX1_Timing_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Measured_ctau_LSP_Timing_Off", points);
     vector<TGraph*> vect_graph_ctau_SigmaT;
     vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_SigmaT[0]);
     vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_MET_SigmaT[0]);
@@ -897,7 +919,30 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         }
         vector<string> leg_text_Sigma_MX2_SigmaMET;
         for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaMET.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-        //Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_met_ctau", points);
+        vect_graph_Sigma_MX2_SigmaMET.at(0)->SetTitle("Analytical: Everything On");
+        Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_met_ctau_Both", points);
+        vect_graph_Sigma_MX2_MET_SigmaMET.at(0)->SetTitle("Analytical: MET Off");
+        Draw_Graphs(fout, vect_graph_Sigma_MX2_MET_SigmaMET, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_met_ctau_MET_Off", points);
+        vect_graph_Sigma_MX2_Timing_SigmaMET.at(0)->SetTitle("Analytical: Timing Off");
+        Draw_Graphs(fout, vect_graph_Sigma_MX2_Timing_SigmaMET, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Analytical_met_ctau_Timing_Off", points);
+        vect_graph_Sigma_MX2_SigmaMET_Measured.at(0)->SetTitle("Measured: Everything On");
+        Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Measured_met_ctau_Both", points);
+        vect_graph_Sigma_MX2_MET_SigmaMET_Measured.at(0)->SetTitle("Measured: MET Off");
+        Draw_Graphs(fout, vect_graph_Sigma_MX2_MET_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Measured_met_ctau_MET_Off", points);
+        vect_graph_Sigma_MX2_Timing_SigmaMET_Measured.at(0)->SetTitle("Measured: Timing Off");
+        Draw_Graphs(fout, vect_graph_Sigma_MX2_Timing_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "Res_LLP_Measured_met_ctau_Timing_Off", points);
+        vect_graph_Sigma_MX1_SigmaMET.at(0)->SetTitle("Analytical: Everything On");
+        Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaMET, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Analytical_met_LSP_Both", points);
+        vect_graph_Sigma_MX1_MET_SigmaMET.at(0)->SetTitle("Analytical: MET Off");
+        Draw_Graphs(fout, vect_graph_Sigma_MX1_MET_SigmaMET, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Analytical_met_LSP_MET_Off", points);
+        vect_graph_Sigma_MX1_Timing_SigmaMET.at(0)->SetTitle("Analytical: Timing Off");
+        Draw_Graphs(fout, vect_graph_Sigma_MX1_Timing_SigmaMET, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Analytical_met_LSP_Timing_Off", points);
+        vect_graph_Sigma_MX1_SigmaMET_Measured.at(0)->SetTitle("Measured: Everything On");
+        Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Measured_met_LSP_Both", points);
+        vect_graph_Sigma_MX1_MET_SigmaMET_Measured.at(0)->SetTitle("Measured: MET Off");
+        Draw_Graphs(fout, vect_graph_Sigma_MX1_MET_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Measured_met_LSP_MET_Off", points);
+        vect_graph_Sigma_MX1_Timing_SigmaMET_Measured.at(0)->SetTitle("Measured: Timing Off");
+        Draw_Graphs(fout, vect_graph_Sigma_MX1_Timing_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "Res_LSP_Measured_met_LSP_Timing_Off", points);
         vector<TGraph*> vect_graph_ctau_SigmaMET;
         vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_SigmaMET[0]);
         vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_MET_SigmaMET[0]);

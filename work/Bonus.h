@@ -358,6 +358,8 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
         vect_graph[5]->SetMarkerColor(kGreen+2);}
     if(type) { mg->Draw("AP"); }
     else { mg->Draw("AC"); }
+    mg->GetXaxis()->CenterTitle(true);
+    mg->GetYaxis()->CenterTitle(true);
     mg->GetYaxis()->SetTitleOffset(1.05);
     mg->GetXaxis()->SetTitleOffset(1.05);
     mg->GetYaxis()->SetTitleSize(.04);
