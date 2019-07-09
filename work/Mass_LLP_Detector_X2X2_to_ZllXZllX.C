@@ -70,9 +70,10 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     int NsigmaMET = sigmaMET.size();
     bool timing_flag = true; //set to false to turn off anything related to looping over sigmat
     bool MET_flag = true;
+    bool points = true;
     
     //Number of events
-    int Ngen = 100000;
+    int Ngen = 10000;
     
     int bins_MX2 = 50.; int bins_MX1 = 50.;
     double xmin_MX2 = 0.; double xmin_MX1 = 0.;
@@ -630,7 +631,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
                     vect_hist_Sigma_MX2_Timing_Measured_SigmaT.at(m).at(i)->Fill(MXa2_Timing_Calc);
                 }
                 PUPPI_Detector.Set_sigmaT((sigmaT[0]/1000.)/sqrt(2.));
-                for(int k = 0; k < NsigmaT; k++)
+                for(int i = 0; i < NsigmaT; i++)
                 {
                     if(MXa1_Calc[i] > 0.0001)
                     {
@@ -738,7 +739,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
                 }
                 MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
                 MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
-                for(int k = 0; k < NsigmaMET; k++)
+                for(int i = 0; i < NsigmaMET; i++)
                 {
                     if(MXa1_Calc[i] > 0.0001)
                     {
@@ -757,7 +758,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
                     }
                 }
             }
-            histPlot->Fill(cat_list_mX1[m]);
+            histPlot->Fill(cat_list[m]);
             acp_events++;
         }
         //LAB_Gen.PrintGeneratorEfficiency();
@@ -807,8 +808,8 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         }
         vector<string> leg_text_Sigma_MX2_SigmaT;
         for(int j = 0; j < NmX2; j++){leg_text_Sigma_MX2_SigmaT.push_back("M(#tilde{#chi}_{2}^{0})"+std::to_string(int(mX2.at(j))));}
-        Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_timing_mX2");
-        Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "MLSP_timing_mX2");
+        Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_timing_mX2", points);
+        Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "MLSP_timing_mX2", points);
     }
     if(MET_flag){
         for(int i = 0; i<NmX2; i++)
@@ -847,8 +848,8 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         }
         vector<string> leg_text_Sigma_MX2_SigmaMET;
         for(int j = 0; j < NmX2; j++){leg_text_Sigma_MX2_SigmaMET.push_back("M(#tilde{#chi}_{2}^{0})"+std::to_string(int(mX2.at(j))));}
-        Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET_mX2");
-        Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{MET} [%]", "MLSP_MET_mX2");
+        Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET_mX2", points);
+        Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{MET} [%]", "MLSP_MET_mX2", points);
     }
     fout.Close();
     histPlot->WriteOutput(output_name);

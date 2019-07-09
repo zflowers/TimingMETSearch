@@ -71,9 +71,10 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     int NsigmaMET = sigmaMET.size();
     bool timing_flag = true; //set to false to turn off anything related to looping over sigmat
     bool MET_flag = true;
+    bool points = true;
     
     //Number of events
-    int Ngen = 100000;
+    int Ngen = 10000;
     
     int bins_MX2 = 25.;
     double xmin_MX2 = 0.;
@@ -394,8 +395,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", -100., 500., "[GeV]");
     const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", -1000., 2000., "[GeV]");
     
-    //histPlot->AddPlot(MXa2, cat_list_mX1);
-    //histPlot->AddPlot(MIa2, cat_list_mX1);
+    //histPlot->AddPlot(MXa2, cat_list_ctau);
+    //histPlot->AddPlot(MIa2, cat_list_ctau);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -630,7 +631,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 vect_hist_Sigma_MX2_Timing_Measured_SigmaT.at(m).at(i)->Fill(MXa2_Timing_Calc);
             }
             PUPPI_Detector.Set_sigmaT((sigmaT[0]/1000.)/sqrt(2.));
-            for(int k = 0; k < NsigmaT; k++)
+            for(int i = 0; i < NsigmaT; i++)
             {
                 if(MXa1_Calc[i] > 0.0001)
                 {
@@ -738,7 +739,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             }
             MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
             MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
-            for(int k = 0; k < NsigmaMET; k++)
+            for(int i = 0; i < NsigmaMET; i++)
             {
                 if(MXa1_Calc[i] > 0.0001)
                 {
@@ -757,7 +758,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 }
             }
         }
-        histPlot->Fill(cat_list_mX1[m]);
+        histPlot->Fill(cat_list_ctau[m]);
         acp_events++;
     }
     //LAB_Gen.PrintGeneratorEfficiency();
@@ -807,8 +808,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     }
     vector<string> leg_text_Sigma_MX2_SigmaT;
     for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaT.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-    Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_timing_ctau");
-    //Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "MLSP_timing_ctau");
+    Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_timing_ctau", points);
+    //Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "#sigma_{M_{LSP}}/M_{LSP}", "#sigma_{t} [ps]", "MLSP_timing_ctau", points);
     vector<TGraph*> vect_graph_ctau_SigmaT;
     vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_SigmaT[0]);
     vect_graph_ctau_SigmaT.push_back(vect_graph_Sigma_MX2_MET_SigmaT[0]);
@@ -821,7 +822,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     leg_text_ctau_SigmaT.push_back("#sigma_{MET} Off");
     leg_text_ctau_SigmaT.push_back("#sigma_{t} Off");
     leg_text_ctau_SigmaT.push_back("Measured");
-    //Draw_Graphs(fout, vect_graph_ctau_SigmaT, leg_text_ctau_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_Timing_ctau");
+    //Draw_Graphs(fout, vect_graph_ctau_SigmaT, leg_text_ctau_SigmaT, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{t} [ps]", "MLLP_Timing_ctau", points);
     }
     if(MET_flag){
     for(int i = 0; i<Nctau; i++)
@@ -860,7 +861,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         }
         vector<string> leg_text_Sigma_MX2_SigmaMET;
         for(int j = 0; j < Nctau; j++){leg_text_Sigma_MX2_SigmaMET.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-        //Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_met_ctau");
+        //Draw_Graphs(fout, vect_graph_Sigma_MX2_SigmaMET_Measured, leg_text_Sigma_MX2_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_met_ctau", points);
         vector<TGraph*> vect_graph_ctau_SigmaMET;
         vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_SigmaMET[0]);
         vect_graph_ctau_SigmaMET.push_back(vect_graph_Sigma_MX2_MET_SigmaMET[0]);
@@ -873,7 +874,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         leg_text_ctau_SigmaMET.push_back("#sigma_{MET} Off");
         leg_text_ctau_SigmaMET.push_back("#sigma_{t} Off");
         leg_text_ctau_SigmaMET.push_back("Measured");
-        //Draw_Graphs(fout, vect_graph_ctau_SigmaMET, leg_text_ctau_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET_ctau");
+        //Draw_Graphs(fout, vect_graph_ctau_SigmaMET, leg_text_ctau_SigmaMET, "#sigma_{M_{LLP}}/M_{LLP}", "#sigma_{MET} [%]", "MLLP_MET_ctau", points);
     }
   fout.Close();
   histPlot->WriteOutput(output_name);

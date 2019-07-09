@@ -287,7 +287,7 @@ void setMyStyle()
     myStyle->cd();
 }
 
-void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>& leg_text, const string& YaxisText, const string& XaxisText, const string& plotName)
+void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>& leg_text, const string& YaxisText, const string& XaxisText, const string& plotName, bool type)
 {
     setMyStyle();
     bool opt_title = false;
@@ -356,7 +356,8 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
         vect_graph[5]->SetMarkerStyle(32);
         vect_graph[5]->SetLineColor(kGreen+2);
         vect_graph[5]->SetMarkerColor(kGreen+2);}
-    mg->Draw("AP"); //mg->Draw("AC");
+    if(type) { mg->Draw("AP"); }
+    else { mg->Draw("AC"); }
     mg->GetYaxis()->SetTitleOffset(1.05);
     mg->GetXaxis()->SetTitleOffset(1.05);
     mg->GetYaxis()->SetTitleSize(.04);

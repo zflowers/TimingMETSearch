@@ -74,6 +74,7 @@ void Efficiency(std::string output_name =
     int Ngen = 5000;
     
     bool met_flag = false;
+    bool points = true;
     
     vector<vector<int>> vect_timing_2displacement(Nctau, vector<int>(NsigmaT,0));
     vector<vector<int>> vect_timing_3displacement(Nctau, vector<int>(NsigmaT,0));
@@ -396,13 +397,13 @@ void Efficiency(std::string output_name =
     TFile fout(output_name.c_str(),"RECREATE");
     vector<string> leg_text_Ctau;
     for(int j = 0; j < Nctau; j++){leg_text_Ctau.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
-    Draw_Graphs(fout, vect_graph_timing_2displacement, leg_text_Ctau, "Reconstruction Efficiency 2#sigma [%]", "#sigma_{t} [ps]", "Efficiency_2Sigma");
-    Draw_Graphs(fout, vect_graph_timing_3displacement, leg_text_Ctau, "Reconstruction Efficiency 3#sigma [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma");
-    Draw_Graphs(fout, vect_graph_timing_2displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 2#sigma & |Cos(#theta)| < 0.9 [%]", "#sigma_{t} [ps]", "Efficiency_2Sigma_DecayAngle");
-    Draw_Graphs(fout, vect_graph_timing_3displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 3#sigma & |Cos(#theta)| < 0.9 [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma_DecayAngle");
+    Draw_Graphs(fout, vect_graph_timing_2displacement, leg_text_Ctau, "Reconstruction Efficiency 2#sigma [%]", "#sigma_{t} [ps]", "Efficiency_2Sigma", points);
+    Draw_Graphs(fout, vect_graph_timing_3displacement, leg_text_Ctau, "Reconstruction Efficiency 3#sigma [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma", points);
+    Draw_Graphs(fout, vect_graph_timing_2displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 2#sigma & |Cos(#theta)| < 0.9 [%]", "#sigma_{t} [ps]", "Efficiency_2Sigma_DecayAngle", points);
+    Draw_Graphs(fout, vect_graph_timing_3displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 3#sigma & |Cos(#theta)| < 0.9 [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma_DecayAngle", points);
     vector<TGraph*> vect_graph_ctau { vect_graph_timing_2displacement.at(1), vect_graph_timing_3displacement.at(1), vect_graph_timing_2displacement_decayangle.at(1), vect_graph_timing_3displacement_decayangle.at(1) };
     vector<string> leg_text { "2#sigma Displacement", "3#sigma Displacement", "2#sigma & |Cos(#theta)| < 0.9", "3#sigma & |Cos(#theta)| < 0.9" };
-    vect_graph_ctau.at(0)->SetTitle(("c#tau = " + std::to_string(int(ctau.at(1))) + " cm, M_{#tilde{#chi}^{ 0}_{2}} = " + std::to_string(int(mX2)) + " GeV, M_{#tilde{#chi}^{ 0}_{1}} = " + std::to_string(int(mX1)) + " GeV").c_str());
+    vect_graph_ctau.at(0)->SetTitle(("c#tau = " + std::to_string(int(ctau.at(1))) + " cm, M_{#tilde{#chi}^{ 0}_{2}} = " + std::to_string(int(mX2)) + " GeV, M_{#tilde{#chi}^{ 0}_{1}} = " + std::to_string(int(mX1)) + " GeV").c_str(), points);
     Draw_Graphs(fout, vect_graph_ctau, leg_text, "Reconstruction Efficiency [%]", "#sigma_{t} [ps]", "Efficiency");
   fout.Close();
   g_Log << LogInfo << "Finished" << LogEnd;
