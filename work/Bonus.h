@@ -19,29 +19,108 @@
 #include <numeric>
 #include <algorithm>
 
-double Hist_Mode(TH1D& hist)
+double Get_Mode(TH1D& hist)
 {
-    //if( hist.GetMaximumBin() == 1 ) { hist.SetBinContent(1,0.); }
-    //if(hist.GetBinContent(1) > hist.GetBinContent(2)) { hist.SetBinContent(1,0.); }
     return hist.GetXaxis()->GetBinCenter(hist.GetMaximumBin());
 }
 
-double Hist_FWHM(TH1D& hist)
+Double_t Fit_Mode(Double_t *x,Double_t *par)
 {
-    //if( hist.GetMaximumBin() == 1 ) { hist.SetBinContent(1,0.); }
-    //if(hist.GetBinContent(1) > hist.GetBinContent(2)) { hist.SetBinContent(1,0.); }
-    int left_bin = 0;
-    int right_bin = 0;
-    for(int i = 0; i < hist.GetNbinsX(); i++)
+    return par[0]*(1./x[0])+par[1];
+}
+
+double Hist_Mode(TH1D hist)
+{
+    TGraph* width_bins = new TGraph(0);
+    int base = 2.;
+    for(int i = 0; i < 11; i++)
     {
-        if(hist.GetBinContent(i) > hist.GetBinContent(hist.GetMaximumBin())/2.) left_bin = i;
+        if(TMath::Power(base,i) == hist.GetNbinsX())
+        {
+            width_bins->Set(i);
+            break;
+        }
     }
-    for(int j = hist.GetNbinsX()-1; j >=0; j--)
+    if(width_bins->GetN() == 0)
     {
-        if(hist.GetBinContent(j) > hist.GetBinContent(hist.GetMaximumBin())/2.) right_bin = j;
+        cout << "Improper number of Histogram Bins ";
+        cout << "Must be a power of: " << base << " ";
+        cout << "Returing zero now" << endl;
+        return 0.;
     }
-    //cout << fabs(hist.GetXaxis()->GetBinUpEdge(right_bin)-hist.GetXaxis()->GetBinLowEdge(left_bin)) << endl;
-    return fabs(hist.GetXaxis()->GetBinUpEdge(right_bin)-hist.GetXaxis()->GetBinLowEdge(left_bin));
+    double constant = 0.;
+    for(int j = width_bins->GetN(); j >= 0; j--)
+    {
+        width_bins->SetPoint(j,TMath::Power(base,j),Get_Mode(hist));
+        if(j == width_bins->GetN()/2) { constant = Get_Mode(hist); }
+        if(hist.GetNbinsX() == 1) break;
+        hist.Rebin(base);
+    }
+    TCanvas* canv = new TCanvas(hist.GetName(),"",750,500);
+    canv->cd();
+    width_bins->Draw("AP");
+    TF1* fit_func = new TF1(hist.GetName(),Fit_Mode,width_bins->GetXaxis()->GetXmin(),width_bins->GetXaxis()->GetXmax(),2);
+    fit_func->SetParameter(0,Get_Mode(hist));
+    fit_func->SetParameter(1,constant);
+    width_bins->Fit(fit_func,"QEMR");
+    double mode = fit_func->GetParameter(1);
+    delete fit_func;
+    delete width_bins;
+    delete canv;
+    return mode;
+}
+
+double Get_FWHM(TH1D& hist)
+{
+    int bin1 = hist.FindFirstBinAbove(hist.GetMaximum()/2);
+    int bin2 = hist.FindLastBinAbove(hist.GetMaximum()/2);
+    return (hist.GetXaxis()->GetBinUpEdge(bin2) - hist.GetXaxis()->GetBinLowEdge(bin1));
+}
+
+Double_t Fit_FWHM(Double_t *x,Double_t *par)
+{
+    return par[0]*(1./x[0])+par[1];
+}
+
+double Hist_FWHM(TH1D hist) //set this to pass by reference when not debugging
+{
+    TGraph* width_bins = new TGraph(0);
+    int base = 2.;
+    for(int i = 0; i < 11; i++)
+    {
+        if(TMath::Power(base,i) == hist.GetNbinsX())
+        {
+            width_bins->Set(i);
+            break;
+        }
+    }
+    if(width_bins->GetN() == 0)
+    {
+        cout << "Improper number of Histogram Bins ";
+        cout << "Must be a power of: " << base << " ";
+        cout << "Returing zero now" << endl;
+        return 0.;
+    }
+    double constant = 0.;
+    for(int j = width_bins->GetN(); j >= 0; j--)
+    {
+        width_bins->SetPoint(j,TMath::Power(base,j),Get_FWHM(hist));
+        if(j == width_bins->GetN()/2) { constant = Get_FWHM(hist); }
+        if(hist.GetNbinsX() == 1) break;
+        hist.Rebin(base);
+    }
+    TCanvas* canv = new TCanvas(hist.GetName(),"",750,500);
+    canv->cd();
+    width_bins->Draw("AP");
+    TF1* fit_func = new TF1(hist.GetName(),Fit_FWHM,width_bins->GetXaxis()->GetXmin(),width_bins->GetXaxis()->GetXmax(),2);
+    fit_func->SetParameter(0,Get_FWHM(hist));
+    fit_func->SetParameter(1,constant);
+    width_bins->Fit(fit_func,"QEMR");
+    double fwhm = fit_func->GetParameter(1);
+    delete fit_func;
+    delete width_bins;
+    delete canv;
+    return fwhm;
 }
 
 double Hist_68_Interval(const TH1F& hist_user)
@@ -215,7 +294,7 @@ void setMyStyle()
     myStyle->SetLegendBorderSize(1);
     myStyle->SetLegendFillColor(0);
     myStyle->SetLegendFont(42);
-    myStyle->SetLegendTextSize(0.05);
+    myStyle->SetLegendTextSize(0.04);
     
     // For the Pad:
     myStyle->SetPadBorderMode(0);
@@ -302,10 +381,10 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     setMyStyle();
     gStyle->SetOptTitle(1);
     if(!(fout.IsOpen())) {cout << "Output File Not Open..." << endl;}
-    TLegend* leg = new TLegend(0.15,0.7,0.3,0.91);
+    TLegend* leg = new TLegend(0.15,0.7,0.28,0.91);
     vector<TLegendEntry*> vect_leg_entry;
     {for(int i = 0; i<int(leg_text.size()); i++) { TLegendEntry* leg_entry = leg->AddEntry(vect_graph.at(i),leg_text.at(i).c_str(),"P"); }}
-    leg->SetTextSize(0.05);
+    leg->SetTextSize(0.04);
     TCanvas* canvas_graph = new TCanvas(("canvas_graph"+plotName).c_str(),"canvas_graph",750,500);
     canvas_graph->SetGridx();
     canvas_graph->SetGridy();

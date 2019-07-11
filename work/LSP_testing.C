@@ -363,8 +363,8 @@ void LSP_testing(std::string output_name =
         Vertex Smeared_PV = PUPPI_Detector.Smear_PV(PV);
         Vertex Smeared_SVa = PUPPI_Detector.Smear_SV(SVa);
         Vertex Smeared_SVb = PUPPI_Detector.Smear_SV(SVb);
-        TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
-        TVector3 Smeared_vBetab = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
+        TVector3 Smeared_vBetaa = PUPPI_Detector.Get_Beta(Smeared_PV,Smeared_SVa);
+        TVector3 Smeared_vBetab = PUPPI_Detector.Get_Beta(Smeared_PV,Smeared_SVb);
         TLorentzVector L1a_Gent = L1a_Gen.GetFourVector();
         L1a_Gent.SetZ(0.0);
         TLorentzVector L2a_Gent = L2a_Gen.GetFourVector();

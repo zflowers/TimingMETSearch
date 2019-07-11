@@ -298,8 +298,8 @@ void Efficiency(std::string output_name =
                  
                  double Smeared_ToFa = PUPPI_Detector.Smear_ToF(ToFa);
                  double Smeared_ToFb = PUPPI_Detector.Smear_ToF(ToFb);
-                 TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
-                 TVector3 Smeared_vBetab = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
+                 TVector3 Smeared_vBetaa = PUPPI_Detector.Get_Beta(Smeared_PV,Smeared_SVa);
+                 TVector3 Smeared_vBetab = PUPPI_Detector.Get_Beta(Smeared_PV,Smeared_SVb);
                  //if(Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.) { continue; }//vect_timing_2displacement.at(m).at(k)++; vect_timing_3displacement.at(m).at(k)++; vect_timing_2displacement_decayangle.at(m).at(k)++; vect_timing_3displacement_decayangle.at(m).at(k)++; continue;}
                  
                  double Da = 30.*Smeared_ToFa*Smeared_vBetaa.Mag();
@@ -403,8 +403,8 @@ void Efficiency(std::string output_name =
     Draw_Graphs(fout, vect_graph_timing_3displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 3#sigma & |Cos(#theta)| < 0.9 [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma_DecayAngle", points);
     vector<TGraph*> vect_graph_ctau { vect_graph_timing_2displacement.at(1), vect_graph_timing_3displacement.at(1), vect_graph_timing_2displacement_decayangle.at(1), vect_graph_timing_3displacement_decayangle.at(1) };
     vector<string> leg_text { "2#sigma Displacement", "3#sigma Displacement", "2#sigma & |Cos(#theta)| < 0.9", "3#sigma & |Cos(#theta)| < 0.9" };
-    vect_graph_ctau.at(0)->SetTitle(("c#tau = " + std::to_string(int(ctau.at(1))) + " cm, M_{#tilde{#chi}^{ 0}_{2}} = " + std::to_string(int(mX2)) + " GeV, M_{#tilde{#chi}^{ 0}_{1}} = " + std::to_string(int(mX1)) + " GeV").c_str(), points);
-    Draw_Graphs(fout, vect_graph_ctau, leg_text, "Reconstruction Efficiency [%]", "#sigma_{t} [ps]", "Efficiency");
+    vect_graph_ctau.at(0)->SetTitle(("c#tau = " + std::to_string(int(ctau.at(1))) + " cm, M_{#tilde{#chi}^{ 0}_{2}} = " + std::to_string(int(mX2)) + " GeV, M_{#tilde{#chi}^{ 0}_{1}} = " + std::to_string(int(mX1)) + " GeV").c_str());
+    Draw_Graphs(fout, vect_graph_ctau, leg_text, "Reconstruction Efficiency [%]", "#sigma_{t} [ps]", "Efficiency",points);
   fout.Close();
   g_Log << LogInfo << "Finished" << LogEnd;
   g_Log << LogInfo << "Time to Process " << Ngen*Nctau << " Events: " << (Long64_t(gSystem->Now())-end)/1000.0 << " seconds" << LogEnd;

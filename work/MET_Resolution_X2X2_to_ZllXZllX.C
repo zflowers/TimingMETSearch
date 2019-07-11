@@ -403,8 +403,8 @@ void MET_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         Vertex Smeared_PV = PUPPI_Detector.Smear_PV(PV);
         Vertex Smeared_SVa = PUPPI_Detector.Smear_SV(SVa);
         Vertex Smeared_SVb = PUPPI_Detector.Smear_SV(SVb);
-        TVector3 Smeared_vBetaa = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVa);
-        TVector3 Smeared_vBetab = PUPPI_Detector.Smear_Beta(Smeared_PV,Smeared_SVb);
+        TVector3 Smeared_vBetaa = PUPPI_Detector.Get_Beta(Smeared_PV,Smeared_SVa);
+        TVector3 Smeared_vBetab = PUPPI_Detector.Get_Beta(Smeared_PV,Smeared_SVb);
         TVector3 Smeared_vBetaaT = Smeared_vBetaa;
         Smeared_vBetaaT.SetZ(0.0);
         TVector3 Smeared_vBetabT = Smeared_vBetab;
