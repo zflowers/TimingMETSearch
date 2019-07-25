@@ -45,7 +45,7 @@ void Efficiency(std::string output_name =
     Long64_t end = 0.;
     
     //setting masses and widths
-    double mX2 = 500.0;
+    double mX2 = 400.0;
     double mX1 = 200.0;
     double mZ = 91.19;
     double wZ = 2.50;
@@ -60,7 +60,7 @@ void Efficiency(std::string output_name =
     vector<double> sigmaT;
     vector<double> sigmaMET;
     
-    for(double i = 10.; i <= 350.; i+=10.)
+    for(double i = 0.; i <= 300.; i+=50.)
     {
         sigmaMET.push_back(i);
         sigmaT.push_back(i);
@@ -71,10 +71,10 @@ void Efficiency(std::string output_name =
     int NsigmaMET = sigmaMET.size();
     
     //Number of events
-    int Ngen = 5000;
+    int Ngen = 10000;
     
     bool met_flag = false;
-    bool points = true;
+    bool points = false;
     
     vector<vector<int>> vect_timing_2displacement(Nctau, vector<int>(NsigmaT,0));
     vector<vector<int>> vect_timing_3displacement(Nctau, vector<int>(NsigmaT,0));
@@ -340,8 +340,8 @@ void Efficiency(std::string output_name =
                  
                  double CosX2a = X2a_Reco.GetCosDecayAngle();
                  double CosX2b = X2b_Reco.GetCosDecayAngle();
-                 if((fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9) || displacement2){ vect_timing_2displacement_decayangle.at(m).at(k)++; }
-                 if((fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9) || displacement3){ vect_timing_3displacement_decayangle.at(m).at(k)++; }
+                 if((fabs(CosX2a) > 0.8 || fabs(CosX2b) > 0.8) || displacement2){ vect_timing_2displacement_decayangle.at(m).at(k)++; }
+                 if((fabs(CosX2a) > 0.8 || fabs(CosX2b) > 0.8) || displacement3){ vect_timing_3displacement_decayangle.at(m).at(k)++; }
                  if((sigmaT[k] < 31. && sigmaT[k] > 29.) && met_flag)
                  {
                      for(int h = 0; h < NsigmaMET; h++)
@@ -377,7 +377,7 @@ void Efficiency(std::string output_name =
                          
                          double CosX2a = X2a_Reco.GetCosDecayAngle();
                          double CosX2b = X2b_Reco.GetCosDecayAngle();
-                         //if(fabs(CosX2a) > 0.9 || fabs(CosX2b) > 0.9){ vect_met_decayangle.at(m).at(h)++; vect_all.at(m).at(h)++; }
+                         //if(fabs(CosX2a) > 0.8 || fabs(CosX2b) > 0.8){ vect_met_decayangle.at(m).at(h)++; vect_all.at(m).at(h)++; }
                      }
                  }
              }
@@ -399,10 +399,10 @@ void Efficiency(std::string output_name =
     for(int j = 0; j < Nctau; j++){leg_text_Ctau.push_back("c#tau "+std::to_string(int(ctau.at(j))));}
     Draw_Graphs(fout, vect_graph_timing_2displacement, leg_text_Ctau, "Reconstruction Efficiency 2#sigma [%]", "#sigma_{t} [ps]", "Efficiency_2Sigma", points);
     Draw_Graphs(fout, vect_graph_timing_3displacement, leg_text_Ctau, "Reconstruction Efficiency 3#sigma [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma", points);
-    Draw_Graphs(fout, vect_graph_timing_2displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 2#sigma & |Cos(#theta)| < 0.9 [%]", "#sigma_{t} [ps]", "Efficiency_2Sigma_DecayAngle", points);
-    Draw_Graphs(fout, vect_graph_timing_3displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 3#sigma & |Cos(#theta)| < 0.9 [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma_DecayAngle", points);
+    Draw_Graphs(fout, vect_graph_timing_2displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 2#sigma & |Cos(#theta)| < 0.8 [%]", "#sigma_{t} [ps]", "Efficiency_2Sigma_DecayAngle", points);
+    Draw_Graphs(fout, vect_graph_timing_3displacement_decayangle, leg_text_Ctau, "Reconstruction Efficiency 3#sigma & |Cos(#theta)| < 0.8 [%]", "#sigma_{t} [ps]", "Efficiency_3Sigma_DecayAngle", points);
     vector<TGraph*> vect_graph_ctau { vect_graph_timing_2displacement.at(1), vect_graph_timing_3displacement.at(1), vect_graph_timing_2displacement_decayangle.at(1), vect_graph_timing_3displacement_decayangle.at(1) };
-    vector<string> leg_text { "2#sigma Displacement", "3#sigma Displacement", "2#sigma & |Cos(#theta)| < 0.9", "3#sigma & |Cos(#theta)| < 0.9" };
+    vector<string> leg_text { "2#sigma Displacement", "3#sigma Displacement", "2#sigma & |Cos(#theta_{#tilde{#chi}^{ 0}_{2a}})| < 0.8", "3#sigma & |Cos(#theta_{#tilde{#chi}^{ 0}_{2a}})| < 0.8" };
     vect_graph_ctau.at(0)->SetTitle(("c#tau = " + std::to_string(int(ctau.at(1))) + " cm, M_{#tilde{#chi}^{ 0}_{2}} = " + std::to_string(int(mX2)) + " GeV, M_{#tilde{#chi}^{ 0}_{1}} = " + std::to_string(int(mX1)) + " GeV").c_str());
     Draw_Graphs(fout, vect_graph_ctau, leg_text, "Reconstruction Efficiency [%]", "#sigma_{t} [ps]", "Efficiency",points);
   fout.Close();

@@ -28,10 +28,16 @@ Double_t Fit_Mode(Double_t *x,Double_t *par)
 {
     return par[0]*(1./x[0])+par[1];
 }
-
+/*
+double Hist_Mode(TH1D hist)
+{
+    return hist.GetXaxis()->GetBinCenter(hist.GetMaximumBin());
+}
+*/
 double Hist_Mode(TH1D hist)
 {
     TGraph* width_bins = new TGraph(0);
+    width_bins->SetTitle("Mode");
     int base = 2.;
     for(int i = 0; i < 11; i++)
     {
@@ -56,7 +62,9 @@ double Hist_Mode(TH1D hist)
         if(hist.GetNbinsX() == 1) break;
         hist.Rebin(base);
     }
-    TCanvas* canv = new TCanvas(hist.GetName(),"",750,500);
+    string name = hist.GetName();
+    name+="Mode";
+    TCanvas* canv = new TCanvas(name.c_str(),"",750,500);
     canv->cd();
     width_bins->Draw("AP");
     TF1* fit_func = new TF1(hist.GetName(),Fit_Mode,width_bins->GetXaxis()->GetXmin(),width_bins->GetXaxis()->GetXmax(),2);
@@ -64,6 +72,7 @@ double Hist_Mode(TH1D hist)
     fit_func->SetParameter(1,constant);
     width_bins->Fit(fit_func,"QEMR");
     double mode = fit_func->GetParameter(1);
+    //canv->SaveAs((name+".pdf").c_str());
     delete fit_func;
     delete width_bins;
     delete canv;
@@ -76,15 +85,23 @@ double Get_FWHM(TH1D& hist)
     int bin2 = hist.FindLastBinAbove(hist.GetMaximum()/2);
     return (hist.GetXaxis()->GetBinUpEdge(bin2) - hist.GetXaxis()->GetBinLowEdge(bin1));
 }
-
+/*
+double Hist_FWHM(TH1D& hist)
+{
+    int bin1 = hist.FindFirstBinAbove(hist.GetMaximum()/2);
+    int bin2 = hist.FindLastBinAbove(hist.GetMaximum()/2);
+    return (hist.GetXaxis()->GetBinUpEdge(bin2) - hist.GetXaxis()->GetBinLowEdge(bin1));
+}
+*/
 Double_t Fit_FWHM(Double_t *x,Double_t *par)
 {
     return par[0]*(1./x[0])+par[1];
 }
 
-double Hist_FWHM(TH1D hist) //set this to pass by reference when not debugging
+double Hist_FWHM(TH1D hist)
 {
     TGraph* width_bins = new TGraph(0);
+    width_bins->SetTitle("FWHM");
     int base = 2.;
     for(int i = 0; i < 11; i++)
     {
@@ -109,7 +126,9 @@ double Hist_FWHM(TH1D hist) //set this to pass by reference when not debugging
         if(hist.GetNbinsX() == 1) break;
         hist.Rebin(base);
     }
-    TCanvas* canv = new TCanvas(hist.GetName(),"",750,500);
+    string name = hist.GetName();
+    name+="FWHM";
+    TCanvas* canv = new TCanvas(name.c_str(),"",750,500);
     canv->cd();
     width_bins->Draw("AP");
     TF1* fit_func = new TF1(hist.GetName(),Fit_FWHM,width_bins->GetXaxis()->GetXmin(),width_bins->GetXaxis()->GetXmax(),2);
@@ -117,6 +136,7 @@ double Hist_FWHM(TH1D hist) //set this to pass by reference when not debugging
     fit_func->SetParameter(1,constant);
     width_bins->Fit(fit_func,"QEMR");
     double fwhm = fit_func->GetParameter(1);
+    //canv->SaveAs((name+".pdf").c_str());
     delete fit_func;
     delete width_bins;
     delete canv;
@@ -291,7 +311,7 @@ void setMyStyle()
     myStyle->SetCanvasDefY(0);
     
     // For the Legend
-    myStyle->SetLegendBorderSize(1);
+    myStyle->SetLegendBorderSize(0);
     myStyle->SetLegendFillColor(0);
     myStyle->SetLegendFont(42);
     myStyle->SetLegendTextSize(0.04);
@@ -314,10 +334,10 @@ void setMyStyle()
     
     // set the paper & margin sizes
     myStyle->SetPaperSize(20,26);
-    myStyle->SetPadTopMargin(0.09);
-    myStyle->SetPadRightMargin(0.25);
+    myStyle->SetPadTopMargin(0.12);
+    myStyle->SetPadRightMargin(0.12);
     myStyle->SetPadBottomMargin(0.18);
-    myStyle->SetPadLeftMargin(0.15);
+    myStyle->SetPadLeftMargin(0.12);
     
     myStyle->SetTitleX(0.5);
     myStyle->SetTitleAlign(23);
@@ -342,6 +362,7 @@ void setMyStyle()
     myStyle->SetStatFont(42);
     
     // use bold lines and markers
+    myStyle->SetLineWidth(2);
     myStyle->SetMarkerStyle(8);
     myStyle->SetHistLineWidth(2);
     myStyle->SetLineStyleString(2,"[12 12]"); // postscript dashes
@@ -350,7 +371,7 @@ void setMyStyle()
     myStyle->SetErrorX(0.001);
     
     // do not display any of the standard histogram decorations
-    myStyle->SetOptTitle(1);
+    myStyle->SetOptTitle(0);
     myStyle->SetOptStat(0);
     myStyle->SetOptFit(11111111);
     
@@ -379,17 +400,17 @@ void setMyStyle()
 void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>& leg_text, const string& YaxisText, const string& XaxisText, const string& plotName, bool type)
 {
     setMyStyle();
-    gStyle->SetOptTitle(1);
+    gStyle->SetOptTitle(0);
     if(!(fout.IsOpen())) {cout << "Output File Not Open..." << endl;}
-    TLegend* leg = new TLegend(0.15,0.7,0.28,0.91);
+    TLegend* leg = new TLegend(0.18,0.65,0.31,0.86);
     vector<TLegendEntry*> vect_leg_entry;
-    {for(int i = 0; i<int(leg_text.size()); i++) { TLegendEntry* leg_entry = leg->AddEntry(vect_graph.at(i),leg_text.at(i).c_str(),"P"); }}
+    {for(int i = 0; i<int(leg_text.size()); i++) { TLegendEntry* leg_entry = leg->AddEntry(vect_graph.at(i),leg_text.at(i).c_str(),"L"); }}
     leg->SetTextSize(0.04);
     TCanvas* canvas_graph = new TCanvas(("canvas_graph"+plotName).c_str(),"canvas_graph",750,500);
     canvas_graph->SetGridx();
+    canvas_graph->SetLogx();
     canvas_graph->SetGridy();
     canvas_graph->cd();
-    
     TMultiGraph* mg = new TMultiGraph();
     string title = vect_graph.at(0)->GetTitle();
     title += (";"+XaxisText+";"+YaxisText);
@@ -397,23 +418,58 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph.at(i)); }
     vect_graph[0]->SetLineStyle(1);
     vect_graph[0]->SetMarkerStyle(22);
-    vect_graph[0]->SetLineColor(kBlue);
-    vect_graph[0]->SetMarkerColor(kBlue);
+    vect_graph[0]->SetLineColor(kCyan);
+    vect_graph[0]->SetMarkerColor(kCyan);
     if(vect_graph.size() > 1){
         vect_graph[1]->SetLineStyle(1);
         vect_graph[1]->SetMarkerStyle(22);
-        vect_graph[1]->SetLineColor(kRed);
-        vect_graph[1]->SetMarkerColor(kRed);}
+        vect_graph[1]->SetLineColor(kPink);
+        vect_graph[1]->SetMarkerColor(kPink);}
     if(vect_graph.size() > 2){
         vect_graph[2]->SetLineStyle(1);
         vect_graph[2]->SetMarkerStyle(22);
-        vect_graph[2]->SetLineColor(kGreen+2);
-        vect_graph[2]->SetMarkerColor(kGreen+2);}
+        vect_graph[2]->SetLineColor(kGreen-4);
+        vect_graph[2]->SetMarkerColor(kGreen-4);}
     if(vect_graph.size() == 4){
-        vect_graph[3]->SetLineStyle(1);
-        vect_graph[3]->SetMarkerStyle(22);
+        vect_graph[0]->SetLineStyle(1);
+        vect_graph[0]->SetMarkerStyle(22);
+        vect_graph[0]->SetLineColor(kPink);
+        vect_graph[0]->SetMarkerColor(kPink);
+        vect_graph[1]->SetLineStyle(1);
+        vect_graph[1]->SetMarkerStyle(22);
+        vect_graph[1]->SetLineColor(kGreen-4);
+        vect_graph[1]->SetMarkerColor(kGreen-4);
+        vect_graph[2]->SetLineStyle(9);
+        vect_graph[2]->SetMarkerStyle(32);
+        vect_graph[2]->SetLineColor(kCyan);
+        vect_graph[2]->SetMarkerColor(kCyan);
+        vect_graph[3]->SetLineStyle(9);
+        vect_graph[3]->SetMarkerStyle(32);
+        vect_graph[3]->SetLineColor(kYellow);
+        vect_graph[3]->SetMarkerColor(kYellow);}
+    if(vect_graph.size() == 5)
+    {
+        vect_graph[0]->SetLineStyle(1);
+        vect_graph[0]->SetMarkerStyle(22);
+        vect_graph[0]->SetLineColor(kRed);
+        vect_graph[0]->SetMarkerColor(kRed);
+        vect_graph[1]->SetLineStyle(1);
+        vect_graph[1]->SetMarkerStyle(22);
+        vect_graph[1]->SetLineColor(kGreen-4);
+        vect_graph[1]->SetMarkerColor(kGreen-4);
+        vect_graph[2]->SetLineStyle(1);
+        vect_graph[2]->SetMarkerStyle(22);
+        vect_graph[2]->SetLineColor(kCyan);
+        vect_graph[2]->SetMarkerColor(kCyan);
+        vect_graph[3]->SetLineStyle(9);
+        vect_graph[3]->SetMarkerStyle(32);
         vect_graph[3]->SetLineColor(kMagenta);
-        vect_graph[3]->SetMarkerColor(kMagenta);}
+        vect_graph[3]->SetMarkerColor(kMagenta);
+        vect_graph[4]->SetLineStyle(9);
+        vect_graph[4]->SetMarkerStyle(32);
+        vect_graph[4]->SetLineColor(kYellow-4);
+        vect_graph[4]->SetMarkerColor(kYellow-4);
+    }
     if(vect_graph.size() == 6){
         vect_graph[0]->SetLineStyle(1);
         vect_graph[0]->SetMarkerStyle(22);
@@ -440,16 +496,37 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
         vect_graph[5]->SetLineColor(kGreen+2);
         vect_graph[5]->SetMarkerColor(kGreen+2);}
     if(type) { mg->Draw("AP"); }
-    else { mg->Draw("AC"); }
+    else { mg->Draw("AL"); }
     mg->GetXaxis()->CenterTitle(true);
     mg->GetYaxis()->CenterTitle(true);
     mg->GetYaxis()->SetTitleOffset(1.05);
-    mg->GetXaxis()->SetTitleOffset(1.05);
+    mg->GetXaxis()->SetTitleOffset(1.3);
     mg->GetYaxis()->SetTitleSize(.04);
     mg->GetXaxis()->SetTitleSize(.04);
     mg->GetYaxis()->SetLabelSize(.04);
     mg->GetXaxis()->SetLabelSize(.04);
     leg->Draw("SAMES");
+    TLatex l(0.6,0.943,"#tilde{#chi}_{2}^{ 0} #tilde{#chi}_{2}^{ 0}#rightarrow Za(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}Zb(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}");
+    l.SetNDC();
+    l.SetTextSize(0.045);
+    l.SetTextFont(42);
+    l.SetTextColor(kWhite);
+    l.DrawLatex(0.62,0.95,"#tilde{#chi}_{2}^{ 0} #tilde{#chi}_{2}^{ 0}#rightarrow Za(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}Zb(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}");
+    l.SetTextSize(0.04);
+    l.SetTextFont(42);
+    l.SetTextColor(kWhite);
+    l.DrawLatex(0.02,0.95,"#bf{#it{RestFrames}} Event Generation");
+    //invert colors
+    mg->GetXaxis()->SetAxisColor(kWhite);
+    mg->GetYaxis()->SetAxisColor(kWhite);
+    mg->GetXaxis()->SetTitleColor(kWhite);
+    mg->GetYaxis()->SetTitleColor(kWhite);
+    mg->GetXaxis()->SetLabelColor(kWhite);
+    mg->GetYaxis()->SetLabelColor(kWhite);
+    canvas_graph->SetFillColor(kBlack);
+    leg->SetTextColor(kWhite);
+    leg->SetFillColor(kBlack);
+    //->SetTextColor(kWhite);
     canvas_graph->SaveAs((plotName+".pdf").c_str());
     canvas_graph->Write();
 }
@@ -1013,30 +1090,32 @@ void Draw_Two_Hists(TH1* hist1, TH1* hist2, TCanvas* canvas)
 void Draw_Hists(vector<TH1F*> hists, TCanvas* canvas)
 {
     canvas->cd();
-    for(int i=0; i<int(hists.size()); i++)
-    {
-        TRandom3 rndm_color;
-        rndm_color.SetSeed(0);
-        Double_t dbl_color_index = rndm_color.Uniform(300.0,1000.0);
-        int color_index = (int)dbl_color_index;
-        hists.at(i)->Draw("SAMES");
-        canvas->Update();
-        hists.at(i)->SetLineColor(color_index);
+    for(int i = 0; i < int(hists.size()); i++){
+        int icolor0 = 7003 + (i%8)*10;
+        int icolor1 = 7000 + (i%8)*10;
+        hists[i]->SetFillColor(icolor1);
+        hists[i]->SetFillStyle(3002);
+        hists[i]->SetLineColor(icolor0);
+        hists[i]->SetLineWidth(3);
+        hists[i]->SetMarkerColor(icolor0);
+        hists[i]->SetMarkerSize(0);
+        hists[i]->Draw("same");
     }
 }
 
 void Draw_Hists(vector<TH1D*> hists, TCanvas* canvas)
 {
     canvas->cd();
-    for(int i=0; i<int(hists.size()); i++)
-    {
-        TRandom3 rndm_color;
-        rndm_color.SetSeed(0);
-        Double_t dbl_color_index = rndm_color.Uniform(300.0,1000.0);
-        int color_index = (int)dbl_color_index;
-        hists.at(i)->Draw("SAMES");
-        canvas->Update();
-        hists.at(i)->SetLineColor(color_index);
+    for(int i = 0; i < int(hists.size()); i++){
+        int icolor0 = 7003 + (i%8)*10;
+        int icolor1 = 7000 + (i%8)*10;
+        hists[i]->SetFillColor(icolor1);
+        hists[i]->SetFillStyle(3002);
+        hists[i]->SetLineColor(icolor0);
+        hists[i]->SetLineWidth(3);
+        hists[i]->SetMarkerColor(icolor0);
+        hists[i]->SetMarkerSize(0);
+        hists[i]->Draw("same");
     }
 }
 

@@ -43,20 +43,21 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t start = gSystem->Now();
 
     //setting masses and widths
-    double mX2 = 700.0;
-    double mX1 = 500.0;
+    double mX2 = 300.0;
+    double mX1 = 200.0;
     double mZ = 91.19;
     double wZ = 2.50;
-    double ctau = 50.;
+    double ctau = 10.;
 
     vector<double> sigmaT;
 
     sigmaT.push_back(30.);
-    //sigmaT.push_back(50.);
-    //sigmaT.push_back(300.);
+    sigmaT.push_back(50.);
+    sigmaT.push_back(300.);
     
     //Number of events
-    int Ngen = 100000;
+    int Ngen = 1000000;
+    double displacement_cut = 3.;
     
     int NsigmaT = sigmaT.size();
 
@@ -239,11 +240,11 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
     //histPlot->AddPlot(MIa, cat_list);
     //histPlot->AddPlot(MXa, cat_list);
     histPlot->AddPlot(MXa2, cat_list);
-    histPlot->AddPlot(MIa2, cat_list);
+    //histPlot->AddPlot(MIa2, cat_list);
     //histPlot->AddPlot(Delta_MIa2, cat_list);
-    histPlot->AddPlot(Pull_MIa2, cat_list);
+    //histPlot->AddPlot(Pull_MIa2, cat_list);
     //histPlot->AddPlot(MXa2, MXb2, cat_list);
-    histPlot->AddPlot(Pull_MXa2, cat_list);
+    //histPlot->AddPlot(Pull_MXa2, cat_list);
     //histPlot->AddPlot(Pull_MXa2, Pull_MXb2, cat_list);
     //histPlot->AddPlot(Pull_Vis, cat_list);
     //histPlot->AddPlot(CosX2a, cat_list);
@@ -419,11 +420,7 @@ void Timing_Resolution_X2X2_to_ZllXZllX(std::string output_name =
         Db = 30.*ToFb*vBetabGen.Mag();
         
         //require significant displacement in space and time
-        if(fabs(Smeared_ToFa) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < 2.*PUPPI_Detector.Get_sigmaT() || fabs(Da) < 2.*sigmaDistance || fabs(Db) < 2.*sigmaDistance)
-        {
-            igen--;
-            continue;
-        }
+        if(fabs(Smeared_ToFa) < displacement_cut*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_ToFb) < displacement_cut*PUPPI_Detector.Get_sigmaT() || fabs(Da) < displacement_cut*sigmaDistance || fabs(Db) < displacement_cut*sigmaDistance || Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.) { igen--; continue;}
 
         TVector3 vPta = (L1a_RECO+L2a_RECO).Vect()+Ia_RECO;
         TVector3 vPtaGen = (L1a_Gen.GetFourVector()+L2a_Gen.GetFourVector()+Ia).Vect();

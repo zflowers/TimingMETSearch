@@ -27,6 +27,7 @@ public:
     double Cos_Resolution(TVector3 V1, TVector3 V2, double sigma_V1, double sigma_V2);
     double Mass_Parent(TVector3 Decay, TVector3 Beta);
     double Mass_Parent_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_L1, double sigma_L2, double sigma_Beta_Mag);
+    double Mass_Invisible(TVector3 MET, TLorentzVector Leptons, TVector3 Beta);
     double Mass_Invisible_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_Beta_Mag);
     double Par_Resolution(TVector3 MET, TVector3 L1a, TVector3 L2a, TVector3 L1b, TVector3 L2b, double sigma_MET, double sigma_L1a, double sigma_L2a, double sigma_L1b, double sigma_L2b);
     double Visible_Resolution(TVector3 L1a, TVector3 L2a, TVector3 L1b, TVector3 L2b, double sigma_L1a, double sigma_L2a, double sigma_L1b, double sigma_L2b);
@@ -149,6 +150,7 @@ inline double Resolution::Cos_Resolution(TVector3 V1, TVector3 V2, double sigma_
 
 inline double Resolution::Mass_Parent(TVector3 Decay, TVector3 Beta)
 {
+    Decay.SetZ(0.);
     return Beta.Dot(Decay)/(1.0/sqrt(1.0-Beta.Mag2())*Beta.Pt()*Beta.Pt());
 }
 
@@ -161,6 +163,16 @@ inline double Resolution::Mass_Parent_Resolution(TVector3 Beta, TVector3 MET, TL
     double c = sigma_L2*(1.0/(gamma*Beta.Pt()))*TMath::Cos(Beta.DeltaPhi(L2.Vect()));
     double d = sigma_Beta_Mag*(-gamma/(Beta.Pt()*Beta.Pt()*Beta.Mag()))*(Beta.Dot(MET+L1.Vect()+L2.Vect()));
     return sqrt(a*a + b*b + c*c + d*d);
+}
+
+inline double Resolution::Mass_Invisible(TVector3 MET, TLorentzVector Leptons, TVector3 Beta)
+{
+    double Mass_V = Leptons.M();
+    double E_V_P = Energy_Z_Parent(Beta,Leptons);
+    Leptons.SetZ(0.);
+    double Mass_P = Mass_Parent(MET+Leptons.Vect(),Beta);
+    if((Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V) < 0.) {return 0.;}
+    else {return sqrt(Mass_P*Mass_P-2.*Mass_P*E_V_P+Mass_V*Mass_V);}
 }
 
 inline double Resolution::Mass_Invisible_Resolution(TVector3 Beta, TVector3 MET, TLorentzVector L1, TLorentzVector L2, double sigma_MET, double sigma_Beta_Mag)
