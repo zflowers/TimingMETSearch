@@ -82,7 +82,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(30.);
     int NsigmaT = sigmaT.size();
     int NsigmaMET = sigmaMET.size();
-    bool timing_flag = false; //set to false to turn off anything related to looping over sigmaT
+    bool timing_flag = true; //set to false to turn off anything related to looping over sigmaT
     bool MET_flag = false; //set to false to turn off anything related to looping over sigmaMET
     bool points = false;
     bool decayangle = false;
@@ -441,7 +441,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& MXa = histPlot->GetNewVar("MXa", "M(#tilde{#chi}_{2}^{0})", 0., 800., "[GeV]");
     const HistPlotVar& EZa = histPlot->GetNewVar("EZ", "E_{Z}^{#tilde{#chi}_{2}^{0}}", 50., 250., "[GeV]");
     const HistPlotVar& CosX2a_Plot = histPlot->GetNewVar("CosX2a", "Cos(#theta_{#tilde{#chi}_{2a}^{0}})", -1., 1., "");
-    
+    /*
     histPlot->AddPlot(MIa, cat_list_ctau);
     histPlot->AddPlot(MXa, cat_list_ctau);
     histPlot->AddPlot(MXa2, cat_list_ctau);
@@ -450,7 +450,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     histPlot->AddPlot(CosX2a_Plot, cat_list_ctau);
     histPlot->AddPlot(MXa2, MXb2, cat_list_ctau);
     histPlot->AddPlot(MIa2, MIb2, cat_list_ctau);
-    
+    */
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
     TFile* input = new TFile("PTEta.root");
@@ -880,7 +880,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
             MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
         }
-        //if((MIa2 > 0. && MIb2 > 0.) && MIa > 0.){
+        if((MIa2 > 0. && MIb2 > 0.) && MIa > 0.){
         if(decayangle){
         histPlot_Cos->Fill(cat_list_ctau_cos[m]);
         histPlot->Fill(cat_list_ctau[m]);
@@ -890,9 +890,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         histPlot->Fill(cat_list_ctau[m]);
         acp_events++;
         }
-        //}
+        }
     }
-    LAB_Gen.PrintGeneratorEfficiency();
+    //LAB_Gen.PrintGeneratorEfficiency();
   }
     g_Log << LogInfo << "Generated a Total of " << gen_events << " Events " << LogEnd;
     g_Log << LogInfo << acp_events << " passed selection requirements " << LogEnd;
@@ -900,7 +900,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*Nctau << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*Nctau << " Events" << LogEnd;
-    histPlot->Draw(true);
+    histPlot->Draw(false);
     //histPlot_Cos->Draw(true);
     TFile fout(output_name.c_str(),"RECREATE");
     /*if(MET_flag || timing_flag){

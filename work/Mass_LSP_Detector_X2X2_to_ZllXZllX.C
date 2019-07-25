@@ -78,12 +78,12 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(30.);
     int NsigmaT = sigmaT.size();
     int NsigmaMET = sigmaMET.size();
-    bool timing_flag = true; //set to false to turn off anything related to looping over sigmat
+    bool timing_flag = false; //set to false to turn off anything related to looping over sigmat
     bool MET_flag = false;
     bool points = false;
     
     //Number of events
-    int Ngen = 5000000;
+    int Ngen = 1000000;
     int Entries = Ngen;
     double displacement_cut = 3.;
     
@@ -425,7 +425,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     
     histPlot->AddPlot(EZa, cat_list_mX1);
     //histPlot->AddPlot(MXa2, cat_list_mX1);
-    //histPlot->AddPlot(MIa2, cat_list_mX1);
+    histPlot->AddPlot(MIa2, cat_list_mX1);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -854,7 +854,8 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         }
         //if(MIa2 > 0.){
         histPlot->Fill(cat_list_mX1[m]);
-        //acp_events++; }
+        acp_events++;
+        //}
     }
     //LAB_Gen.PrintGeneratorEfficiency();
   }
@@ -864,7 +865,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*NmX1 << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*NmX1 << " Events" << LogEnd;
-    histPlot->Draw(true);
+    histPlot->Draw(false);
     TFile fout(output_name.c_str(),"RECREATE");
     if(timing_flag){
     for(int i = 0; i<NmX1; i++)

@@ -433,20 +433,20 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     if(vect_graph.size() == 4){
         vect_graph[0]->SetLineStyle(1);
         vect_graph[0]->SetMarkerStyle(22);
-        vect_graph[0]->SetLineColor(kPink);
-        vect_graph[0]->SetMarkerColor(kPink);
+        vect_graph[0]->SetLineColor(kRed);
+        vect_graph[0]->SetMarkerColor(kRed);
         vect_graph[1]->SetLineStyle(1);
         vect_graph[1]->SetMarkerStyle(22);
-        vect_graph[1]->SetLineColor(kGreen-4);
-        vect_graph[1]->SetMarkerColor(kGreen-4);
+        vect_graph[1]->SetLineColor(kGreen);
+        vect_graph[1]->SetMarkerColor(kGreen);
         vect_graph[2]->SetLineStyle(9);
         vect_graph[2]->SetMarkerStyle(32);
-        vect_graph[2]->SetLineColor(kCyan);
-        vect_graph[2]->SetMarkerColor(kCyan);
+        vect_graph[2]->SetLineColor(kBlue);
+        vect_graph[2]->SetMarkerColor(kBlue);
         vect_graph[3]->SetLineStyle(9);
         vect_graph[3]->SetMarkerStyle(32);
-        vect_graph[3]->SetLineColor(kYellow);
-        vect_graph[3]->SetMarkerColor(kYellow);}
+        vect_graph[3]->SetLineColor(kMagenta);
+        vect_graph[3]->SetMarkerColor(kMagenta);}
     if(vect_graph.size() == 5)
     {
         vect_graph[0]->SetLineStyle(1);
@@ -517,6 +517,7 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     l.SetTextColor(kWhite);
     l.DrawLatex(0.02,0.95,"#bf{#it{RestFrames}} Event Generation");
     //invert colors
+    /*
     mg->GetXaxis()->SetAxisColor(kWhite);
     mg->GetYaxis()->SetAxisColor(kWhite);
     mg->GetXaxis()->SetTitleColor(kWhite);
@@ -526,7 +527,7 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     canvas_graph->SetFillColor(kBlack);
     leg->SetTextColor(kWhite);
     leg->SetFillColor(kBlack);
-    //->SetTextColor(kWhite);
+    */
     canvas_graph->SaveAs((plotName+".pdf").c_str());
     canvas_graph->Write();
 }
