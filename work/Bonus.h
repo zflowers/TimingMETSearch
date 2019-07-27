@@ -517,7 +517,7 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     l.SetTextColor(kWhite);
     l.DrawLatex(0.02,0.95,"#bf{#it{RestFrames}} Event Generation");
     //invert colors
-    /*
+    
     mg->GetXaxis()->SetAxisColor(kWhite);
     mg->GetYaxis()->SetAxisColor(kWhite);
     mg->GetXaxis()->SetTitleColor(kWhite);
@@ -527,7 +527,7 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     canvas_graph->SetFillColor(kBlack);
     leg->SetTextColor(kWhite);
     leg->SetFillColor(kBlack);
-    */
+    
     canvas_graph->SaveAs((plotName+".pdf").c_str());
     canvas_graph->Write();
 }

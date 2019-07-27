@@ -78,7 +78,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(30.);
     int NsigmaT = sigmaT.size();
     int NsigmaMET = sigmaMET.size();
-    bool timing_flag = false; //set to false to turn off anything related to looping over sigmat
+    bool timing_flag = true; //set to false to turn off anything related to looping over sigmat
     bool MET_flag = false;
     bool points = false;
     
@@ -92,7 +92,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     double xmax_MX2 = 1500.;
     int bins_MX1 = 1024;
     double xmin_MX1 = 0.;
-    vector<double> xmax_MX1 = { 1000., 1200., 1300. };
+    vector<double> xmax_MX1 = { 1000., 1200., 1400. };
     double ana_factor = 500.;
     
     vector<vector<TH1D*>> vect_hist_Sigma_MX2_SigmaT(NmX1, vector<TH1D*>(NsigmaT));
@@ -423,9 +423,9 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", /*"M(#tilde{#chi}_{2a}^{0})"*/ "Mass of LLP", 0., 2000., "[GeV]");
     const HistPlotVar& EZa = histPlot->GetNewVar("EZa", "E_{Za}^{#tilde{#chi}_{2a}^{0}}", 20., 180., "[GeV]");
     
-    histPlot->AddPlot(EZa, cat_list_mX1);
+    //histPlot->AddPlot(EZa, cat_list_mX1);
     //histPlot->AddPlot(MXa2, cat_list_mX1);
-    histPlot->AddPlot(MIa2, cat_list_mX1);
+    //histPlot->AddPlot(MIa2, cat_list_mX1);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -852,10 +852,10 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
             MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
             MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
         }
-        //if(MIa2 > 0.){
+        if(MIa2 > 0.){
         histPlot->Fill(cat_list_mX1[m]);
         acp_events++;
-        //}
+        }
     }
     //LAB_Gen.PrintGeneratorEfficiency();
   }
@@ -865,7 +865,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*NmX1 << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*NmX1 << " Events" << LogEnd;
-    histPlot->Draw(false);
+    histPlot->Draw(true);
     TFile fout(output_name.c_str(),"RECREATE");
     if(timing_flag){
     for(int i = 0; i<NmX1; i++)
@@ -903,7 +903,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     }
     }
     vector<string> leg_text_Sigma_MX2_SigmaT;
-        for(int j = 0; j < NmX1; j++){leg_text_Sigma_MX2_SigmaT.push_back("#Delta m = "+std::to_string(int((mX2-mX1.at(j))))+" GeV");}
+        for(int j = 0; j < NmX1; j++){leg_text_Sigma_MX2_SigmaT.push_back("M(#tilde{#chi}_{2}^{0}) - M(#tilde{#chi}_{1}^{0}) = "+std::to_string(int((mX2-mX1.at(j))))+" GeV");}
         gStyle->SetOptTitle(1);
         vect_graph_Sigma_MX2_SigmaT.at(0)->SetTitle("Analytical: Everything On");
         vect_graph_Sigma_MX2_MET_SigmaT.at(0)->SetTitle("Analytical: MET Off");

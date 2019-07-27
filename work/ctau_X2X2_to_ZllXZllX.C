@@ -434,13 +434,18 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     //setting up all the variables that could be potentially plotted
     const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", 0., 600., "[GeV]");
     const HistPlotVar& MIb2 = histPlot->GetNewVar("MIb2", "M(#tilde{#chi}_{1b}^{0})", 0., 600., "[GeV]");
-    const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 800., "[GeV]");
+    const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 50., 800., "[GeV]");
     const HistPlotVar& MXa2_Cos = histPlot_Cos->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 800., "[GeV]");
     const HistPlotVar& MXb2 = histPlot->GetNewVar("MXb2", "M(#tilde{#chi}_{2b}^{0})", 0., 800., "[GeV]");
     const HistPlotVar& MIa = histPlot->GetNewVar("MIa", "M(#tilde{#chi}_{1}^{0})", 200., 500., "[GeV]");
     const HistPlotVar& MXa = histPlot->GetNewVar("MXa", "M(#tilde{#chi}_{2}^{0})", 0., 800., "[GeV]");
     const HistPlotVar& EZa = histPlot->GetNewVar("EZ", "E_{Z}^{#tilde{#chi}_{2}^{0}}", 50., 250., "[GeV]");
     const HistPlotVar& CosX2a_Plot = histPlot->GetNewVar("CosX2a", "Cos(#theta_{#tilde{#chi}_{2a}^{0}})", -1., 1., "");
+    const HistPlotVar& tReco_tTrue = histPlot->GetNewVar("tReco_tTrue", "#theta_{#tilde{#chi}_{2a}^{0}}^{RECO} - #theta_{#tilde{#chi}_{2a}^{0}}^{TRUE}", -0.05, 0.05, "");
+    
+    histPlot->AddPlot(MXa2,MIb2,cat_list_ctau);
+    histPlot->AddPlot(MXa2,MIa2,cat_list_ctau);
+    //histPlot->AddPlot(tReco_tTrue,cat_list_ctau);
     /*
     histPlot->AddPlot(MIa, cat_list_ctau);
     histPlot->AddPlot(MXa, cat_list_ctau);
@@ -623,6 +628,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         LAB_Reco.AnalyzeEvent();
         
         CosX2a_Plot = X2a_Reco.GetCosDecayAngle();
+        tReco_tTrue = TMath::ACos(CosX2a_Plot) - TMath::ACos(X2a_Gen.GetCosDecayAngle());
         double CosX2b = X2b_Reco.GetCosDecayAngle();
         if((fabs(CosX2a_Plot) < 0.8 || fabs(CosX2b) < 0.8))
         {
@@ -880,7 +886,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
             MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
         }
-        if((MIa2 > 0. && MIb2 > 0.) && MIa > 0.){
+        //if((MIa2 > 0. && MIb2 > 0.) && MIa > 0.){
         if(decayangle){
         histPlot_Cos->Fill(cat_list_ctau_cos[m]);
         histPlot->Fill(cat_list_ctau[m]);
@@ -890,7 +896,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         histPlot->Fill(cat_list_ctau[m]);
         acp_events++;
         }
-        }
+        //}
     }
     //LAB_Gen.PrintGeneratorEfficiency();
   }
@@ -1002,31 +1008,17 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         vect_graph_ctau_SigmaT_SigmaMX1.push_back(vect_graph_Sigma_MX1_Timing_SigmaT_Measured[0]);
         //Draw_Graphs(fout, vect_graph_ctau_SigmaT_SigmaMX1, leg_text_ctau_SigmaT, "FWHM M [%]", "#sigma_{t} [ps]", "MLSP_Timing_ctau", points);
         //For cos decay angle
-        vector<TGraph*> vect_graph_ctau_cos0;
-        vect_graph_ctau_cos0.push_back(vect_graph_Sigma_MX2_SigmaT_Measured[0]);
-        //vect_graph_ctau_cos0.push_back(vect_graph_Sigma_MX2_SigmaT_Measured_cos09[0]);
-        vect_graph_ctau_cos0.push_back(vect_graph_Sigma_MX2_SigmaT_Measured_cos08[0]);
-        vect_graph_ctau_cos0.push_back(vect_graph_Sigma_MX2_MET_SigmaT_Measured[0]);
-        vect_graph_ctau_cos0.push_back(vect_graph_Sigma_MX2_Timing_SigmaT_Measured[0]);
-        vector<string> leg_text_ctau_cos0;
-        //leg_text_ctau_cos0.push_back("No |Cos(#theta_{#tilde{#chi}_{2a}^{0}})| Cut");
-        leg_text_ctau_cos0.push_back("Expected");
-        //leg_text_ctau_cos0.push_back("|Cos(#theta_{#tilde{#chi}_{2a}^{0}})| < 0.9");
-        leg_text_ctau_cos0.push_back("|Cos(#theta_{#tilde{#chi}_{2a}^{0}})| < 0.8");
-        leg_text_ctau_cos0.push_back("#sigma_{MET} Off");
-        leg_text_ctau_cos0.push_back("#sigma_{t} Off");
-        //Draw_Graphs(fout, vect_graph_ctau_cos0, leg_text_ctau_cos0, "FWHM M [%]", "#sigma_{t} [ps]", "MLLP_Timing_Cos0", points);
         vector<TGraph*> vect_graph_ctau_cos2;
         vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured[2]);
         //vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured_cos09[2]);
-        vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured_cos08[2]);
+        //vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured_cos08[2]);
         vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_MET_SigmaT_Measured[2]);
         vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_Timing_SigmaT_Measured[2]);
         vector<string> leg_text_ctau_cos2;
         //leg_text_ctau_cos2.push_back("No |Cos(#theta_{#tilde{#chi}_{2a}^{0}})| Cut");
         leg_text_ctau_cos2.push_back("Expected");
         //leg_text_ctau_cos2.push_back("|Cos(#theta_{#tilde{#chi}_{2a}^{0}})| < 0.9");
-        leg_text_ctau_cos2.push_back("|Cos(#theta_{#tilde{#chi}_{2a}^{0}})| < 0.8");
+        //leg_text_ctau_cos2.push_back("|Cos(#theta_{#tilde{#chi}_{2a}^{0}})| < 0.8");
         leg_text_ctau_cos2.push_back("#sigma_{MET} Off");
         leg_text_ctau_cos2.push_back("#sigma_{t} Off");
         Draw_Graphs(fout, vect_graph_ctau_cos2, leg_text_ctau_cos2, "FWHM M [%]", "#sigma_{t} [ps]", "MLLP_Timing_Cos2", points);
