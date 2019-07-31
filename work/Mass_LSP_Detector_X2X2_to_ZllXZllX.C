@@ -39,7 +39,7 @@
 using namespace RestFrames;
 
 void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
-			      "output_Mass_LSP_Detector_X2X2_to_ZallXZbllX.root"){
+			      "output_Mass_LSP_Detector_X2X2_to_ZallXZbllX_Ratio.root"){
 
     Long64_t start = gSystem->Now();
     Long64_t end = 0.;
@@ -48,7 +48,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     double mZ = 91.19;
     double wZ = 2.50;
     
-    double ctau = 5.;
+    double ctau = 20.;
     gStyle->SetOptTitle(0);
     //vector<double> mX1 { 100., 150., 300. };
     vector<double> mX1 { 200., 300., 350. };
@@ -78,12 +78,12 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(30.);
     int NsigmaT = sigmaT.size();
     int NsigmaMET = sigmaMET.size();
-    bool timing_flag = true; //set to false to turn off anything related to looping over sigmat
+    bool timing_flag = false; //set to false to turn off anything related to looping over sigmat
     bool MET_flag = false;
     bool points = false;
     
     //Number of events
-    int Ngen = 1000000;
+    int Ngen = 10000000;
     int Entries = Ngen;
     double displacement_cut = 3.;
     
@@ -92,7 +92,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     double xmax_MX2 = 1500.;
     int bins_MX1 = 1024;
     double xmin_MX1 = 0.;
-    vector<double> xmax_MX1 = { 1000., 1200., 1400. };
+    vector<double> xmax_MX1 = { 1000., 1200., 1300. };
     double ana_factor = 500.;
     
     vector<vector<TH1D*>> vect_hist_Sigma_MX2_SigmaT(NmX1, vector<TH1D*>(NsigmaT));
@@ -390,7 +390,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
                                       "Zb(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}");
     
     histPlot->SetRebin(1);
-    /*
+    
     RFList<const HistPlotCategory> cat_list_mX1;
     char smassX1[200];
     //string smX1 = "#tilde{#chi}^{ 0}_{1} = ";
@@ -403,7 +403,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         
         cat_list_mX1 += histPlot->GetNewCategory(scatmX1, smX1+std::string(snamemX1));
     }
-    */
+    /*
     RFList<const HistPlotCategory> cat_list_mX1;
     char smassX1[200];
     //string smX1 = "#tilde{#chi}^{ 0}_{1} = ";
@@ -417,11 +417,16 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         
         cat_list_mX1 += histPlot->GetNewCategory(scatmX1, smX1+std::string(snamemX1));
     }
-    
+    */
     //setting up all the variables that could be potentially plotted
     const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", /*"M(#tilde{#chi}_{1a}^{0})"*/ "Mass of LSP", 0., 700., "[GeV]");
     const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", /*"M(#tilde{#chi}_{2a}^{0})"*/ "Mass of LLP", 0., 2000., "[GeV]");
     const HistPlotVar& EZa = histPlot->GetNewVar("EZa", "E_{Za}^{#tilde{#chi}_{2a}^{0}}", 20., 180., "[GeV]");
+    const HistPlotVar& MIa2_MXa2 = histPlot->GetNewVar("MIa2_MXa2", "M(#tilde{#chi}_{1a}^{0})/M(#tilde{#chi}_{2a}^{0})", 0.2, 1.0, "");
+    const HistPlotVar& MIb2_MXb2 = histPlot->GetNewVar("MIb2_MXb2", "M(#tilde{#chi}_{1b}^{0})/M(#tilde{#chi}_{2b}^{0})", 0.2, 1.0, "");
+    
+    histPlot->AddPlot(MIa2_MXa2, cat_list_mX1);
+    histPlot->AddPlot(MIa2_MXa2, MIb2_MXb2, cat_list_mX1);
     
     //histPlot->AddPlot(EZa, cat_list_mX1);
     //histPlot->AddPlot(MXa2, cat_list_mX1);
@@ -602,6 +607,9 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         }
         
         MIa2 = test_Resolution.Mass_Invisible2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa,Smeared_vBetab);
+        double MIb2 = test_Resolution.Mass_Invisible2(MET_RECO_PUPPI,Vb,Va,Smeared_vBetab,Smeared_vBetaa);
+        MIa2_MXa2 = MIa2/MXa2;
+        MIb2_MXb2 = MIb2/MXb2;
         
         if(timing_flag){
             PUPPI_Detector.Set_sigmaT(0.);
@@ -852,12 +860,12 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
             MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
             MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
         }
-        if(MIa2 > 0.){
+        if(MIa2 > 0. && MIb2 > 0.){
         histPlot->Fill(cat_list_mX1[m]);
         acp_events++;
         }
     }
-    //LAB_Gen.PrintGeneratorEfficiency();
+    LAB_Gen.PrintGeneratorEfficiency();
   }
     g_Log << LogInfo << "Generated a Total of " << gen_events << " Events " << LogEnd;
     g_Log << LogInfo << acp_events << " passed selection requirements " << LogEnd;
@@ -865,7 +873,13 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*NmX1 << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*NmX1 << " Events" << LogEnd;
-    histPlot->Draw(true);
+    histPlot->Draw(false);
+    TLatex l(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
+    l.SetNDC();
+    l.SetTextSize(0.04);
+    l.SetTextFont(42);
+    l.SetTextColor(kBlack);
+    l.DrawLatex(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
     TFile fout(output_name.c_str(),"RECREATE");
     if(timing_flag){
     for(int i = 0; i<NmX1; i++)

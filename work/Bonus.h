@@ -418,18 +418,18 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph.at(i)); }
     vect_graph[0]->SetLineStyle(1);
     vect_graph[0]->SetMarkerStyle(22);
-    vect_graph[0]->SetLineColor(kCyan);
-    vect_graph[0]->SetMarkerColor(kCyan);
+    vect_graph[0]->SetLineColor(kAzure);
+    vect_graph[0]->SetMarkerColor(kAzure);
     if(vect_graph.size() > 1){
         vect_graph[1]->SetLineStyle(1);
         vect_graph[1]->SetMarkerStyle(22);
-        vect_graph[1]->SetLineColor(kPink);
-        vect_graph[1]->SetMarkerColor(kPink);}
+        vect_graph[1]->SetLineColor(kOrange+2);
+        vect_graph[1]->SetMarkerColor(kOrange+2);}
     if(vect_graph.size() > 2){
         vect_graph[2]->SetLineStyle(1);
         vect_graph[2]->SetMarkerStyle(22);
-        vect_graph[2]->SetLineColor(kGreen-4);
-        vect_graph[2]->SetMarkerColor(kGreen-4);}
+        vect_graph[2]->SetLineColor(kGreen+4);
+        vect_graph[2]->SetMarkerColor(kGreen+4);}
     if(vect_graph.size() == 4){
         vect_graph[0]->SetLineStyle(1);
         vect_graph[0]->SetMarkerStyle(22);
@@ -510,14 +510,14 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     l.SetNDC();
     l.SetTextSize(0.045);
     l.SetTextFont(42);
-    l.SetTextColor(kWhite);
+    l.SetTextColor(kBlack);
     l.DrawLatex(0.62,0.95,"#tilde{#chi}_{2}^{ 0} #tilde{#chi}_{2}^{ 0}#rightarrow Za(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}Zb(#it{l}#it{l}) #tilde{#chi}_{1}^{ 0}");
     l.SetTextSize(0.04);
     l.SetTextFont(42);
-    l.SetTextColor(kWhite);
+    l.SetTextColor(kBlack);
     l.DrawLatex(0.02,0.95,"#bf{#it{RestFrames}} Event Generation");
     //invert colors
-    
+    /*
     mg->GetXaxis()->SetAxisColor(kWhite);
     mg->GetYaxis()->SetAxisColor(kWhite);
     mg->GetXaxis()->SetTitleColor(kWhite);
@@ -527,7 +527,7 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     canvas_graph->SetFillColor(kBlack);
     leg->SetTextColor(kWhite);
     leg->SetFillColor(kBlack);
-    
+    */
     canvas_graph->SaveAs((plotName+".pdf").c_str());
     canvas_graph->Write();
 }

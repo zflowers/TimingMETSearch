@@ -39,7 +39,7 @@
 using namespace RestFrames;
 
 void ctau_X2X2_to_ZllXZllX(std::string output_name =
-			      "output_ctau_X2X2_to_ZallXZbllX.root"){
+			      "output_ctau_X2X2_to_ZallXZbllX_Ratio.root"){
 
     Long64_t start = gSystem->Now();
     Long64_t end = 0.;
@@ -82,15 +82,14 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     //sigmaT.push_back(30.);
     int NsigmaT = sigmaT.size();
     int NsigmaMET = sigmaMET.size();
-    bool timing_flag = true; //set to false to turn off anything related to looping over sigmaT
+    bool timing_flag = false; //set to false to turn off anything related to looping over sigmaT
     bool MET_flag = false; //set to false to turn off anything related to looping over sigmaMET
     bool points = false;
     bool decayangle = false;
     
     //Number of events
-    int Ngen = 1000000;
-    int Entries = 100000;
-    //int Entries = 100000; //for comparing turning effects off
+    int Ngen = 10000000;
+    int Entries = Ngen;
     double displacement_cut = 3.;
     
     int bins_MX2 = 1024;
@@ -433,6 +432,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     
     //setting up all the variables that could be potentially plotted
     const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", 0., 600., "[GeV]");
+    const HistPlotVar& MIa2_MXa2 = histPlot->GetNewVar("MIa2_MXa2", "M(#tilde{#chi}_{1a}^{0})/M(#tilde{#chi}_{2a}^{0})", 0.6, 1., "");
+    const HistPlotVar& MIb2_MXb2 = histPlot->GetNewVar("MIb2_MXb2", "M(#tilde{#chi}_{1b}^{0})/M(#tilde{#chi}_{2b}^{0})", 0.6, 1., "");
     const HistPlotVar& MIb2 = histPlot->GetNewVar("MIb2", "M(#tilde{#chi}_{1b}^{0})", 0., 600., "[GeV]");
     const HistPlotVar& MXa2 = histPlot->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 50., 800., "[GeV]");
     const HistPlotVar& MXa2_Cos = histPlot_Cos->GetNewVar("MXa2", "M(#tilde{#chi}_{2a}^{0})", 0., 800., "[GeV]");
@@ -441,11 +442,18 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& MXa = histPlot->GetNewVar("MXa", "M(#tilde{#chi}_{2}^{0})", 0., 800., "[GeV]");
     const HistPlotVar& EZa = histPlot->GetNewVar("EZ", "E_{Z}^{#tilde{#chi}_{2}^{0}}", 50., 250., "[GeV]");
     const HistPlotVar& CosX2a_Plot = histPlot->GetNewVar("CosX2a", "Cos(#theta_{#tilde{#chi}_{2a}^{0}})", -1., 1., "");
-    const HistPlotVar& tReco_tTrue = histPlot->GetNewVar("tReco_tTrue", "#theta_{#tilde{#chi}_{2a}^{0}}^{RECO} - #theta_{#tilde{#chi}_{2a}^{0}}^{TRUE}", -0.05, 0.05, "");
+    const HistPlotVar& tReco_tTrue = histPlot->GetNewVar("tReco_tTrue", "#theta_{#tilde{#chi}_{2a}^{0}}^{RECO} - #theta_{#tilde{#chi}_{2a}^{0}}^{TRUE}", -0.5, 0.5, "");
     
-    histPlot->AddPlot(MXa2,MIb2,cat_list_ctau);
-    histPlot->AddPlot(MXa2,MIa2,cat_list_ctau);
+    histPlot->AddPlot(MIa2_MXa2, MIb2_MXb2, cat_list_ctau);
+    histPlot->AddPlot(MIa2_MXa2, cat_list_ctau);
+    
+    //histPlot->AddPlot(MXa2,MIb2,cat_list_ctau);
+    //histPlot->AddPlot(MXa2,MIa2,cat_list_ctau);
+    //histPlot->AddPlot(MXa2,CosX2a_Plot,cat_list_ctau);
+    //histPlot->AddPlot(CosX2a_Plot,cat_list_ctau);
     //histPlot->AddPlot(tReco_tTrue,cat_list_ctau);
+    //histPlot->AddPlot(tReco_tTrue,CosX2a_Plot,cat_list_ctau);
+    //histPlot->AddPlot(MIa2_MXa2,cat_list_ctau);
     /*
     histPlot->AddPlot(MIa, cat_list_ctau);
     histPlot->AddPlot(MXa, cat_list_ctau);
@@ -606,8 +614,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         double MXa2_Resolution = test_Resolution.Mass_Parents2_Resolution(MET_RECO_PUPPI,Va.Vect()+Vb.Vect(),Smeared_vBetaa,Smeared_vBetab,Sigma_Beta_Mag,MET_Mag_Resolution,MET_Dir_Resolution,Sigma_Vis);
         
         MIa2 = test_Resolution.Mass_Invisible2(MET_RECO_PUPPI,Va,Vb,Smeared_vBetaa,Smeared_vBetab);
+        MIa2_MXa2 = MIa2/MXa2;
         MIb2 = test_Resolution.Mass_Invisible2(MET_RECO_PUPPI,Vb,Va,Smeared_vBetab,Smeared_vBetaa);
-        
+        MIb2_MXb2 = MIb2/MXb2;
         //Angle Analysis
         TLorentzVector PX2a;
         PX2a.SetPxPyPzE(0.0,0.0,0.0,MXa2);
@@ -886,7 +895,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
             MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
         }
-        //if((MIa2 > 0. && MIb2 > 0.) && MIa > 0.){
+        if((MIa2 > 0. && MIb2 > 0.) && MIa > 0.){
         if(decayangle){
         histPlot_Cos->Fill(cat_list_ctau_cos[m]);
         histPlot->Fill(cat_list_ctau[m]);
@@ -896,7 +905,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         histPlot->Fill(cat_list_ctau[m]);
         acp_events++;
         }
-        //}
+        }
     }
     //LAB_Gen.PrintGeneratorEfficiency();
   }
@@ -907,6 +916,12 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     g_Log << LogInfo << "Time to Generate " << Ngen*Nctau << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*Nctau << " Events" << LogEnd;
     histPlot->Draw(false);
+    TLatex l(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
+    l.SetNDC();
+    l.SetTextSize(0.04);
+    l.SetTextFont(42);
+    l.SetTextColor(kBlack);
+    l.DrawLatex(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
     //histPlot_Cos->Draw(true);
     TFile fout(output_name.c_str(),"RECREATE");
     /*if(MET_flag || timing_flag){
