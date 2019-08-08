@@ -39,7 +39,7 @@
 using namespace RestFrames;
 
 void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
-			      "output_Mass_LSP_Detector_X2X2_to_ZallXZbllX_Ratio.root"){
+			      "output_Mass_LSP_Detector_X2X2_to_ZallXZbllX_LSP_Mass.root"){
 
     Long64_t start = gSystem->Now();
     Long64_t end = 0.;
@@ -425,12 +425,11 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& MIa2_MXa2 = histPlot->GetNewVar("MIa2_MXa2", "M(#tilde{#chi}_{1a}^{0})/M(#tilde{#chi}_{2a}^{0})", 0.2, 1.0, "");
     const HistPlotVar& MIb2_MXb2 = histPlot->GetNewVar("MIb2_MXb2", "M(#tilde{#chi}_{1b}^{0})/M(#tilde{#chi}_{2b}^{0})", 0.2, 1.0, "");
     
-    histPlot->AddPlot(MIa2_MXa2, cat_list_mX1);
-    histPlot->AddPlot(MIa2_MXa2, MIb2_MXb2, cat_list_mX1);
-    
+    //histPlot->AddPlot(MIa2_MXa2, cat_list_mX1);
+    //histPlot->AddPlot(MIa2_MXa2, MIb2_MXb2, cat_list_mX1);
     //histPlot->AddPlot(EZa, cat_list_mX1);
     //histPlot->AddPlot(MXa2, cat_list_mX1);
-    //histPlot->AddPlot(MIa2, cat_list_mX1);
+    histPlot->AddPlot(MIa2, cat_list_mX1);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -874,12 +873,14 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     g_Log << LogInfo << "Time to Generate " << Ngen*NmX1 << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*NmX1 << " Events" << LogEnd;
     histPlot->Draw(false);
+    /*
     TLatex l(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
     l.SetNDC();
     l.SetTextSize(0.04);
     l.SetTextFont(42);
     l.SetTextColor(kBlack);
     l.DrawLatex(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
+    */
     TFile fout(output_name.c_str(),"RECREATE");
     if(timing_flag){
     for(int i = 0; i<NmX1; i++)

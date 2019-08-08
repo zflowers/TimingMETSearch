@@ -39,7 +39,7 @@
 using namespace RestFrames;
 
 void ctau_X2X2_to_ZllXZllX(std::string output_name =
-			      "output_ctau_X2X2_to_ZallXZbllX_Ratio.root"){
+			      "output_ctau_X2X2_to_ZallXZbllX_Overlay_Cos.root"){
 
     Long64_t start = gSystem->Now();
     Long64_t end = 0.;
@@ -47,14 +47,14 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     
     //setting masses and widths
     double mX2 = 400.0;
-    double mX1 = 350.0;
+    double mX1 = 200.0;
     double mZ = 91.19;
     double wZ = 2.50;
     
     vector<double> ctau;
     
-    ctau.push_back(20.);
-    ctau.push_back(10.);
+    //ctau.push_back(20.);
+    //ctau.push_back(10.);
     ctau.push_back(5.);
     
     int Nctau = ctau.size();
@@ -94,7 +94,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     
     int bins_MX2 = 1024;
     double xmin_MX2 = 0.;
-    double xmax_MX2 = 1500.;
+    double xmax_MX2 = 1200.;
     int bins_MX1 = 1024;
     double xmin_MX1 = 0.;
     vector<double> xmax_MX1 = { 1200., 1200., 1200. };
@@ -444,26 +444,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& CosX2a_Plot = histPlot->GetNewVar("CosX2a", "Cos(#theta_{#tilde{#chi}_{2a}^{0}})", -1., 1., "");
     const HistPlotVar& tReco_tTrue = histPlot->GetNewVar("tReco_tTrue", "#theta_{#tilde{#chi}_{2a}^{0}}^{RECO} - #theta_{#tilde{#chi}_{2a}^{0}}^{TRUE}", -0.5, 0.5, "");
     
-    histPlot->AddPlot(MIa2_MXa2, MIb2_MXb2, cat_list_ctau);
-    histPlot->AddPlot(MIa2_MXa2, cat_list_ctau);
-    
-    //histPlot->AddPlot(MXa2,MIb2,cat_list_ctau);
-    //histPlot->AddPlot(MXa2,MIa2,cat_list_ctau);
-    //histPlot->AddPlot(MXa2,CosX2a_Plot,cat_list_ctau);
-    //histPlot->AddPlot(CosX2a_Plot,cat_list_ctau);
-    //histPlot->AddPlot(tReco_tTrue,cat_list_ctau);
-    //histPlot->AddPlot(tReco_tTrue,CosX2a_Plot,cat_list_ctau);
-    //histPlot->AddPlot(MIa2_MXa2,cat_list_ctau);
-    /*
-    histPlot->AddPlot(MIa, cat_list_ctau);
-    histPlot->AddPlot(MXa, cat_list_ctau);
+    histPlot_Cos->AddPlot(MXa2_Cos, cat_list_ctau_cos);
     histPlot->AddPlot(MXa2, cat_list_ctau);
-    histPlot->AddPlot(MIa2, cat_list_ctau);
-    histPlot->AddPlot(MXa2, CosX2a_Plot, cat_list_ctau);
-    histPlot->AddPlot(CosX2a_Plot, cat_list_ctau);
-    histPlot->AddPlot(MXa2, MXb2, cat_list_ctau);
-    histPlot->AddPlot(MIa2, MIb2, cat_list_ctau);
-    */
+    
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
     TFile* input = new TFile("PTEta.root");
@@ -639,8 +622,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         CosX2a_Plot = X2a_Reco.GetCosDecayAngle();
         tReco_tTrue = TMath::ACos(CosX2a_Plot) - TMath::ACos(X2a_Gen.GetCosDecayAngle());
         double CosX2b = X2b_Reco.GetCosDecayAngle();
-        if((fabs(CosX2a_Plot) < 0.8 || fabs(CosX2b) < 0.8))
+        if((fabs(CosX2a_Plot) < 0.9 || fabs(CosX2b) < 0.9))
         {
+            //igen--;
             decayangle = true;
         }
         
@@ -656,7 +640,7 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             double Db_No_Time = 30.*ToFb*Smeared_vBetab_No_Time.Mag();
             if(fabs(ToFa) < displacement_cut*PUPPI_Detector.Get_sigmaT() || fabs(ToFb) < displacement_cut*PUPPI_Detector.Get_sigmaT() || fabs(Da_No_Time) < displacement_cut*sigmaDistance || fabs(Db_No_Time) < displacement_cut*sigmaDistance || Smeared_vBetaa_No_Time.Mag() >= 1. || Smeared_vBetab_No_Time.Mag() >= 1.)
             {
-                igen--;
+                //igen--;
                 continue;
             }
             
@@ -739,11 +723,11 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
                 double CosX2a = X2a_Reco.GetCosDecayAngle();
                 double CosX2b = X2b_Reco.GetCosDecayAngle();
                 //if((fabs(CosX2a) > 0.8 || fabs(CosX2b) > 0.8))
-                if((fabs(CosX2a) < 0.8 && fabs(CosX2b) < 0.8))// && vect_hist_Sigma_MX2_Measured_SigmaT_cos08.at(m).at(i)->GetEntries() < Entries)
+                if((fabs(CosX2a) > 0.8 && fabs(CosX2b) > 0.8) && vect_hist_Sigma_MX2_Measured_SigmaT_cos08.at(m).at(i)->GetEntries() < Entries)
                 {
                     vect_hist_Sigma_MX2_Measured_SigmaT_cos08.at(m).at(i)->Fill(MXa2_Calc);
                 }
-                if((fabs(CosX2a) < 0.9 && fabs(CosX2b) < 0.9))// && vect_hist_Sigma_MX2_Measured_SigmaT_cos09.at(m).at(i)->GetEntries() < Entries)
+                if((fabs(CosX2a) > 0.9 && fabs(CosX2b) > 0.9) && vect_hist_Sigma_MX2_Measured_SigmaT_cos09.at(m).at(i)->GetEntries() < Entries)
                 {
                     vect_hist_Sigma_MX2_Measured_SigmaT_cos09.at(m).at(i)->Fill(MXa2_Calc);
                 }
@@ -895,8 +879,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
             MET_Mag_Resolution = PUPPI_Detector.Get_Sigma_Par(sys);
             MET_Dir_Resolution = PUPPI_Detector.Get_Sigma_Perp(sys);
         }
-        if((MIa2 > 0. && MIb2 > 0.) && MIa > 0.){
-        if(decayangle){
+        //if((MIa2 > 0. && MIb2 > 0.) && MIa > 0.){
+        if(!decayangle){
         histPlot_Cos->Fill(cat_list_ctau_cos[m]);
         histPlot->Fill(cat_list_ctau[m]);
         acp_events++;
@@ -905,9 +889,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         histPlot->Fill(cat_list_ctau[m]);
         acp_events++;
         }
-        }
+        //}
     }
-    //LAB_Gen.PrintGeneratorEfficiency();
+    LAB_Gen.PrintGeneratorEfficiency();
   }
     g_Log << LogInfo << "Generated a Total of " << gen_events << " Events " << LogEnd;
     g_Log << LogInfo << acp_events << " passed selection requirements " << LogEnd;
@@ -916,22 +900,20 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     g_Log << LogInfo << "Time to Generate " << Ngen*Nctau << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*Nctau << " Events" << LogEnd;
     histPlot->Draw(false);
+    histPlot_Cos->Draw(false);/*
     TLatex l(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
     l.SetNDC();
     l.SetTextSize(0.04);
     l.SetTextFont(42);
     l.SetTextColor(kBlack);
-    l.DrawLatex(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
-    //histPlot_Cos->Draw(true);
+    l.DrawLatex(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");*/
     TFile fout(output_name.c_str(),"RECREATE");
-    /*if(MET_flag || timing_flag){
+    if(MET_flag || timing_flag){
     TCanvas* canv = new TCanvas("canv","",750,500);
-    Draw_Hists(vect_hist_Sigma_MX1_Measured_SigmaT.at(2),canv);
+    Draw_Hists(vect_hist_Sigma_MX2_Measured_SigmaT_cos08.at(0),canv);
     TCanvas* canv2 = new TCanvas("canv2","",750,500);
-    Draw_Hists(vect_hist_Sigma_MX1_Measured_SigmaT.at(1),canv2);
-    TCanvas* canv1 = new TCanvas("canv1","",750,500);
-    Draw_Hists(vect_hist_Sigma_MX1_Measured_SigmaT.at(0),canv1);
-    }*/
+    Draw_Hists(vect_hist_Sigma_MX2_Measured_SigmaT.at(0),canv2);
+    }
     if(timing_flag){
     for(int i = 0; i<Nctau; i++)
     {
@@ -956,8 +938,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         delete vect_hist_Sigma_MX2_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_MET_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_Timing_SigmaT.at(i).at(j);
-        delete vect_hist_Sigma_MX2_Measured_SigmaT.at(i).at(j);
-        delete vect_hist_Sigma_MX2_Measured_SigmaT_cos08.at(i).at(j);
+        //delete vect_hist_Sigma_MX2_Measured_SigmaT.at(i).at(j);
+        //delete vect_hist_Sigma_MX2_Measured_SigmaT_cos08.at(i).at(j);
         delete vect_hist_Sigma_MX2_Measured_SigmaT_cos09.at(i).at(j);
         delete vect_hist_Sigma_MX2_MET_Measured_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_Timing_Measured_SigmaT.at(i).at(j);
@@ -998,22 +980,6 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     //Draw_Graphs(fout, vect_graph_Sigma_MX1_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "FWHM M [%]", "#sigma_{t} [ps]", "Res_LSP_Measured_ctau_timing_Both", points);
     //Draw_Graphs(fout, vect_graph_Sigma_MX1_MET_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "FWHM M [%]", "#sigma_{t} [ps]", "Res_LSP_Measured_ctau_timing_MET_Off", points);
     //Draw_Graphs(fout, vect_graph_Sigma_MX1_Timing_SigmaT_Measured, leg_text_Sigma_MX2_SigmaT, "FWHM M [%]", "#sigma_{t} [ps]", "Res_LSP_Measured_ctau_timing_Timing_Off", points);
-       /*
-        vector<TGraph*> vect_graph_ctau_SigmaT_SigmaMX2;
-        //vect_graph_ctau_SigmaT_SigmaMX2.push_back(vect_graph_Sigma_MX2_SigmaT[0]);
-        //vect_graph_ctau_SigmaT_SigmaMX2.push_back(vect_graph_Sigma_MX2_MET_SigmaT[0]);
-        //vect_graph_ctau_SigmaT_SigmaMX2.push_back(vect_graph_Sigma_MX2_Timing_SigmaT[0]);
-        vect_graph_ctau_SigmaT_SigmaMX2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured[2]);
-        vect_graph_ctau_SigmaT_SigmaMX2.push_back(vect_graph_Sigma_MX2_MET_SigmaT_Measured[2]);
-        vect_graph_ctau_SigmaT_SigmaMX2.push_back(vect_graph_Sigma_MX2_Timing_SigmaT_Measured[2]);
-        vector<string> leg_text_ctau_SigmaT;
-        //leg_text_ctau_SigmaT.push_back("Analytical");
-        leg_text_ctau_SigmaT.push_back("Measured");
-        leg_text_ctau_SigmaT.push_back("#sigma_{MET} Off");
-        leg_text_ctau_SigmaT.push_back("#sigma_{t} Off");
-        //leg_text_ctau_SigmaT.push_back("Measured");
-        Draw_Graphs(fout, vect_graph_ctau_SigmaT_SigmaMX2, leg_text_ctau_SigmaT, "FWHM M [%]", "#sigma_{t} [ps]", "MLLP_Timing_ctau", points);
-        */
         vector<TGraph*> vect_graph_ctau_SigmaT_SigmaMX1;
         vect_graph_ctau_SigmaT_SigmaMX1.push_back(vect_graph_Sigma_MX1_SigmaT[0]);
         vect_graph_ctau_SigmaT_SigmaMX1.push_back(vect_graph_Sigma_MX1_MET_SigmaT[0]);
@@ -1024,16 +990,16 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         //Draw_Graphs(fout, vect_graph_ctau_SigmaT_SigmaMX1, leg_text_ctau_SigmaT, "FWHM M [%]", "#sigma_{t} [ps]", "MLSP_Timing_ctau", points);
         //For cos decay angle
         vector<TGraph*> vect_graph_ctau_cos2;
-        vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured[2]);
-        //vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured_cos09[2]);
-        //vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured_cos08[2]);
-        vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_MET_SigmaT_Measured[2]);
-        vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_Timing_SigmaT_Measured[2]);
+        vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured[0]);
+        vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured_cos09[0]);
+        //vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_SigmaT_Measured_cos08[0]);
+        vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_MET_SigmaT_Measured[0]);
+        vect_graph_ctau_cos2.push_back(vect_graph_Sigma_MX2_Timing_SigmaT_Measured[0]);
         vector<string> leg_text_ctau_cos2;
         //leg_text_ctau_cos2.push_back("No |Cos(#theta_{#tilde{#chi}_{2a}^{0}})| Cut");
         leg_text_ctau_cos2.push_back("Expected");
-        //leg_text_ctau_cos2.push_back("|Cos(#theta_{#tilde{#chi}_{2a}^{0}})| < 0.9");
-        //leg_text_ctau_cos2.push_back("|Cos(#theta_{#tilde{#chi}_{2a}^{0}})| < 0.8");
+        leg_text_ctau_cos2.push_back("|Cos(#theta_{#tilde{#chi}_{2a}^{0}})| < 0.9");
+        //leg_text_ctau_cos2.push_back("|Cos(#theta_{#tilde{#chi}_{2a}^{0}})| > 0.8");
         leg_text_ctau_cos2.push_back("#sigma_{MET} Off");
         leg_text_ctau_cos2.push_back("#sigma_{t} Off");
         Draw_Graphs(fout, vect_graph_ctau_cos2, leg_text_ctau_cos2, "FWHM M [%]", "#sigma_{t} [ps]", "MLLP_Timing_Cos2", points);
