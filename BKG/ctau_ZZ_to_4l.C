@@ -161,20 +161,12 @@ void ctau_ZZ_to_4l(std::string output_name =
     
     //get the kinematics of the ZZ system
     //use 200 GeV for now
-     TFile* input = new TFile("../work/PTEta.root");
-     TH3* hist = (TH3*)input->Get("hist_PTvsEtavsMass_200");
-     Physics physics;
-     physics.SetEtaPtMCM(*hist);
-     input->Close();
-     delete input;
-    /*
     TFile* input = new TFile("PTEta_BKG.root");
-    TH3* hist = (TH3*)input->Get("hist_PTvsEtavsMass");
+    TH3* hist = (TH3*)input->Get("hist_PTvsEtavsMass_BKG");
     Physics physics;
     physics.SetEtaPtMCM(*hist);
     input->Close();
     delete input;
-    */
     //build the detector
     Detector PUPPI_Detector;
     //Refer to the formula for MET smearing (see Detector.hh)

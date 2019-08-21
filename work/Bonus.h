@@ -349,7 +349,7 @@ void setMyStyle()
     myStyle->SetTitleFontSize(0.05);
     myStyle->SetTitleBorderSize(0);
     
-    // use large Times-Roman fonts
+    // use large Helvetica fonts
     myStyle->SetTitleFont(42,"xyz");  // set the all 3 axes title font
     myStyle->SetTitleFont(42," ");    // set the pad title font
     myStyle->SetTitleSize(0.06,"xyz"); // set the 3 axes title size
@@ -530,6 +530,15 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     */
     canvas_graph->SaveAs((plotName+".pdf").c_str());
     canvas_graph->Write();
+}
+
+double evaluateZbi(double Nsig, double Nbkg, double sys)
+{
+    double Nobs = Nsig+Nbkg;
+    double tau = 1./Nbkg/(sys*sys/10000.);
+    double aux = Nbkg*tau;
+    double Pvalue = TMath::BetaIncomplete(1./(1.+tau),Nobs,aux+1.);
+    return sqrt(2.)*TMath::ErfcInverse(Pvalue*2.);
 }
 
 Double_t Expo_sqrt(Double_t *x,Double_t *par)
