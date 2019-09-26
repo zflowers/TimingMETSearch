@@ -53,8 +53,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     
     vector<double> ctau;
     
-    //ctau.push_back(20.);
-    //ctau.push_back(10.);
+    ctau.push_back(20.);
+    ctau.push_back(10.);
     ctau.push_back(5.);
     
     int Nctau = ctau.size();
@@ -444,8 +444,11 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& CosX2a_Plot = histPlot->GetNewVar("CosX2a", "Cos(#theta_{#tilde{#chi}_{2a}^{0}})", -1., 1., "");
     const HistPlotVar& tReco_tTrue = histPlot->GetNewVar("tReco_tTrue", "#theta_{#tilde{#chi}_{2a}^{0}}^{RECO} - #theta_{#tilde{#chi}_{2a}^{0}}^{TRUE}", -0.5, 0.5, "");
     
-    histPlot_Cos->AddPlot(MXa2_Cos, cat_list_ctau_cos);
+    //histPlot_Cos->AddPlot(MXa2_Cos, cat_list_ctau_cos);
     histPlot->AddPlot(MXa2, cat_list_ctau);
+    histPlot->AddPlot(tReco_tTrue, cat_list_ctau);
+    histPlot->AddPlot(tReco_tTrue, CosX2a_Plot, cat_list_ctau);
+    histPlot->AddPlot(MXa2, CosX2a_Plot, cat_list_ctau);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
     //from 200-1000 GeV (in 100 GeV steps) the correlation depending on the X2 mass
@@ -899,8 +902,9 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*Nctau << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*Nctau << " Events" << LogEnd;
-    histPlot->Draw(false);
-    histPlot_Cos->Draw(false);/*
+    histPlot->Draw(true);
+    //histPlot_Cos->Draw(false);
+    /*
     TLatex l(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
     l.SetNDC();
     l.SetTextSize(0.04);
@@ -938,8 +942,8 @@ void ctau_X2X2_to_ZllXZllX(std::string output_name =
         delete vect_hist_Sigma_MX2_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_MET_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_Timing_SigmaT.at(i).at(j);
-        //delete vect_hist_Sigma_MX2_Measured_SigmaT.at(i).at(j);
-        //delete vect_hist_Sigma_MX2_Measured_SigmaT_cos08.at(i).at(j);
+        delete vect_hist_Sigma_MX2_Measured_SigmaT.at(i).at(j);
+        delete vect_hist_Sigma_MX2_Measured_SigmaT_cos08.at(i).at(j);
         delete vect_hist_Sigma_MX2_Measured_SigmaT_cos09.at(i).at(j);
         delete vect_hist_Sigma_MX2_MET_Measured_SigmaT.at(i).at(j);
         delete vect_hist_Sigma_MX2_Timing_Measured_SigmaT.at(i).at(j);

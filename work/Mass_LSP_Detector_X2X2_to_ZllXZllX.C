@@ -62,7 +62,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
      sigmaMET.push_back(i);
      sigmaT.push_back(i);
      }
-     */
+    */
     sigmaT.push_back(0.);
     sigmaT.push_back(10.);
     sigmaT.push_back(30.);
@@ -399,7 +399,7 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
         
         char snamemX1[200], scatmX1[50];
         sprintf(scatmX1, "mX1_%d", m);
-        sprintf(snamemX1, "%.1f GeV", mX1[m]);
+        sprintf(snamemX1, "%.0f GeV", mX1[m]);
         
         cat_list_mX1 += histPlot->GetNewCategory(scatmX1, smX1+std::string(snamemX1));
     }
@@ -425,10 +425,10 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     const HistPlotVar& MIa2_MXa2 = histPlot->GetNewVar("MIa2_MXa2", "M(#tilde{#chi}_{1a}^{0})/M(#tilde{#chi}_{2a}^{0})", 0.2, 1.0, "");
     const HistPlotVar& MIb2_MXb2 = histPlot->GetNewVar("MIb2_MXb2", "M(#tilde{#chi}_{1b}^{0})/M(#tilde{#chi}_{2b}^{0})", 0.2, 1.0, "");
     
-    //histPlot->AddPlot(MIa2_MXa2, cat_list_mX1);
-    //histPlot->AddPlot(MIa2_MXa2, MIb2_MXb2, cat_list_mX1);
-    //histPlot->AddPlot(EZa, cat_list_mX1);
-    //histPlot->AddPlot(MXa2, cat_list_mX1);
+    histPlot->AddPlot(MIa2_MXa2, cat_list_mX1);
+    histPlot->AddPlot(MIa2_MXa2, MIb2_MXb2, cat_list_mX1);
+    histPlot->AddPlot(EZa, cat_list_mX1);
+    histPlot->AddPlot(MXa2, cat_list_mX1);
     histPlot->AddPlot(MIa2, cat_list_mX1);
     
     //since there is a correlation between MET and the PT/Eta of the CM frame
@@ -872,15 +872,15 @@ void Mass_LSP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     end = gSystem->Now();
     g_Log << LogInfo << "Time to Generate " << Ngen*NmX1 << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
     g_Log << LogInfo << "Processing " << Ngen*NmX1 << " Events" << LogEnd;
-    histPlot->Draw(false);
-    /*
+    histPlot->Draw(true);
+    
     TLatex l(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
     l.SetNDC();
     l.SetTextSize(0.04);
     l.SetTextFont(42);
     l.SetTextColor(kBlack);
     l.DrawLatex(0.23,0.64,"M(#tilde{#chi}_{2b}^{0}) = 400 GeV");
-    */
+    
     TFile fout(output_name.c_str(),"RECREATE");
     if(timing_flag){
     for(int i = 0; i<NmX1; i++)

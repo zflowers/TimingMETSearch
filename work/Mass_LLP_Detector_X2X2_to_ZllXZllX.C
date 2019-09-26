@@ -46,7 +46,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     Long64_t start = gSystem->Now();
     Long64_t end = 0.;
     setMyStyle();
-    double ctau = 5.0;
+    double ctau = 20.0;
     double mX1 = 100.0;
     double mZ = 91.19;
     double wZ = 2.50;
@@ -87,7 +87,7 @@ void Mass_LLP_Detector_X2X2_to_ZllXZllX(std::string output_name =
     bool decayangle = false;
     
     //Number of events
-    int Ngen = 1000000;
+    int Ngen = 10000000;
     int Entries = Ngen;
     double displacement_cut = 3.;
     
