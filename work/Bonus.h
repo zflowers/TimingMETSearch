@@ -418,18 +418,18 @@ void Draw_Graphs(TFile& fout, vector<TGraph*>& vect_graph, const vector<string>&
     for(int i = 0; i < int(vect_graph.size()); i++) { mg->Add(vect_graph.at(i)); }
     vect_graph[0]->SetLineStyle(1);
     vect_graph[0]->SetMarkerStyle(22);
-    vect_graph[0]->SetLineColor(kAzure);
-    vect_graph[0]->SetMarkerColor(kAzure);
+    vect_graph[0]->SetLineColor(kAzure-1);
+    vect_graph[0]->SetMarkerColor(kAzure-1);
     if(vect_graph.size() > 1){
         vect_graph[1]->SetLineStyle(1);
         vect_graph[1]->SetMarkerStyle(22);
-        vect_graph[1]->SetLineColor(kOrange+2);
-        vect_graph[1]->SetMarkerColor(kOrange+2);}
+        vect_graph[1]->SetLineColor(kOrange+1);
+        vect_graph[1]->SetMarkerColor(kOrange+1);}
     if(vect_graph.size() > 2){
         vect_graph[2]->SetLineStyle(1);
         vect_graph[2]->SetMarkerStyle(22);
-        vect_graph[2]->SetLineColor(kGreen+4);
-        vect_graph[2]->SetMarkerColor(kGreen+4);}
+        vect_graph[2]->SetLineColor(kGreen+2);
+        vect_graph[2]->SetMarkerColor(kGreen+2);}
     if(vect_graph.size() == 4){
         vect_graph[0]->SetLineStyle(1);
         vect_graph[0]->SetMarkerStyle(22);

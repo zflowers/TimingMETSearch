@@ -38,8 +38,8 @@
 
 using namespace RestFrames;
 
-void SVz_ZZ_to_4l(std::string output_name =
-			      "output_SV_ZZ_to_4l.root"){
+void Displacement_ZZ_to_4l(std::string output_name =
+			      "output_Displacement_ZZ_to_4l.root"){
 
     Long64_t start = gSystem->Now();
     Long64_t end = 0.;
@@ -48,18 +48,17 @@ void SVz_ZZ_to_4l(std::string output_name =
     double mZ = 91.19;
     double wZ = 2.50;
     
-    vector<double> SV; //resolution on SVs in microns
+    vector<double> displacement; //resolution on SVs in microns
     
-    //SV.push_back(30.);
-    SV.push_back(65.);
-    //SV.push_back(100.);
+    displacement.push_back(0.);
+    displacement.push_back(1.);
+    displacement.push_back(2.);
     
-    int NSV = SV.size();
+    int Ndisplacement = displacement.size();
     
     //Number of events
     int Ngen = 1000000;
     int Entries = Ngen;
-    double displacement_cut = 3.;
     
     g_Log << LogInfo << "Initializing generator frames and tree..." << LogEnd;
     
@@ -143,16 +142,16 @@ void SVz_ZZ_to_4l(std::string output_name =
     
     histPlot->SetRebin(1);
     
-    RFList<const HistPlotCategory> cat_list_SV;
+    RFList<const HistPlotCategory> cat_list;
     char smassX2[200];
-    string sSV = "#delta_{SV} = ";
-    for(int m = 0; m < NSV; m++){
+    string sdisplacement = "#sigma_{Displacement} = ";
+    for(int m = 0; m < Ndisplacement; m++){
         
-        char snameSV[200], scatSV[50];
-        sprintf(scatSV, "#delta_{SV}_%d", m);
-        sprintf(snameSV, "%.1f #mu m", SV[m]);
+        char snamedisplacement[200], scatdisplacement[50];
+        sprintf(scatdisplacement, "#sigma_{Displacement}_%d", m);
+        sprintf(snamedisplacement, "%.1f #mu m", displacement[m]);
         
-        cat_list_SV += histPlot->GetNewCategory(scatSV, sSV+std::string(snameSV));
+        cat_list += histPlot->GetNewCategory(scatdisplacement, sdisplacement+std::string(snamedisplacement));
     }
     
     const HistPlotVar& EZa = histPlot->GetNewVar("EZ", "E_{Z}^{#tilde{#chi}_{2}^{0}}", 0., 500., "[GeV]");
@@ -160,13 +159,13 @@ void SVz_ZZ_to_4l(std::string output_name =
     const HistPlotVar& MIa2 = histPlot->GetNewVar("MIa2", "M(#tilde{#chi}_{1a}^{0})", 0., 2000., "[GeV]");
     const HistPlotVar& MXb2 = histPlot->GetNewVar("MXb2", "M(#tilde{#chi}_{2b}^{0})", 0., 2000., "[GeV]");
     
-    histPlot->AddPlot(EZa, cat_list_SV);
-    histPlot->AddPlot(MXa2, cat_list_SV);
-    histPlot->AddPlot(MIa2, cat_list_SV);
+    histPlot->AddPlot(EZa, cat_list);
+    histPlot->AddPlot(MXa2, cat_list);
+    histPlot->AddPlot(MIa2, cat_list);
     
     //get the kinematics of the ZZ system
     //use 200 GeV for now
-    TFile* input = new TFile("PTEta_BKG.root");
+    TFile* input = new TFile("PTEta_BKG_ZZ.root");
     TH3* hist = (TH3*)input->Get("hist_PTvsEtavsMass_BKG");
     Physics physics;
     physics.SetEtaPtMCM(*hist);
@@ -183,7 +182,7 @@ void SVz_ZZ_to_4l(std::string output_name =
     PUPPI_Detector.Set_con2_perp(-6.37947e-07);
     PUPPI_Detector.Set_sigmaT(0.03/sqrt(2.)); //timing resolution
     PUPPI_Detector.Set_sigmaPV(20.0/10000.0); //Primary Vertex resolution
-    //PUPPI_Detector.Set_sigmaSV(65.0/10000.0); //secondary Vertex resolution
+    PUPPI_Detector.Set_sigmaSV(65.0/10000.0); //secondary Vertex resolution
     Vertex PV(0.0,0.0,0.0,0.0); //nominal PV at 0
     Vertex SV_true(0.0,0.0,0.0,0.0); //nominal PV at 0
     Resolution test_Resolution(PUPPI_Detector); //setting up the Resolution "calculator"
@@ -192,20 +191,18 @@ void SVz_ZZ_to_4l(std::string output_name =
     double LAB_M;
     
     //relative uncertainty on the distance between PV and SV
-    //double sigmaDistance = sqrt((PUPPI_Detector.Get_sigmaPV()*PUPPI_Detector.Get_sigmaPV()+PUPPI_Detector.Get_sigmaSV()*PUPPI_Detector.Get_sigmaSV()));
+    double sigmaDistance = sqrt((PUPPI_Detector.Get_sigmaPV()*PUPPI_Detector.Get_sigmaPV()+PUPPI_Detector.Get_sigmaSV()*PUPPI_Detector.Get_sigmaSV()));
     
     //for checking generator efficiency
     int gen_events = 0;
     int acp_events = 0;
     
-  for(int m = 0; m < NSV; m++){
+  for(int m = 0; m < Ndisplacement; m++){
     g_Log << LogInfo << "Generating BKG events for ";
-    g_Log << "SV = " << SV[m] << LogEnd;
+    g_Log << "Displacement = " << displacement[m] << LogEnd;
     
     LAB_Gen.InitializeAnalysis(); //Comment for "Official" Plots
-    PUPPI_Detector.Set_sigmaSV(SV[m]/10000.0); //secondary Vertex resolution
-    double sigmaDistance = sqrt((PUPPI_Detector.Get_sigmaPV()*PUPPI_Detector.Get_sigmaPV()+PUPPI_Detector.Get_sigmaSV()*PUPPI_Detector.Get_sigmaSV()));
-      
+    
     for(int igen = 0; igen < Ngen; igen++){
       if(igen%((std::max(Ngen,10))/10) == 0)
 	g_Log << LogInfo << "Generating event " << igen << " of " << Ngen << LogEnd;
@@ -251,8 +248,8 @@ void SVz_ZZ_to_4l(std::string output_name =
         double Da = 30.*Smeared_SVa.GetTPos()*Smeared_vBetaa.Mag();
         double Db = 30.*Smeared_SVa.GetTPos()*Smeared_vBetab.Mag();
         
-        //if(fabs(Smeared_SVa.GetTPos()) < displacement_cut*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_SVb.GetTPos()) < displacement_cut*PUPPI_Detector.Get_sigmaT() || fabs(Da) < displacement_cut*sigmaDistance || fabs(Db) < displacement_cut*sigmaDistance || Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.) { igen--; continue;}
-        if(Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.) { igen--; continue;}
+        if(fabs(Smeared_SVa.GetTPos()) < displacement.at(m)*PUPPI_Detector.Get_sigmaT() || fabs(Smeared_SVb.GetTPos()) < displacement.at(m)*PUPPI_Detector.Get_sigmaT() || fabs(Da) < displacement.at(m)*sigmaDistance || fabs(Db) < displacement.at(m)*sigmaDistance || Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.) { igen--; continue;}
+        //if(Smeared_vBetaa.Mag() >= 1. || Smeared_vBetab.Mag() >= 1.) { igen--; continue;}
         
         double Sigma_Beta_Mag = sqrt((1.0/(Smeared_SVa.GetTPos()*Smeared_SVa.GetTPos()))*(sigmaDistance*sigmaDistance+2.*Smeared_vBetaa.Mag()*Smeared_vBetaa.Mag()*PUPPI_Detector.Get_sigmaT()*PUPPI_Detector.Get_sigmaT()));
         
@@ -284,7 +281,7 @@ void SVz_ZZ_to_4l(std::string output_name =
         L2b_Reco.SetLabFrameFourVector(L2b_RECO);
         LAB_Reco.AnalyzeEvent();
         
-        histPlot->Fill(cat_list_SV[m]);
+        histPlot->Fill(cat_list[m]);
         acp_events++;
     }
     LAB_Gen.PrintGeneratorEfficiency();
@@ -293,8 +290,8 @@ void SVz_ZZ_to_4l(std::string output_name =
     g_Log << LogInfo << acp_events << " passed selection requirements " << LogEnd;
     g_Log << LogInfo << "Efficiency: " << 100.0*acp_events/gen_events << "%" << LogEnd;
     end = gSystem->Now();
-    g_Log << LogInfo << "Time to Generate " << Ngen*NSV << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
-    g_Log << LogInfo << "Processing " << Ngen*NSV << " Events" << LogEnd;
+    g_Log << LogInfo << "Time to Generate " << Ngen*Ndisplacement << " Events: " << (end-start)/1000.0 << " seconds" << LogEnd;
+    g_Log << LogInfo << "Processing " << Ngen*Ndisplacement << " Events" << LogEnd;
     histPlot->Draw(false);
     
     TFile fout(output_name.c_str(),"RECREATE");
@@ -303,5 +300,5 @@ void SVz_ZZ_to_4l(std::string output_name =
   histPlot->WriteHist(output_name);
   treePlot->WriteOutput(output_name);
   g_Log << LogInfo << "Finished" << LogEnd;
-  g_Log << LogInfo << "Time to Process " << Ngen*NSV << " Events: " << (Long64_t(gSystem->Now())-end)/1000.0 << " seconds" << LogEnd;
+  g_Log << LogInfo << "Time to Process " << Ngen*Ndisplacement << " Events: " << (Long64_t(gSystem->Now())-end)/1000.0 << " seconds" << LogEnd;
 }
